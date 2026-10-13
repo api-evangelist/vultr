@@ -1,5 +1,5 @@
 generated: '2026-10-13'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/vultr/integrations
 - https://n8n.io/integrations/vultr/
@@ -12,5 +12,21 @@ checked:
 - https://zapier.com/apps/vultr/integrations
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: Amazon Web Services
+  partner: amazon-web-services
+  partner_match: shape-anchor
+  channel: provider-built
+  relationship: compatible
+  direction: provider-built
+  shape: aws-s3
+  type: contract
+  degree: declared-unqualified
+  evidence: https://github.com/api-evangelist/vultr/blob/main/openapi/vultr-openapi.yml#L222
+  evidence_kind: own-contract
+  quote: '[Object Storage](https://www.vultr.com/docs/vultr-object-storage/) is S3 API compatible. Objects uploaded
+    to object storage can be accessed privately or publicly on the web. Object storage supports a virtually unlimited
+    number of objects. C'
+  detected_by: sweep-shape-compat.py
+  first_seen: '2026-10-13'
 templates: []
