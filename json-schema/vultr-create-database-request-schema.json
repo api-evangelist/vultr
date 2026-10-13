@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-create-database-request-schema.json",
+  "title": "create_database_request",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-openapi.yml#/components/schemas/create_database_request",
+  "properties": {
+    "database_engine": {
+      "description": "The database engine type for the Managed Database.\n* `mysql`\n* `pg`\n* `ferretpg`\n* `redis`",
+      "type": "string"
+    },
+    "database_engine_version": {
+      "description": "The version of the chosen database engine type for the Managed Database.\n* MySQL: `8`\n* PostgreSQL: `12` - `15`\n* FerretDB + PostgreSQL: `12` - `15`\n* Redis: `7`",
+      "type": "string"
+    },
+    "region": {
+      "description": "The [Region id](#operation/list-regions) where the Managed Database is located.",
+      "type": "string"
+    },
+    "plan": {
+      "description": "The [Plan id](#operation/list-database-plans) to use when deploying this Managed Database.",
+      "type": "string"
+    },
+    "label": {
+      "description": "A user-supplied label for this Managed Database.",
+      "type": "string"
+    },
+    "tag": {
+      "description": "The user-supplied tag for this Managed Database.",
+      "type": "string"
+    },
+    "vpc_id": {
+      "description": "The [VPC id](#operation/list-vpcs) to use when deploying this Managed Database. It can also be set to `new` to configure a new VPC network with this deployment.",
+      "type": "string"
+    },
+    "maintenance_dow": {
+      "description": "The day of week for routine maintenance updates.\n* `monday`\n* `tuesday`\n* `wednesday`\n* `thursday`\n* `friday`\n* `saturday`\n* `sunday`",
+      "type": "string"
+    },
+    "maintenance_time": {
+      "description": "The preferred time (UTC) for routine maintenance updates to occur in 24-hour HH:00 format (e.g. `01:00`, `13:00`, `23:00`, etc.).",
+      "type": "string"
+    },
+    "trusted_ips": {
+      "description": "A list of IP addresses allowed to access the Managed Database in CIDR notation (defaults to /32 if excluded).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "mysql_sql_modes": {
+      "description": "A list of SQL modes to enable on the Managed Database (MySQL engine type only).\n* `ALLOW_INVALID_DATES`\n* `ANSI` (Combination Mode)\n* `ANSI_QUOTES`\n* `ERROR_FOR_DIVISION_BY_ZERO`\n* `HIGH_NOT_PRECEDENCE`\n* `IGNORE_SPACE`\n* `NO_AUTO_VALUE_ON_ZERO`\n* `NO_DIR_IN_CREATE`\n* `NO_ENGINE_SUBSTITUTION`\n* `NO_UNSIGNED_SUBTRACTION`\n* `NO_ZERO_DATE`\n* `NO_ZERO_IN_DATE`\n* `ONLY_FULL_GROUP_BY`\n* `PIPES_AS_CONCAT`\n* `REAL_AS_FLOAT`\n* `STRICT_ALL_TABLES`\n* `STRICT_TRANS_TABLES`\n* `TIME_TRUNCATE_FRACTIONAL`\n* `TRADITIONAL` (Combination Mode)",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "mysql_require_primary_key": {
+      "description": "Require a primary key for all tables on the Managed Database (MySQL engine type only).",
+      "type": "boolean"
+    },
+    "mysql_slow_query_log": {
+      "description": "Enable or disable slow query logging on the Managed Database (MySQL engine type only).",
+      "type": "boolean"
+    },
+    "mysql_long_query_time": {
+      "description": "The number of seconds to denote a slow query when logging is enabled (MySQL engine type only).",
+      "type": "integer"
+    },
+    "redis_eviction_policy": {
+      "description": "Set the data eviction policy for the Managed Database (Redis engine type only)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "database_engine",
+    "database_engine_version",
+    "label",
+    "plan",
+    "region"
+  ],
+  "type": "object"
+}

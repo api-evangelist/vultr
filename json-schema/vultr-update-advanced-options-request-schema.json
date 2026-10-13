@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-update-advanced-options-request-schema.json",
+  "title": "update_advanced_options_request",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-openapi.yml#/components/schemas/update_advanced_options_request",
+  "properties": {
+    "autovacuum_analyze_scale_factor": {
+      "description": "Accepted values: 0 - 1",
+      "type": "float"
+    },
+    "autovacuum_analyze_threshold": {
+      "description": "Accepted values: 0 - 2147483647",
+      "type": "int"
+    },
+    "autovacuum_freeze_max_age": {
+      "description": "Accepted values: 200000000 - 1500000000",
+      "type": "int"
+    },
+    "autovacuum_max_workers": {
+      "description": "Accepted values: 1 - 20",
+      "type": "int"
+    },
+    "autovacuum_naptime": {
+      "description": "Accepted values: 1 - 86400",
+      "type": "int"
+    },
+    "autovacuum_vacuum_cost_delay": {
+      "description": "Accepted values: -1 - 100",
+      "type": "int"
+    },
+    "autovacuum_vacuum_cost_limit": {
+      "description": "Accepted values: -1 - 10000",
+      "type": "int"
+    },
+    "autovacuum_vacuum_scale_factor": {
+      "description": "Accepted values: 0 - 1",
+      "type": "float"
+    },
+    "autovacuum_vacuum_threshold": {
+      "description": "Accepted values: 0 - 2147483647",
+      "type": "int"
+    },
+    "bgwriter_delay": {
+      "description": "Accepted values: 10 - 10000",
+      "type": "int"
+    },
+    "bgwriter_flush_after": {
+      "description": "Accepted values: 0 - 2048",
+      "type": "int"
+    },
+    "bgwriter_lru_maxpages": {
+      "description": "Accepted values: 0 - 1073741823",
+      "type": "int"
+    },
+    "bgwriter_lru_multiplier": {
+      "description": "Accepted values: 0 - 10",
+      "type": "float"
+    },
+    "deadlock_timeout": {
+      "description": "Accepted values: 500 - 1800000",
+      "type": "int"
+    },
+    "default_toast_compression": {
+      "description": "Accepted values:\n* `lz4`\n* `pglz`",
+      "type": "enum"
+    },
+    "idle_in_transaction_session_timeout": {
+      "description": "Accepted values: 0 - 604800000",
+      "type": "int"
+    },
+    "jit": {
+      "description": "Accepted values:\n* `true`\n* `false`",
+      "type": "boolean"
+    },
+    "log_autovacuum_min_duration": {
+      "description": "Accepted values: -1 - 2147483647",
+      "type": "int"
+    },
+    "log_error_verbosity": {
+      "description": "Accepted values:\n* `TERSE`\n* `DEFAULT`\n* `VERBOSE`",
+      "type": "enum"
+    },
+    "log_line_prefix": {
+      "description": "Accepted values:\n* `'pid=%p,user=%u,db=%d,app=%a,client=%h '`\n* `'%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '`\n* `'%m [%p] %q[user=%u,db=%d,app=%a] '`",
+      "type": "enum"
+    },
+    "log_min_duration_statement": {
+      "description": "Accepted values: -1 - 86400000",
+      "type": "int"
+    },
+    "max_files_per_process": {
+      "description": "Accepted values: 1000 - 4096",
+      "type": "int"
+    },
+    "max_locks_per_transaction": {
+      "description": "Accepted values: 64 - 6400",
+      "type": "int"
+    },
+    "max_logical_replication_workers": {
+      "description": "Accepted values: 4 - 64",
+      "type": "int"
+    },
+    "max_parallel_workers": {
+      "description": "Accepted values: 0 - 96",
+      "type": "int"
+    },
+    "max_parallel_workers_per_gather": {
+      "description": "Accepted values: 0 - 96",
+      "type": "int"
+    },
+    "max_pred_locks_per_transaction": {
+      "description": "Accepted values: 64 - 5120",
+      "type": "int"
+    },
+    "max_prepared_transactions": {
+      "description": "Accepted values: 0 - 10000",
+      "type": "int"
+    },
+    "max_replication_slots": {
+      "description": "Accepted values: 8 - 64",
+      "type": "int"
+    },
+    "max_stack_depth": {
+      "description": "Accepted values: 2097152 - 6291456",
+      "type": "int"
+    },
+    "max_standby_archive_delay": {
+      "description": "Accepted values: 1 - 43200000",
+      "type": "int"
+    },
+    "max_standby_streaming_delay": {
+      "description": "Accepted values: 1 - 43200000",
+      "type": "int"
+    },
+    "max_wal_senders": {
+      "description": "Accepted values: 20 - 64",
+      "type": "int"
+    },
+    "max_worker_processes": {
+      "description": "Accepted values: 8 - 96",
+      "type": "int"
+    },
+    "pg_partman_bgw.interval": {
+      "description": "Accepted values: 3600 - 604800",
+      "type": "int"
+    },
+    "pg_partman_bgw.role": {
+      "description": "Maximum length: 64 characters",
+      "type": "string"
+    },
+    "pg_stat_statements.track": {
+      "description": "Accepted values:\n* `all`\n* `top`\n* `none`",
+      "type": "enum"
+    },
+    "temp_file_limit": {
+      "description": "Accepted values: -1 - 2147483647",
+      "type": "int"
+    },
+    "track_activity_query_size": {
+      "description": "Accepted values: 1024 - 10240",
+      "type": "int"
+    },
+    "track_commit_timestamp": {
+      "description": "Accepted values:\n* `off`\n* `on`",
+      "type": "enum"
+    },
+    "track_functions": {
+      "description": "Accepted values:\n* `all`\n* `pl`\n* `none`",
+      "type": "enum"
+    },
+    "track_io_timing": {
+      "description": "Accepted values:\n* `off`\n* `on`",
+      "type": "enum"
+    },
+    "wal_sender_timeout": {
+      "description": "Accepted values: 0, 5000 - 10800000",
+      "type": "int"
+    },
+    "wal_writer_delay": {
+      "description": "Accepted values: 10 - 200",
+      "type": "int"
+    }
+  },
+  "type": "object"
+}

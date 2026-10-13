@@ -1,0 +1,4166 @@
+openapi: 3.0.0
+info:
+  title: Vultr IAM & SCIM Management API
+  version: 2.0.0
+  description: Complete Identity, Access Management, and SCIM provisioning endpoints for users, groups, roles, policies, and sessions.
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+
+servers:
+  - url: https://api.vultr.com
+
+tags:
+  - name: Organizations
+    description: Manage organizations
+  - name: Organization Membership Management
+    description: Manage users inside organizations (membership, roles, suspensions)
+  - name: Organization Invitations
+    description: Manage invitations for users to join organizations
+  - name: SCIM Settings
+    description: Manage SCIM enablement and tokens for organizations
+  - name: SCIM Users
+    description: SCIM 2.0 compliant endpoints for managing users
+  - name: SCIM Groups
+    description: SCIM 2.0 compliant endpoints for managing groups
+  - name: IAM Groups
+    description: Non-SCIM group management endpoints
+  - name: IAM Roles
+    description: Endpoints for managing IAM roles within an organization
+  - name: IAM Policies
+    description: Endpoints for managing IAM policies within an organization
+  - name: IAM Role-Policy Mappings
+    description: Manage the attachment and detachment of IAM policies to roles
+  - name: IAM Role-User Mappings
+    description: Manage role assignments to users
+  - name: IAM Role-Group Mappings
+    description: Manage role assignments to groups
+  - name: IAM Policy-User Mappings
+    description: Manage direct policy attachments to users
+  - name: IAM Policy-Group Mappings
+    description: Manage direct policy attachments to groups
+  - name: IAM Role Trusts
+    description: Manage trust relationships between roles
+  - name: IAM Assumed Roles
+    description: Manage temporary role assumptions
+  - name: IAM Endpoint Actions
+    description: View available IAM endpoint-to-action mappings
+  - name: User Resources
+    description: Endpoints for viewing user-specific IAM resources (groups, roles, policies)
+  - name: Logs
+    description: Endpoints for viewing logs and for managing an audit logs subscription
+
+paths:
+  # Organizations
+  /v2/organizations:
+    post:
+      tags: [Organizations]
+      summary: Create Organization
+      operationId: createOrganization
+      description: Create a new organization and initialize SCIM settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Name of the organization
+                  example: My Organization
+                type:
+                  type: string
+                  description: Type of organization
+                  example: Personal/Team
+      responses:
+        '201':
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    get:
+      tags: [Organizations]
+      summary: List Organizations
+      operationId: listOrganizations
+      description: List all organizations that belong to the authenticated user
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orgs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/organizations/{id}:
+    get:
+      tags: [Organizations]
+      summary: Get Organization
+      operationId: getOrganization
+      description: Retrieve a single organization by its UUID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Organizations]
+      summary: Update Organization
+      operationId: updateOrganization
+      description: Update an organization's name (Root role required)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: New name for the organization
+                  example: Updated Organization Name
+      responses:
+        '200':
+          description: Organization updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Organizations]
+      summary: Soft Delete Organization
+      operationId: softDeleteOrganization
+      description: Disable SCIM, expire invites, suspend users, and soft delete the organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Organization deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/restore:
+    patch:
+      tags: [Organizations]
+      summary: Restore Organization
+      operationId: restoreOrganization
+      description: Restore a previously soft-deleted organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Organization restored
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Organization Membership Management
+  /v2/organizations/{id}/user/{user_id}:
+    delete:
+      tags: [Organization Membership Management]
+      summary: Remove User from Organization
+      operationId: removeUserFromOrganization
+      description: Remove a user from the organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User removed from organization
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/user/{user_id}/suspend:
+    put:
+      tags: [Organization Membership Management]
+      summary: Suspend User in Organization
+      operationId: suspendUserInOrganization
+      description: Suspend a user within the organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User suspended
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/user/{user_id}/unsuspend:
+    put:
+      tags: [Organization Membership Management]
+      summary: Unsuspend User in Organization
+      operationId: unsuspendUserInOrganization
+      description: Unsuspend a previously suspended user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User unsuspended
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/suspended-users:
+    get:
+      tags: [Organization Membership Management]
+      summary: List Suspended Users
+      operationId: listSuspendedUsers
+      description: List all suspended users within an organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of suspended users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SuspendedUser'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # SCIM Settings
+  /v2/organizations/{id}/scim:
+    get:
+      tags: [SCIM Settings]
+      summary: Get SCIM Settings
+      operationId: getSCIMSettings
+      description: Retrieve SCIM settings for an organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: SCIM settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/scim/enable:
+    post:
+      tags: [SCIM Settings]
+      summary: Enable SCIM
+      operationId: enableSCIM
+      description: Enable SCIM for the organization and generate token
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_method:
+                  type: string
+                  enum: [uuid, jwt]
+                  default: uuid
+                  description: Authentication method for SCIM
+      responses:
+        '200':
+          description: SCIM enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/scim/disable:
+    post:
+      tags: [SCIM Settings]
+      summary: Disable SCIM
+      operationId: disableSCIM
+      description: Disable SCIM for the organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: SCIM disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/organizations/{id}/scim/token:
+    post:
+      tags: [SCIM Settings]
+      summary: Rotate SCIM Token
+      operationId: rotateSCIMToken
+      description: Generate a new SCIM authentication token
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: New token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Organization Invitations
+  /v2/invitation:
+    post:
+      tags: [Organization Invitations]
+      summary: Create Invitation
+      operationId: createInvitation
+      description: Invite a user to join an organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email_invited
+              properties:
+                email_invited:
+                  type: string
+                  format: email
+                  description: Email of the user to invite
+                permissions:
+                  type: object
+                  description: JSON object with roles and API permissions
+                  properties:
+                    roles:
+                      type: object
+                      additionalProperties:
+                        type: string
+                        enum: [yes, no]
+                    api_enabled:
+                      type: string
+                      enum: [yes, no]
+      responses:
+        '201':
+          description: Invitation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [Organization Invitations]
+      summary: List Invitations
+      operationId: listOrganizationInvites
+      description: List all organization invitations across all organizations
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of organization invitations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationInvitation'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/invitation/{id}:
+    get:
+      tags: [Organization Invitations]
+      summary: Get Invitation
+      operationId: getInvitation
+      description: Retrieve details of a specific invitation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invitation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/invitation/{id}/resend:
+    post:
+      tags: [Organization Invitations]
+      summary: Resend Invitation
+      operationId: resendInvitation
+      description: Resend an invitation email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invitation resent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # SCIM Users
+  /scim/v2/Users:
+    post:
+      tags: [SCIM Users]
+      summary: Create SCIM User
+      operationId: createSCIMUser
+      description: Create a new user via SCIM 2.0 protocol
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/SCIMUser'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMUser'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+
+    get:
+      tags: [SCIM Users]
+      summary: List SCIM Users
+      operationId: listSCIMUsers
+      description: List users via SCIM 2.0 protocol with filtering
+      parameters:
+        - name: filter
+          in: query
+          description: SCIM filter expression
+          schema:
+            type: string
+            example: userName eq "john.doe@example.com"
+        - name: startIndex
+          in: query
+          description: Starting index for pagination (1-indexed)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: count
+          in: query
+          description: Number of results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /scim/v2/Users/{id}:
+    get:
+      tags: [SCIM Users]
+      summary: Get SCIM User
+      operationId: getSCIMUser
+      description: Retrieve a specific user via SCIM 2.0 protocol
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+
+  # SCIM Groups
+  /scim/v2/Groups:
+    post:
+      tags: [SCIM Groups]
+      summary: Create SCIM Group
+      operationId: createSCIMGroup
+      description: Create a new group via SCIM 2.0 protocol
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMGroup'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+
+    get:
+      tags: [SCIM Groups]
+      summary: List SCIM Groups
+      operationId: listSCIMGroups
+      description: List groups via SCIM 2.0 protocol with filtering
+      parameters:
+        - name: filter
+          in: query
+          description: SCIM filter expression
+          schema:
+            type: string
+            example: displayName eq "Developers"
+        - name: startIndex
+          in: query
+          description: Starting index for pagination (1-indexed)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: count
+          in: query
+          description: Number of results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /scim/v2/Groups/{id}:
+    get:
+      tags: [SCIM Groups]
+      summary: Get SCIM Group
+      operationId: getSCIMGroup
+      description: Retrieve a specific group via SCIM 2.0 protocol
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+
+    put:
+      tags: [SCIM Groups]
+      summary: Replace SCIM Group
+      operationId: replaceSCIMGroup
+      description: Fully replace a group via SCIM 2.0 protocol
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMGroup'
+      responses:
+        '200':
+          description: Group replaced
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+
+    patch:
+      tags: [SCIM Groups]
+      summary: Patch SCIM Group
+      operationId: patchSCIMGroup
+      description: Partially update a group via SCIM 2.0 protocol
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMPatchOp'
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+
+    delete:
+      tags: [SCIM Groups]
+      summary: Delete SCIM Group
+      operationId: deleteSCIMGroup
+      description: Delete a group via SCIM 2.0 protocol
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Group deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+
+  # IAM Groups
+  /v2/groups:
+    post:
+      tags: [IAM Groups]
+      summary: Create Group
+      operationId: createGroup
+      description: Create a new IAM group within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - display_name
+              properties:
+                display_name:
+                  type: string
+                  description: Display name of the group
+                  example: DevelopersGroup
+                description:
+                  type: string
+                  description: Description of the group
+                  example: Group for all developers
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [IAM Groups]
+      summary: List Groups
+      operationId: listGroups
+      description: List all IAM groups within the organization
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/groups/{id}:
+    get:
+      tags: [IAM Groups]
+      summary: Get Group
+      operationId: getGroup
+      description: Retrieve a specific IAM group by ID
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  group:
+                    $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [IAM Groups]
+      summary: Update Group
+      operationId: updateGroup
+      description: Update an IAM group's attributes
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  description: Display name of the group
+                description:
+                  type: string
+                  description: Description of the group
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [IAM Groups]
+      summary: Delete Group
+      operationId: deleteGroup
+      description: Soft delete an IAM group
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Group deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/groups/{id}/members:
+    post:
+      tags: [IAM Groups]
+      summary: Add Member to Group
+      operationId: addGroupMember
+      description: Add a user to a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  description: User ID to add to the group
+                display_name:
+                  type: string
+                  description: Optional display name for the group member
+      responses:
+        '200':
+          description: Member added
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/groups/{id}/members/{user_id}:
+    delete:
+      tags: [IAM Groups]
+      summary: Remove Member from Group
+      operationId: removeGroupMember
+      description: Remove a user from a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Member removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/groups/{id}/policies:
+    get:
+      tags: [IAM Groups]
+      summary: List Policies for Group
+      operationId: listPoliciesForGroup
+      description: List all policies that are attached to this group
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List Policies for Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Group:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  policies:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        items:
+                         $ref: '#/components/schemas/GroupAttachedPolicy'
+                      from_roles:
+                        type: array
+                        items:
+                         $ref: '#/components/schemas/GroupAttachedPolicy'
+                      all:
+                        type: array
+                        items:
+                         $ref: '#/components/schemas/GroupAttachedPolicy'
+                  meta:
+                    $ref: '#/components/schemas/MetaWithoutPagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/groups/{id}/roles:
+    get:
+      tags: [IAM Groups]
+      summary: List Roles for Group
+      operationId: listRolesForGroup
+      description: List all roles that are attached to this group
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List Roles for Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Group:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  Roles:
+                    type: array
+                    items:
+                       $ref: '#/components/schemas/GroupAttachedRole'
+                  meta:
+                    $ref: '#/components/schemas/MetaWithoutPagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Roles
+  /v2/roles:
+    post:
+      tags: [IAM Roles]
+      summary: Create Role
+      operationId: createRole
+      description: Create a new IAM role within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Name of the role
+                  example: ReadOnlyRole
+                description:
+                  type: string
+                  description: Description of the role
+                  example: Role with read-only access to resources
+                role_type:
+                  type: string
+                  enum:
+                    - assumable
+                    - assignable
+                  description: Type of role - assumable (can be temporarily assumed) or assignable (directly assigned to users/groups)
+                  default: assumable
+                  example: assumable
+                max_session_duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  default: 3600
+                  description: Maximum session duration in seconds (15 min to 12 hours)
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [IAM Roles]
+      summary: List Roles
+      operationId: listRoles
+      description: List all IAM roles within the organization
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Role'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/roles/{id}:
+    get:
+      tags: [IAM Roles]
+      summary: Get Role
+      operationId: getRole
+      description: Retrieve a specific IAM role by ID
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [IAM Roles]
+      summary: Update Role
+      operationId: updateRole
+      description: Update an IAM role's attributes
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the role
+                description:
+                  type: string
+                  description: Description of the role
+                role_type:
+                  type: string
+                  enum:
+                    - assumable
+                    - assignable
+                  description: Type of role
+                max_session_duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  description: Maximum session duration in seconds
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [IAM Roles]
+      summary: Delete Role
+      operationId: deleteRole
+      description: Soft delete an IAM role
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Role deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/roles/{id}/restore:
+    patch:
+      tags: [IAM Roles]
+      summary: Restore Role
+      operationId: restoreRole
+      description: Restore a previously soft-deleted IAM role
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Role-Policy Mappings
+  /v2/roles/{id}/policies:
+    post:
+      tags: [IAM Role-Policy Mappings]
+      summary: Attach Policy to Role
+      operationId: attachPolicyToRole
+      description: Attach an IAM policy to a role
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - policy_id
+              properties:
+                policy_id:
+                  type: string
+                  format: uuid
+                  description: Policy ID to attach
+      responses:
+        '200':
+          description: Policy attached
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [IAM Role-Policy Mappings]
+      summary: List Role Policies
+      operationId: listRolePolicies
+      description: List all policies attached to a role
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of attached policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Policy'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/roles/{id}/policies/{policy-id}:
+    delete:
+      tags: [IAM Role-Policy Mappings]
+      summary: Detach Policy from Role
+      operationId: detachPolicyFromRole
+      description: Detach an IAM policy from a role
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: policy-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Policy detached
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Role-User Mappings
+  /v2/roles/{id}/users:
+    get:
+      tags: [IAM Role-User Mappings]
+      summary: List Users with Role
+      operationId: listUsersWithRole
+      description: List all users that have this role assigned
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of users with this role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleAssignment'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/roles/{id}/users/{user-id}:
+    post:
+      tags: [IAM Role-User Mappings]
+      summary: Attach Role to User
+      operationId: attachRoleToUser
+      description: Assign this role to a user
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: user-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Role attached to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [IAM Role-User Mappings]
+      summary: Detach Role from User
+      operationId: detachRoleFromUser
+      description: Remove this role from a user
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: user-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Role detached from user
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Role-Group Mappings
+  /v2/roles/{id}/groups:
+    get:
+      tags: [IAM Role-Group Mappings]
+      summary: List Groups with Role
+      operationId: listGroupsWithRole
+      description: List all groups that have this role assigned
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of groups with this role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupRoleAssignment'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/roles/{id}/groups/{group-id}:
+    post:
+      tags: [IAM Role-Group Mappings]
+      summary: Attach Role to Group
+      operationId: attachRoleToGroup
+      description: Assign this role to a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: group-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Role attached to group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRoleAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [IAM Role-Group Mappings]
+      summary: Detach Role from Group
+      operationId: detachRoleFromGroup
+      description: Remove this role from a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: group-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Role detached from group
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Policies
+  /v2/policies:
+    post:
+      tags: [IAM Policies]
+      summary: Create Policy
+      operationId: createPolicy
+      description: Create a new IAM policy within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - policy_document
+              properties:
+                name:
+                  type: string
+                  description: Name of the policy
+                  example: ReadOnlyPolicy
+                description:
+                  type: string
+                  description: Description of the policy
+                  example: Policy that allows read-only access to resources
+                policy_document:
+                  type: object
+                  description: IAM policy document in JSON format
+                  example:
+                    Version: "2012-10-17"
+                    Statement:
+                      - Effect: Allow
+                        Action:
+                          - compute.instance.Create
+                          - compute.instance.Read
+                          - compute.instance.Update
+                          - compute.instance.Delete
+                          - compute.backup.List
+                          - compute.backup.Read
+                        Resource: "*"
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [IAM Policies]
+      summary: List Policies
+      operationId: listPolicies
+      description: List all IAM policies within the organization
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Policy'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/policies/{id}:
+    get:
+      tags: [IAM Policies]
+      summary: Get Policy
+      operationId: getPolicy
+      description: Retrieve a specific IAM policy by ID
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    $ref: '#/components/schemas/Policy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [IAM Policies]
+      summary: Update Policy
+      operationId: updatePolicy
+      description: Update an IAM policy
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the policy
+                description:
+                  type: string
+                  description: Description of the policy
+                policy_document:
+                  type: object
+                  description: IAM policy document in JSON format
+                  example:
+                    Version: "2012-10-17"
+                    Statement:
+                      - Effect: Allow
+                        Action:
+                          - kubernetes.cluster.Create
+                          - kubernetes.cluster.Read
+                          - kubernetes.cluster.Update
+                          - kubernetes.cluster.Delete
+                        Resource: "*"
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [IAM Policies]
+      summary: Delete Policy
+      operationId: deletePolicy
+      description: Soft delete an IAM policy
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Policy deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/policies/{id}/restore:
+    patch:
+      tags: [IAM Policies]
+      summary: Restore Policy
+      operationId: restorePolicy
+      description: Restore a previously soft-deleted IAM policy
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Policy restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Policy-User Mappings
+  /v2/policies/{id}/users:
+    get:
+      tags: [IAM Policy-User Mappings]
+      summary: List Users with Policy
+      operationId: listUsersWithPolicy
+      description: List all users that have this policy directly attached
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of users with this policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        email:
+                          type: string
+                          format: email
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        assigned_date:
+                          type: string
+                          format: date-time
+                        assignment_type:
+                          type: string
+                          enum: [direct, inherited]
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/policies/{id}/users/{user-id}:
+    post:
+      tags: [IAM Policy-User Mappings]
+      summary: Attach Policy to User
+      operationId: attachPolicyToUser
+      description: Attach this policy directly to a user
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: user-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Policy attached to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPolicyAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [IAM Policy-User Mappings]
+      summary: Detach Policy from User
+      operationId: detachPolicyFromUser
+      description: Remove this policy from a user
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: user-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Policy detached from user
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Policy-Group Mappings
+  /v2/policies/{id}/groups:
+    get:
+      tags: [IAM Policy-Group Mappings]
+      summary: List Groups with Policy
+      operationId: listGroupsWithPolicy
+      description: List all groups that have this policy attached
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of groups with this policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  groups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        assigned_date:
+                          type: string
+                          format: date-time
+                        member_count:
+                          type: string
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/policies/{id}/groups/{group-id}:
+    post:
+      tags: [IAM Policy-Group Mappings]
+      summary: Attach Policy to Group
+      operationId: attachPolicyToGroup
+      description: Attach this policy to a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: group-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Policy attached to group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupPolicyAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [IAM Policy-Group Mappings]
+      summary: Detach Policy from Group
+      operationId: detachPolicyFromGroup
+      description: Remove this policy from a group
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: group-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Policy detached from group
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # IAM Role Trusts
+  /v2/role-trusts:
+    post:
+      tags: [IAM Role Trusts]
+      summary: Create Role Trust
+      operationId: createRoleTrust
+      description: Create a trust relationship allowing users/groups to assume a role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role_id
+              properties:
+                role_id:
+                  type: string
+                  format: uuid
+                  description: Role that can be assumed
+                trusted_user_id:
+                  type: string
+                  format: uuid
+                  description: User ID that can assume the role (provide either this or trusted_group_id)
+                trusted_group_id:
+                  type: string
+                  format: uuid
+                  description: Group ID that can assume the role (provide either this or trusted_user_id)
+                trust_type:
+                  type: string
+                  enum: [TemporaryAssumption]
+                  default: TemporaryAssumption
+                  description: Type of trust relationship
+                conditions:
+                  type: object
+                  description: Optional conditions for trust (e.g., time_of_day, ip_address)
+                  example:
+                    time_of_day:
+                      start: 10
+                      end: 17
+                    ip_address:
+                      - "10.0.0.0/8"
+                      - "192.168.1.0/24"
+                valid_until:
+                  type: string
+                  format: date-time
+                  description: Optional expiration date for the trust relationship
+                  example: "2025-12-31T23:59:59Z"
+      responses:
+        '201':
+          description: Trust created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleTrust'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [IAM Role Trusts]
+      summary: List Role Trusts
+      operationId: listRoleTrusts
+      description: List all role trust relationships
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of role trusts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trusts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/role-trusts/{id}:
+    get:
+      tags: [IAM Role Trusts]
+      summary: Get Role Trust
+      operationId: getRoleTrust
+      description: Retrieve a specific role trust relationship
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role trust details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trust:
+                    $ref: '#/components/schemas/RoleTrust'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [IAM Role Trusts]
+      summary: Update Role Trust
+      operationId: updateRoleTrust
+      description: Update a role trust relationship
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trust_type:
+                  type: string
+                  enum: [TemporaryAssumption]
+                  description: Type of trust relationship
+                conditions:
+                  type: object
+                  description: Updated conditions for trust (e.g., time_of_day, ip_address)
+                  example:
+                    time_of_day:
+                      start: 9
+                      end: 17
+                    ip_address:
+                      - "10.0.0.0/8"
+                      - "192.168.1.0/24"
+                valid_until:
+                  type: string
+                  format: date-time
+                  description: When this trust relationship should expire
+                  example: "2025-12-31T23:59:59Z"
+      responses:
+        '200':
+          description: Trust updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleTrust'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [IAM Role Trusts]
+      summary: Delete Role Trust
+      operationId: deleteRoleTrust
+      description: Remove a role trust relationship
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Trust deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/role-trusts/{id}/restore:
+    patch:
+      tags: [IAM Role Trusts]
+      summary: Restore Role Trust
+      operationId: restoreRoleTrust
+      description: Restore a previously deleted role trust
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Trust restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trust:
+                    $ref: '#/components/schemas/RoleTrust'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/role-trusts/by-role/{role_id}:
+    get:
+      tags: [IAM Role Trusts]
+      summary: List Trusts for Role
+      operationId: listTrustsForRole
+      description: List all trust relationships for a specific role
+      parameters:
+        - name: role_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of trusts for the role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trusts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/role-trusts/assumable/{user_id}:
+    get:
+      tags: [IAM Role Trusts]
+      summary: List Assumable Roles for User
+      operationId: listAssumableRolesForUser
+      description: List all roles that a user can assume
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of assumable roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assumable_roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # IAM Assumed Roles
+  /v2/assumed-roles/assume:
+    post:
+      tags: [IAM Assumed Roles]
+      summary: Assume Role
+      operationId: assumeRole
+      description: Assume a role and receive temporary credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - role_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User ID that wants to assume the role
+                role_id:
+                  type: string
+                  format: uuid
+                  description: Role to assume
+                session_name:
+                  type: string
+                  description: Name for the session
+                  example: ViewAllInstances
+                duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  default: 3600
+                  description: Session duration in seconds
+                context:
+                  type: object
+                  description: Additional context for the session
+                  properties:
+                    ip_address:
+                      type: string
+                      description: IP address for the session
+                      example: "192.168.1.1"
+      responses:
+        '201':
+          description: Role assumed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_token:
+                    type: string
+                    description: Token to use for authenticated requests
+                    example: "ars-8352ff31bc30e7a9fcf9492ca79974b1670b5aa686bbdec7db56b9cb09b3ee43"
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: ID of the user who assumed the role
+                  role_id:
+                    type: string
+                    format: uuid
+                    description: ID of the role that was assumed
+                  session_name:
+                    type: string
+                    description: Name of the session
+                  auth_method:
+                    type: string
+                    description: Authentication method used
+                    example: api_key
+                  expires_at:
+                    type: string
+                    format: date-time
+                    description: When the session expires
+                  assumed_at:
+                    type: string
+                    format: date-time
+                    description: When the role was assumed
+                  remaining_duration:
+                    type: integer
+                    description: Remaining seconds until expiration
+                  conditions_met:
+                    type: array
+                    items:
+                      type: string
+                    description: Which conditions were met
+                  source_ip:
+                    type: string
+                    description: IP address of the request
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Access denied - cannot assume this role
+
+  /v2/assumed-roles/{session_token}:
+    get:
+      tags: [IAM Assumed Roles]
+      summary: Get Assumed Role Session
+      operationId: getAssumedRoleSession
+      description: Get details about an assumed role session
+      parameters:
+        - name: session_token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssumedRoleSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [IAM Assumed Roles]
+      summary: Revoke Assumed Role Session
+      operationId: revokeAssumedRoleSession
+      description: Revoke an active assumed role session
+      parameters:
+        - name: session_token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/assumed-roles/users/{user_id}/sessions:
+    get:
+      tags: [IAM Assumed Roles]
+      summary: List User Sessions
+      operationId: listUserSessions
+      description: List all active assumed role sessions for a user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of active sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssumedRoleSession'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # IAM Endpoint Actions
+  /v2/endpoint-action-maps:
+    get:
+      tags: [IAM Endpoint Actions]
+      summary: List Endpoint Action Maps
+      operationId: listEndpointActionMaps
+      description: List all endpoint-to-action mappings for policy creation
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of endpoint action mappings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_action_maps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EndpointActionMap'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/endpoint-action-maps/available-actions:
+    get:
+      tags: [IAM Endpoint Actions]
+      summary: List Available Actions
+      operationId: listAvailableActions
+      description: List all available IAM actions that can be used in policies
+      responses:
+        '200':
+          description: List of available actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: object
+                    description: Actions grouped by resource type
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          action:
+                            type: string
+                            example: compute.instance.Create
+                            description: The IAM action
+                          description:
+                            type: string
+                            example: Create new instance
+                            description: Description of what this action does
+                    example:
+                      instance:
+                        - action: compute.instance.Create
+                          description: Create new instance
+                        - action: compute.instance.Delete
+                          description: Delete instance
+                      backup:
+                        - action: compute.backup.List
+                          description: List all backups
+                        - action: compute.backup.Read
+                          description: Get backup details
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Total number of resource types
+                        example: 24
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/endpoint-action-maps/{id}:
+    get:
+      tags: [IAM Endpoint Actions]
+      summary: Get Endpoint Action Map
+      operationId: getEndpointActionMap
+      description: Retrieve a specific endpoint action mapping
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Endpoint action map details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_action_map:
+                    $ref: '#/components/schemas/EndpointActionMap'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # User-specific IAM Resources
+  /v2/users/me/groups:
+    get:
+      tags: [User Resources]
+      summary: List My Groups
+      operationId: listMyGroups
+      description: List all groups that the authenticated user belongs to
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the authenticated user
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/users/me/roles:
+    get:
+      tags: [User Resources]
+      summary: List My Roles
+      operationId: listMyRoles
+      description: List all roles assigned to the authenticated user (both direct and via groups)
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the authenticated user
+                  roles:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        description: Roles directly assigned to the user
+                        items:
+                          $ref: '#/components/schemas/Role'
+                      inherited:
+                        type: array
+                        description: Roles inherited from group memberships
+                        items:
+                          $ref: '#/components/schemas/Role'
+                      all:
+                        type: array
+                        description: All roles (direct + inherited)
+                        items:
+                          $ref: '#/components/schemas/Role'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/users/me/policies:
+    get:
+      tags: [User Resources]
+      summary: List My Policies
+      operationId: listMyPolicies
+      description: List all policies attached to the authenticated user (both direct and via roles/groups)
+      parameters:
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the authenticated user
+                  policies:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        description: Policies directly attached to the user
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      inherited:
+                        type: array
+                        description: Policies inherited from group memberships
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      from_roles:
+                        type: array
+                        description: Policies attached via roles
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      all:
+                        type: array
+                        description: All policies (direct + inherited + from_roles)
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /v2/users/{user-id}/groups:
+    get:
+      tags: [User Resources]
+      summary: List User Groups
+      operationId: listUserGroups
+      description: List all groups that a specific user belongs to
+      parameters:
+        - name: user-id
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the user
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/users/{user-id}/roles:
+    get:
+      tags: [User Resources]
+      summary: List User Roles
+      operationId: listUserRoles
+      description: List all roles assigned to a specific user (both direct and via groups)
+      parameters:
+        - name: user-id
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the user
+                  roles:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        description: Roles directly assigned to the user
+                        items:
+                          $ref: '#/components/schemas/Role'
+                      inherited:
+                        type: array
+                        description: Roles inherited from group memberships
+                        items:
+                          $ref: '#/components/schemas/Role'
+                      all:
+                        type: array
+                        description: All roles (direct + inherited)
+                        items:
+                          $ref: '#/components/schemas/Role'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/users/{user-id}/policies:
+    get:
+      tags: [User Resources]
+      summary: List User Policies
+      operationId: listUserPolicies
+      description: List all policies attached to a specific user (both direct and via roles/groups)
+      parameters:
+        - name: user-id
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/per_page'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of user's policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: UUID of the user
+                  policies:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        description: Policies directly attached to the user
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      inherited:
+                        type: array
+                        description: Policies inherited from group memberships
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      from_roles:
+                        type: array
+                        description: Policies attached via roles
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                      all:
+                        type: array
+                        description: All policies (direct + inherited + from_roles)
+                        items:
+                          $ref: '#/components/schemas/Policy'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  
+  # Customer Audit Logs
+  /v2/logs/:
+    get:
+      tags: [Logs]
+      summary: List logs
+      operationId: ListLogs
+      description: Get a list of logs for a specific time period in the last 30 days.
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: start_time
+          description: |
+            A UTC timestamp for the start of the time period from which to return logs. `start_time` is an inclusive endpoint. Logs with a timestamp equal to, or after `start_time` are included in the response<br>
+            <span style="color: red">This field is required if the end_time field is not provided.</span></br>
+            **Expected Format:** yyyy-mm-ddThh:mm:ssZ<br>
+            **EX:** `2025-06-26T00:00:00Z`<br>
+            *start_time must be after to the date added for start_time*<br>
+            *start_time and end_time may not be more than 30 days and 1 hour apart*<br>
+            *If no start_time is provided a time 30 days and 1 hour prior to the end_time will be used by default*
+        - schema:
+            type: string
+          in: query
+          name: end_time
+          description: |-
+            A UTC timestamp for the end of the time period from which to return logs. `end_time` is an exclusive endpoint.  Only logs with a timestamp before the `end_time` are included in the response. <br>
+            <span style="color: red">This field is required if the start_time field is not provided.</span></br>
+            **Expected Format:** yyyy-mm-ddThh:mm:ssZ<br>
+            **EX:** `2025-06-26T00:00:00Z`<br>
+            *end_time must be before the date added for start_time*<br>
+            *start_time and end_time may not be more than 30 days and 1 hour apart*<br>
+            *If no end_time is provided the current time will be used  by default*
+        - schema:
+            type: string
+          in: query
+          name: log_level
+          description: |-
+            Filter the logs by the level assigned to the log.
+            * `info`
+            * `debug`
+            * `warning`
+            * `error`
+            * `critical`
+        - schema:
+            type: string
+          in: query
+          name: resource_type
+          description: |
+            Filter the logs by the type of a resource such as an instances, bare-metals, kubernetes, etc.<br>
+            *resource_type must be an exact match to the value of the resource type set in the log.*
+        - schema:
+            type: string
+          in: query
+          name: resource_id
+          description: Filter the logs by the UUID of a specific resource such as an instance.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    description: Maximum of 5,000 log records returned per request
+                    items:
+                      $ref: '#/components/schemas/log'
+                  meta:
+                    $ref: '#/components/schemas/log-meta'
+              examples:
+                response:
+                  value:
+                    logs:
+                      - resource_id: xb671a46-66ed-4dfb-b839-543f2c6c0b63
+                        resource_type: instances
+                        log_level: debug
+                        message: Success
+                        timestamp: "2025-06-26T16:45:06+00:00"
+                        metadata: {}
+                    meta:
+                      next_page_url: "https://api.vultr.com/v2/logs?end_time=2025-09-18T10:21:20Z&start_time=2025-09-18T00:00:00Z&resource_type=kubernetes"
+                      continue_time: "2025-06-26T12:24:03Z"
+                      returned_count: 5000
+                      unreturned_count: 3524
+                      total_count: 8524
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/logs/audit-logs:
+    post:
+      tags: [Logs]
+      summary: Create audit logs subscription
+      operationId: CreateAuditLogs
+      description: Create a subscription for audit logging to hold logs in object storage for 400 days.  An account may only have one audit logs subscription.  Once the subscription is created and the object storage is activated logs are transfered in 15 minute intervals.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cluster_id
+                - label
+                - expiration_days
+              properties:
+                cluster_id:
+                  type: integer
+                  description: Used to select the cluster on which to host the object storage in which the logs will be stored.  Use the [Get All Clusters](https://www.vultr.com/api/#tag/s3/operation/list-object-storage-clusters) endpoint for available cluster_id values.
+                  example: 2
+                label:
+                  type: string
+                  description: A label to identify the subscription.
+                  example: my_audit_logs
+                expiration_days:
+                  type: integer
+                  description: The number of days to store log files for.  After a log file is upload it can not be deleted until the number of days set for expiration_days has elapsed.  Once that time has elapsed the file will be deleted automaticaly.
+                  example: 400
+      responses:
+        '201':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags: [Logs]
+      summary: List audit logs subscriptions
+      operationId: ListAuditLogs
+      description: List existing audit logs subscriptions.
+      responses:
+        '200':
+          description: List of audit logs subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v2/logs/audit-logs/{id}:
+    get:
+      tags: [Logs]
+      summary: Get audit logs subscription
+      operationId: GetExtendedLog
+      description: View information for a specific audit logs subscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Extended log subscription UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Logs]
+      summary: Update audit logs subscription
+      operationId: UpdateExtendedLog
+      description: Update information for a specific audit logs subscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Extended log subscription UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: A label to identify the subscription.
+                  example: my_audit_logs
+                expiration_days:
+                  type: integer
+                  description: The number of days for log files to be stored.  After a log file is upload it can not be deleted until the number of days set for expiration_days has elapsed.  Once that time has elapsed the file will be deleted automaticaly.
+                  example: 400
+      responses:
+        '200':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v2/logs/audit-logs/clusters:
+    get:
+      tags: [Logs]
+      summary: List audit logs Clusters
+      operationId: ListAuditLogsClusters
+      description: List Clusters available for audit logs.
+      responses:
+        '200':
+          description: List of audit logs clusters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExtendedLogCluster'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+
+  schemas:
+    # Organization Schemas
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Organization UUID
+        name:
+          type: string
+          description: Organization name
+        type:
+          type: string
+          description: Organization type
+          enum: ['Personal/Team', 'Business/Enterprise']
+          default: 'Personal/Team'
+        date_created:
+          type: string
+          format: date-time
+
+    OrganizationSCIM:
+      type: object
+      properties:
+        scim_enabled:
+          type: boolean
+          description: Whether SCIM is enabled
+        auth_method:
+          type: string
+          enum: [uuid, jwt]
+          description: Authentication method for SCIM
+        scim_token:
+          type: string
+          description: SCIM authentication token (only shown when auth_method is uuid)
+        date_added:
+          type: string
+          format: date-time
+        date_updated:
+          type: string
+          format: date-time
+
+    # Invitation Schemas
+    OrganizationInvitation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        inviter_name:
+          type: string
+        inviter_email:
+          type: string
+          format: email
+        email_invited:
+          type: string
+          format: email
+        email_registered:
+          type: string
+          format: email
+        permissions:
+          type: object
+          properties:
+            roles:
+              type: object
+              additionalProperties:
+                type: string
+                enum: [yes, no]
+            api_enabled:
+              type: string
+              enum: [yes, no]
+        org_id:
+          type: string
+          format: uuid
+        org_name:
+          type: string
+        status:
+          type: string
+        status_full:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        date_responded:
+          type: string
+          format: date-time
+          nullable: true
+        expiration_date:
+          type: string
+          format: date-time
+        invite_status:
+          type: string
+
+    SuspendedUser:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        date_suspended:
+          type: string
+          format: date-time
+
+    # Group Schemas
+    Group:
+      type: object
+      required:
+        - id
+        - display_name
+        - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          description: Display name of the group
+        description:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        members:
+          type: array
+          items:
+            type: object
+          description: Group members (only included when not empty - typically not present in create response)
+
+    # Role Schemas
+    Role:
+      type: object
+      required:
+        - id
+        - name
+        - role_type
+        - max_session_duration
+        - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        role_type:
+          type: string
+          enum:
+            - assumable
+            - assignable
+          description: Type of role
+          example: assumable
+        max_session_duration:
+          type: integer
+          minimum: 900
+          maximum: 43200
+          default: 3600
+        date_created:
+          type: string
+          format: date-time
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+          description: Attached policies (only included when policies are attached)
+    
+    GroupAttachedRole:
+      type: object
+      required:
+        - id
+        - name
+        - role_type
+        - max_session_duration
+        - date_assigned
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        role_type:
+          type: string
+          enum:
+            - assumable
+            - assignable
+          description: Type of role
+          example: assumable
+        date_assigned:
+          type: string
+          format: date-time
+
+    # Policy Schemas
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        version:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        is_system_policy:
+          type: boolean
+          description: Whether this is a system-managed policy
+
+    GroupAttachedPolicy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        from_role:
+          type: string
+        source:
+          type: string
+        date_assigned:
+          type: string
+          format: date-time
+
+    # Role Assignment Schemas
+    RoleAssignment:
+      type: object
+      required:
+        - user_id
+        - role_id
+        - role_name
+        - role_type
+        - date_assigned
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user assigned to the role
+        role_id:
+          type: string
+          format: uuid
+          description: UUID of the assigned role
+        role_name:
+          type: string
+          description: Name of the assigned role
+        role_description:
+          type: string
+          description: Description of the assigned role
+        role_type:
+          type: string
+          enum: [assignable, assumed]
+          description: Type of role assignment
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the role was assigned
+
+    GroupRoleAssignment:
+      type: object
+      required:
+        - group_id
+        - role_id
+        - role_name
+        - role_type
+        - date_assigned
+      properties:
+        group_id:
+          type: string
+          format: uuid
+          description: UUID of the group assigned to the role
+        group_name:
+          type: string
+          description: Name of the group
+        role_id:
+          type: string
+          format: uuid
+          description: UUID of the assigned role
+        role_name:
+          type: string
+          description: Name of the assigned role
+        role_description:
+          type: string
+          description: Description of the assigned role
+        role_type:
+          type: string
+          enum: [assignable, assumed]
+          description: Type of role assignment
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the role was assigned to the group
+
+    UserPolicyAssignment:
+      type: object
+      required:
+        - user_id
+        - policy_id
+        - policy_name
+        - date_assigned
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user with the policy
+        policy_id:
+          type: string
+          format: uuid
+          description: UUID of the attached policy
+        policy_name:
+          type: string
+          description: Name of the attached policy
+        policy_description:
+          type: string
+          description: Description of the attached policy
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the policy was attached to the user
+
+    GroupPolicyAssignment:
+      type: object
+      required:
+        - group_id
+        - group_name
+        - policy_id
+        - policy_name
+        - date_assigned
+      properties:
+        group_id:
+          type: string
+          format: uuid
+          description: UUID of the group with the policy
+        group_name:
+          type: string
+          description: Name of the group
+        policy_id:
+          type: string
+          format: uuid
+          description: UUID of the attached policy
+        policy_name:
+          type: string
+          description: Name of the attached policy
+        policy_description:
+          type: string
+          description: Description of the attached policy
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the policy was attached to the group
+
+    # Role Trust Schemas
+    RoleTrust:
+      type: object
+      required:
+        - id
+        - role_name
+        - trust_type
+        - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        role_name:
+          type: string
+          description: Name of the role that can be assumed
+        trust_type:
+          type: string
+          enum: [TemporaryAssumption]
+          description: Type of trust relationship
+        trusted_user_id:
+          type: string
+          format: uuid
+          description: User that can assume the role (if user trust)
+        trusted_group_id:
+          type: string
+          format: uuid
+          description: Group that can assume the role (if group trust)
+        user_display:
+          type: string
+          description: Display name of the trusted user (if user trust)
+        group_display:
+          type: string
+          description: Display name of the trusted group (if group trust)
+        conditions:
+          type: object
+          description: Conditions that must be met to assume the role
+        valid_until:
+          type: string
+          format: date-time
+          description: When this trust relationship expires
+        date_created:
+          type: string
+          format: date-time
+
+    # Assumed Role Schemas
+    AssumedRoleSession:
+      type: object
+      properties:
+        session_token:
+          type: string
+          description: The session token
+          example: "ars-8352ff31bc30e7a9fcf9492ca79974b1670b5aa686bbdec7db56b9cb09b3ee43"
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who assumed the role
+        role_id:
+          type: string
+          format: uuid
+          description: ID of the role that was assumed
+        session_name:
+          type: string
+          description: Name of the session
+        auth_method:
+          type: string
+          description: Authentication method used
+          example: api_key
+        expires_at:
+          type: string
+          format: date-time
+          description: When the session expires
+        assumed_at:
+          type: string
+          format: date-time
+          description: When the role was assumed
+        remaining_duration:
+          type: integer
+          description: Remaining seconds until expiration
+        conditions_met:
+          type: array
+          items:
+            type: string
+          description: Which conditions were met
+        source_ip:
+          type: string
+          description: IP address of the request
+
+    # Endpoint Action Schemas
+    EndpointActionMap:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the mapping
+          example: "224"
+        endpoint_pattern:
+          type: string
+          description: API endpoint pattern with parameters
+          example: "/v2/iam/policies/{policy-id}/groups/{group-id}"
+        http_method:
+          type: string
+          enum: [GET, POST, PUT, DELETE, PATCH]
+          description: HTTP method for the endpoint
+          example: DELETE
+        required_action:
+          type: string
+          description: IAM action required to access this endpoint
+          example: "iam.policy.Update"
+        resource_type:
+          type: string
+          description: Type of resource this endpoint affects
+          example: "policy"
+        resource_pattern:
+          type: string
+          description: Pattern for resource matching (if applicable)
+        description:
+          type: string
+          description: Human-readable description of what this endpoint does
+          example: "Detach policy from group"
+        date_created:
+          type: string
+          format: date-time
+          description: When this mapping was created
+
+    # SCIM Schemas
+    SCIMUser:
+      type: object
+      required:
+        - schemas
+        - userName
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example: ["urn:ietf:params:scim:schemas:core:2.0:User"]
+        id:
+          type: string
+        externalId:
+          type: string
+        userName:
+          type: string
+        name:
+          type: object
+          properties:
+            formatted:
+              type: string
+            familyName:
+              type: string
+            givenName:
+              type: string
+        displayName:
+          type: string
+        emails:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              type:
+                type: string
+              primary:
+                type: boolean
+        phoneNumbers:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              type:
+                type: string
+        active:
+          type: boolean
+        groups:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              $ref:
+                type: string
+              display:
+                type: string
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            created:
+              type: string
+            lastModified:
+              type: string
+            location:
+              type: string
+
+    SCIMGroup:
+      type: object
+      required:
+        - schemas
+        - displayName
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example: ["urn:ietf:params:scim:schemas:core:2.0:Group"]
+        id:
+          type: string
+        externalId:
+          type: string
+        displayName:
+          type: string
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              $ref:
+                type: string
+              display:
+                type: string
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            created:
+              type: string
+            lastModified:
+              type: string
+            location:
+              type: string
+
+    SCIMListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example: ["urn:ietf:params:scim:api:messages:2.0:ListResponse"]
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            type: object
+
+    SCIMPatchOp:
+      type: object
+      required:
+        - schemas
+        - Operations
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
+        Operations:
+          type: array
+          items:
+            type: object
+            required:
+              - op
+            properties:
+              op:
+                type: string
+                enum: [add, remove, replace]
+              path:
+                type: string
+              value:
+                description: The value to set, add, or replace. Can be string, number, boolean, object, or array.
+                oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: object
+                  - type: array
+                    items: {}
+    
+    log:
+      title: log
+      type: object
+      x-tags:
+        - log
+      description: Log line information
+      required:
+        - resource_id
+        - resource_type
+        - log_level
+        - message
+        - timestamp
+      properties:
+        resource_id:
+          type: string
+          minLength: 1
+          description: The UUID for the resource that was interacted with.  Only set if the logged interaction relates to a specific resource with a UUID.
+        resource_type:
+          type: string
+          minLength: 1
+          description: The type of resource that was interacted with.
+        log_level:
+          type: string
+          minLength: 1
+          description: |-
+            The type of the configuration option.
+            * `info`
+            * `debug`
+            * `warning`
+            * `error`
+            * `critical`
+        message:
+          type: string
+          minLength: 1
+          description: A message relating to the event that is being logged.
+        timestamp:
+          type: string
+          minLength: 1
+          description: The UTC timestamp of the time at which the log was generated.
+        metadata:
+          type: object
+          minLength: 1
+          description: A set of data that is specific to the logged event.  The properties of this object can varry depending on the source of the log.
+          required:
+            - user_id
+            - ip_address
+          properties:
+            user_id:
+              type: string
+              minLength: 1
+              description: The UUID for the user who triggered the event that is being logged.
+            ip_address:
+              type: string
+              minLength: 1
+              description: The IP address from which the request that generated the log originated.
+            username:
+              type: string
+              minLength: 1
+              description: The email address of a user who is logging in.<br>*This field is only included in the metadata for logs relating to users logging in.*
+            http_status_code:
+              type: integer
+              minLength: 1
+              description: The status code returned for and API request.<br>*This field is only included in the metadata for logs relating to API requests.*
+            method:
+              type: string
+              minLength: 1
+              description: |-
+                The HTTP request method of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+                * `GET`
+                * `POST`
+                * `PUT`
+                * `PATCH`
+                * `DELETE`
+            request_path:
+              type: string
+              minLength: 1
+              description: The URI path of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+            request_body:
+              type: string
+              description: The request body provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+            query_parameters:
+              type: string
+              description: The query string provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+
+    log-meta:
+      title: log-meta
+      type: object
+      x-tags:
+        - log-meta
+      required:
+        - next_page_url
+        - continue_time
+        - returned_count
+        - unreturned_count
+        - total_count
+      properties:
+        next_page_url:
+          type: string
+          description: |
+            In the event that there are more logs found for a specified time period than can be returned, this field will contain a URL that can be used to request the next block of logs for the time period.
+
+            The new request is inclusive of the timestamp for the last logs from the previous request. This is done to avoid skipping over any logs that may have the same timestamp as the last log in the previous request, but which may not have been included in that response.
+             **Be aware that because of this there will be boundary duplicates between this new request and the previous one.**
+        continue_time:
+          type: string
+          description: |
+            In the event that there are more logs found for a specified time period that can be returned, this field will be set with a UTC timestamp of where the logs were left off.
+        returned_count:
+          type: integer
+          minLength: 1
+          description: The number of log records that were returned. There is a maximum limit of 5,000 logs returned by any request.
+        unreturned_count:
+          type: integer
+          minLength: 1
+          description: The number of log records from the specified time period that were not returned due to the maximum return limit of 5,000 logs.
+        total_count:
+          type: integer
+          minLength: 1
+          description: The total number of records that were found for the specified time period.
+
+    ExtendedLog:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique id for the audit logs subscription.
+          example: "e106f15e-ab58-4648-9106-19104b85ff65"
+        date_created:
+          type: string
+          format: date-time
+          description: The date and time that the subscription was created.
+          example: "2025-10-24T20:10:16+00:00"
+        cluster_id:
+          type: integer
+          description: The id of the cluster used for object storage.
+          example: 2
+        region:
+          type: string
+          description: Code for the region where the cluster is hosted.
+          example: "EWR"
+        location:
+          type: string
+          description: A description of the location wher ethe cluster is hosted.
+          example: "New Jersey"
+        label:
+          type: string
+          description: The label used to identify the subscritpion.
+          example: "my_audit_logs"
+        sub_status:
+          type: string
+          description: The status of the audit logs subscription.
+          example: "active"
+        storage_status:
+          type: string
+          description: The status of the object storage that will be used to store the logs. There may be a delay of about a minute between creating the subscription and the object storage being activated.
+          example: "active"
+        s3_hostname:
+          type: string
+          description: The hostname used to connect to object storage.
+          example: "ewr-staging.vultrlabs.com"
+        s3_access_key:
+          type: string
+          description: The read only access key used to connect to object storage.  This value will only be set after storage_status is active.
+          example: "0V3QRR3ZODMIPU2LNM49"
+        s3_secret_key:
+          type: string
+          description: The read only secret Key used to connect to object storage.  This value will only be set after storage_status is active.
+          example: "Zq5sV3DVgd7rUpb3yZqMPSE3L3fBW87AqDPz6jpC"
+        bucket_name:
+          type: string
+          description: The name of the bucket on object storage, in which the logs will be stored.
+          example: "c2af82b2-0db0-4862-ae0d-3eee783df5ff-auditlog"
+        prefix:
+          type: string
+          description: The vaue that will be used for the prifix part of the object key of each log file that is stored.
+          example: "7952126"
+        expiration_days:
+          type: number
+          description: The number of days to retain logs before they expire.
+          example: 400
+        retention_gb:
+          type: number
+          description: The average daily retention for the current pay cycle in gb(1024^3).
+          example: 0
+        ingestion_gb:
+          type: number
+          description: The total ingestion for the current pay cycle in gb(1024^3).
+          example: 0
+        retention_gb_price:
+          type: number
+          description: The price per gigabite of disk space used for the billing period.
+          example: 0
+        ingestion_gb_price:
+          type: number
+          description: The price per gigabite of files uploaded during the billig period.
+          example: 0
+        next_invoice_date:
+          type: string
+          description: The end of the current billing period.
+          example: "2025-11-01"
+        charges:
+          type: number
+          description: The expected charges for the current billing period.
+          example: 0
+        storage_used_bytes:
+          type: number
+          description: The current storage usage in bytes.
+          example: 0
+
+    ExtendedLogCluster:
+      type: object
+      properties:
+        id:
+          type: int
+          description: The unique id for the audit logs culster.
+          example: 2
+        region:
+          type: string
+          description: The region id where the cluster is located.
+          example: "ewr"
+        hostname:
+          type: string
+          description: The hostname used to connect to object storage on the cluster.
+          example: "ewr1.vultrobjects.com"
+        name:
+          type: string
+          description: Location of the cluster.
+          example: "New Jersey"
+        deploy:
+          type: string
+          description: The Cluster is eligible for Object Storage deployment..
+          example: "yes"
+
+    # Common Schemas
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+
+    MetaWithoutPagination:
+      type: object
+      description: Result Count metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    SCIMError:
+      description: SCIM Error Response
+      content:
+        application/scim+json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                items:
+                  type: string
+                example: ["urn:ietf:params:scim:api:messages:2.0:Error"]
+              status:
+                type: string
+                example: "400"
+              scimType:
+                type: string
+                example: "invalidValue"
+              detail:
+                type: string
+                example: "Invalid filter syntax"

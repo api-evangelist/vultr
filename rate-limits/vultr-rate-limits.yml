@@ -1,0 +1,12 @@
+name: Vultr API Rate Limits
+generated: '2026-10-13'
+method: searched
+source: https://raw.githubusercontent.com/vultr/vultr-java/HEAD/api/openapi.yaml
+limits:
+- name: Per-IP request rate
+  limit_text: If your application sends more than 30 requests per second, the API may return HTTP status code 429.
+  max: 30
+  window: 1 second
+  scope: per IP address
+  status_on_exhaustion: 429
+note: Quoted from info.description of the Vultr API v2 OpenAPI.

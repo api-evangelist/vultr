@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-instance-schema.json",
+  "title": "instance",
+  "description": "Instance information.",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/vultr-schema-openapi.json#/components/schemas/instance",
+  "type": "object",
+  "x-tags": [
+    "instances"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "A unique ID for the VPS Instance."
+    },
+    "os": {
+      "type": "string",
+      "description": "The [Operating System name](#operation/list-os)."
+    },
+    "ram": {
+      "type": "integer",
+      "description": "The amount of RAM in MB."
+    },
+    "disk": {
+      "type": "integer",
+      "description": "The size of the disk in GB."
+    },
+    "main_ip": {
+      "type": "string",
+      "description": "The main IPv4 address."
+    },
+    "vcpu_count": {
+      "type": "integer",
+      "description": "Number of vCPUs."
+    },
+    "region": {
+      "type": "string",
+      "description": "The [Region id](#operation/list-regions) where the Instance is located."
+    },
+    "default_password": {
+      "type": "string",
+      "description": "The default password assigned at deployment."
+    },
+    "date_created": {
+      "type": "string",
+      "description": "The date this instance was created."
+    },
+    "status": {
+      "type": "string",
+      "description": "The current status.\n\n* active\n* halted\n* rebooting\n* resizing"
+    },
+    "power_status": {
+      "type": "string",
+      "description": "The power-on status.\n\n* running"
+    },
+    "server_status": {
+      "type": "string",
+      "description": "The server health status.\n\n* ok"
+    },
+    "allowed_bandwidth": {
+      "type": "integer",
+      "description": "Monthly bandwidth quota in GB."
+    },
+    "netmask_v4": {
+      "type": "string",
+      "description": "The IPv4 netmask in dot-decimal notation."
+    },
+    "gateway_v4": {
+      "type": "string",
+      "description": "The gateway IP address."
+    },
+    "v6_networks": {
+      "type": "array",
+      "description": "An array of IPv6 objects.",
+      "items": {
+        "type": "object",
+        "description": "An IPv6 object.",
+        "properties": {
+          "network": {
+            "type": "string",
+            "description": "The IPv6 subnet."
+          },
+          "main_ip": {
+            "type": "string",
+            "description": "The main IPv6 network address."
+          },
+          "network_size": {
+            "description": "The IPv6 network size in bits.",
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "hostname": {
+      "type": "string",
+      "description": "The hostname for this instance."
+    },
+    "label": {
+      "type": "string",
+      "description": "The user-supplied label for this instance."
+    },
+    "tag": {
+      "type": "string",
+      "description": "The user-supplied tag for this instance."
+    },
+    "internal_ip": {
+      "type": "string",
+      "description": "The [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api) that can be supplied for tools such as cloudinit."
+    },
+    "kvm": {
+      "type": "string",
+      "description": "HTTPS link to the Vultr noVNC Web Console."
+    },
+    "os_id": {
+      "type": "integer",
+      "description": "The [Operating System id](#operation/list-os) used by this instance."
+    },
+    "app_id": {
+      "type": "integer",
+      "description": "The [Application id](#operation/list-applications) used by this instance."
+    },
+    "image_id": {
+      "type": "string",
+      "description": "The [Application image_id](#operation/list-applications) used by this instance."
+    },
+    "firewall_group_id": {
+      "type": "string",
+      "description": "The [Firewall Group id](#operation/list-firewall-groups) linked to this Instance."
+    },
+    "features": {
+      "type": "array",
+      "description": "\"auto_backups\", \"ipv6\", \"ddos_protection\"",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan": {
+      "type": "string",
+      "description": "A unique ID for the Plan."
+    }
+  }
+}

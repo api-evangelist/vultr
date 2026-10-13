@@ -1,0 +1,25 @@
+name: Vultr MCP Server
+generated: '2026-10-13'
+method: searched
+source: https://github.com/vultr/vultr-mcp
+status: official
+deployment:
+  mode: remote
+  endpoint: https://mcp.vultr.com/mcp
+  auth: oauth
+  verified: probed
+probe:
+  tools_list: 'POST https://mcp.vultr.com/mcp tools/list -> 401 (OAuth required)'
+  oauth_protected_resource: 'https://mcp.vultr.com/.well-known/oauth-protected-resource -> 200, authorization_servers [https://mcp.vultr.com/]'
+note: Official Vultr-hosted MCP server (README of github.com/vultr/vultr-mcp). Serves 186 tools at /mcp; per-area endpoints below. Sign-in via Vultr OAuth; calls go to api.vultr.com as the user. Tool schemas require authenticated introspection.
+endpoints:
+- {path: /mcp/compute, tools: 33}
+- {path: /mcp/network, tools: 38}
+- {path: /mcp/databases, tools: 29}
+- {path: /mcp/account, tools: 23}
+- {path: /mcp/catalog, tools: 19}
+- {path: /mcp/storage, tools: 16}
+- {path: /mcp/registry, tools: 14}
+- {path: /mcp/kubernetes, tools: 11}
+- {path: /mcp/inference, tools: 3}
+tools: []

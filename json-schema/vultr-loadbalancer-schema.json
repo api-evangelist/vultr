@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-loadbalancer-schema.json",
+  "title": "loadbalancer",
+  "description": "Load Balancer information.",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/vultr-schema-openapi.json#/components/schemas/loadbalancer",
+  "type": "object",
+  "x-tags": [
+    "load-balancer"
+  ],
+  "properties": {
+    "id": {
+      "description": "A unique ID for the Load Balancer.",
+      "type": "string"
+    },
+    "date_created": {
+      "type": "string",
+      "description": "Date this Load Balancer was created."
+    },
+    "region": {
+      "type": "string",
+      "description": "The [Region id](#operation/list-regions) where the Load Balancer is located."
+    },
+    "label": {
+      "type": "string",
+      "description": "The user-supplied label for this load-balancer."
+    },
+    "status": {
+      "type": "string",
+      "description": "The current status.\n\n* active"
+    },
+    "ipv4": {
+      "type": "string",
+      "description": "The IPv4 address of this Load Balancer."
+    },
+    "ipv6": {
+      "type": "string",
+      "description": "The IPv6 address of this Load Balancer."
+    },
+    "generic_info": {
+      "type": "object",
+      "description": "An object containing additional options.",
+      "properties": {
+        "balancing_algorithm": {
+          "type": "string",
+          "description": "The balancing algorithm.\n\n* roundrobin (default)\n* leastconn"
+        },
+        "ssl_redirect": {
+          "type": "boolean",
+          "description": "If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.\n\n* true\n* false"
+        },
+        "sticky_sessions": {
+          "type": "object",
+          "description": "Array of sticky session cookies.",
+          "properties": {
+            "cookie_name": {
+              "type": "string",
+              "description": "The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration)."
+            }
+          }
+        },
+        "proxy_protocol": {
+          "type": "boolean",
+          "description": "\"If `true`, you must configure backend nodes to accept Proxy protocol. \\n\\n* true\\n* false (Default)\""
+        },
+        "private_network": {
+          "type": "string",
+          "description": "ID of the private network you wish to use. If private_network is omitted it will default to the public network."
+        }
+      }
+    },
+    "health_check": {
+      "type": "object",
+      "description": "The health check object configuration. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "description": "The protocol to use for health checks.\n\n* HTTPS\n* HTTP\n* TCP"
+        },
+        "port": {
+          "type": "integer",
+          "description": "The port to use for health checks."
+        },
+        "path": {
+          "type": "string",
+          "description": "HTTP Path to check. Only applies if Protocol is HTTP or HTTPS."
+        },
+        "check_interval": {
+          "type": "integer",
+          "description": "Interval between health checks."
+        },
+        "response_timeout": {
+          "type": "integer",
+          "description": "Timeout before health check fails."
+        },
+        "unhealthy_threshold": {
+          "type": "integer",
+          "description": "Number times a check must fail before becoming unhealthy."
+        },
+        "healthy_threshold": {
+          "type": "integer",
+          "description": "Number of times a check must succeed before returning to healthy status."
+        }
+      }
+    },
+    "has_ssl": {
+      "type": "boolean",
+      "description": "Indicates if this Load Balancer has an SSL certificate installed."
+    },
+    "forward_rules": {
+      "type": "array",
+      "description": "An array of forwarding rule objects.",
+      "items": {
+        "type": "object",
+        "description": "A forwarding rule object.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique ID for the forwarding rule."
+          },
+          "frontend_protocol": {
+            "type": "string",
+            "description": "The protocol on the Load Balancer to forward to the backend.\n\n* HTTP\n* HTTPS\n* TCP"
+          },
+          "frontend_port": {
+            "type": "integer",
+            "description": "The port number on the Load Balancer to forward to the backend."
+          },
+          "backend_portocol": {
+            "type": "string",
+            "description": "The protocol destination on the backend server.\n\n* HTTP\n* HTTPS\n* TCP"
+          },
+          "backend_port": {
+            "type": "integer",
+            "description": "The port number destination on the backend server. "
+          }
+        }
+      }
+    },
+    "instances": {
+      "type": "array",
+      "description": "Array of [Instance ids](#operation/list-instances) attached to this Load Balancer.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "firewall_rules": {
+      "type": "array",
+      "description": "An array of firewall rule objects.",
+      "items": {
+        "type": "object",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique ID for the firewall rule."
+          },
+          "port": {
+            "type": "integer",
+            "description": "Port for this rule."
+          },
+          "source": {
+            "type": "string",
+            "description": "If the source string is given a value of \"cloudflare\" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.\n\n  Possible values:\n\n  |   | Value | Description |\n  | - | ------ | ------------- |\n  |   | \"192.168.1.1/16\" | Ip address with a subnet size. |\n  |   | cloudflare | Allow all of Cloudflare's IP space through the firewall |"
+          },
+          "ip_type": {
+            "type": "string",
+            "description": "The type of IP rule.\n\n* v4\n* v6\n"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-firewall-rule-schema.json",
+  "title": "firewall-rule",
+  "description": "Firewall rule information.",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/vultr-schema-openapi.json#/components/schemas/firewall-rule",
+  "type": "object",
+  "x-tags": [
+    "firewall"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "A unique ID for the Firewall Rule."
+    },
+    "action": {
+      "type": "string",
+      "description": "Action to take when this rule is met.\n\n* accept"
+    },
+    "protocol": {
+      "type": "string",
+      "description": "The protocol for this rule.\n\n* ICMP\n* TCP\n* UDP\n* GRE\n"
+    },
+    "port": {
+      "type": "string",
+      "description": "Port or port range for this rule."
+    },
+    "subnet": {
+      "type": "string",
+      "description": "The IPv4 network in CIDR notation. Example: 192.0.2.123"
+    },
+    "subnet_size": {
+      "type": "integer",
+      "description": "The number of bits for the netmask in CIDR notation. Example: 24"
+    },
+    "source": {
+      "type": "string",
+      "description": "If the source string is given a value of \"cloudflare\" subnet and subnet_size will both be ignored.\nPossible values:\n\n|   | Value | Description |\n| - | ------ | ------------- |\n|   | \"\" | Use the value from `subnet` and `subnet_size`. |\n|   | cloudflare | Allow all of Cloudflare's IP space through the firewall |"
+    },
+    "notes": {
+      "type": "string",
+      "description": "User-supplied notes for this rule."
+    },
+    "ip_type": {
+      "type": "string",
+      "description": "The type of IP rule.\n\n* v4\n* v6"
+    }
+  }
+}

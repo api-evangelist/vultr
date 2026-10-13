@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-baremetal-schema.json",
+  "title": "baremetal",
+  "description": "Bare Metal information.",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/vultr-schema-openapi.json#/components/schemas/baremetal",
+  "type": "object",
+  "x-tags": [
+    "baremetal"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "A unique ID for the Bare Metal instance."
+    },
+    "os": {
+      "type": "string",
+      "description": "The [Operating System name](#operation/list-os)."
+    },
+    "ram": {
+      "type": "string",
+      "description": "Text description of the instances' RAM."
+    },
+    "disk": {
+      "type": "string",
+      "description": "Text description of the instances' disk configuration."
+    },
+    "main_ip": {
+      "type": "string",
+      "description": "The main IPv4 address."
+    },
+    "cpu_count": {
+      "type": "integer",
+      "description": "Number of CPUs."
+    },
+    "region": {
+      "type": "string",
+      "description": "The [Region id](#operation/list-regions) where the instance is located."
+    },
+    "default_password": {
+      "type": "string",
+      "description": "The default password assigned at deployment."
+    },
+    "date_created": {
+      "type": "string",
+      "description": "The date this instance was created."
+    },
+    "status": {
+      "type": "string",
+      "description": "The current status.\n\n* active\n* rebooting\n* halted"
+    },
+    "netmask_v4": {
+      "type": "string",
+      "description": "The IPv4 netmask in dot-decimal notation."
+    },
+    "gateway_v4": {
+      "type": "string",
+      "description": "The IPv4 gateway address."
+    },
+    "plan": {
+      "type": "string",
+      "description": "The [Bare Metal Plan id](#operation/list-metal-plans) used by this instance."
+    },
+    "label": {
+      "type": "string",
+      "description": "The user-supplied label for this instance."
+    },
+    "tag": {
+      "type": "string",
+      "description": "The user-supplied tag for this instance."
+    },
+    "os_id": {
+      "type": "integer",
+      "description": "The [Operating System id](#operation/list-os)."
+    },
+    "app_id": {
+      "type": "integer",
+      "description": "The [Application id](#operation/list-applications)."
+    },
+    "image_id": {
+      "type": "string",
+      "description": "The [Application image_id](#operation/list-applications)."
+    },
+    "v6_network": {
+      "type": "string",
+      "description": "The IPv6 network size in bits."
+    },
+    "v6_main_ip": {
+      "type": "string",
+      "description": "The main IPv6 network address."
+    },
+    "v6_network_size": {
+      "type": "integer",
+      "description": "The IPv6 subnet."
+    },
+    "mac_address": {
+      "type": "integer",
+      "description": "The MAC address for a Bare Metal server"
+    }
+  }
+}

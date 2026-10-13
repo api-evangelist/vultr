@@ -1,0 +1,128 @@
+generated: '2026-10-13'
+method: probed
+generator: harvest-packages.py
+source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io) ; github.com/vultr
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (authentication/vultr-authentication.yml,
+  mcp/vultr-mcp.yml, security/vultr-domain-security.yml, vultr.com) or its accepted GitHub org (vultr).'
+packages:
+- name: vultr
+  registry: pypi
+  url: https://pypi.org/project/vultr/
+  language: Python
+  official: true
+  version: 1.0.1
+  published: '2018-06-04'
+  evidence: metadata names vultr.com
+- name: vultr
+  registry: rubygems
+  url: https://rubygems.org/gems/vultr
+  language: Ruby
+  official: true
+  version: 2.1.2
+  published: '2026-09-15'
+  evidence: metadata names vultr.com
+- name: model-catalog-python
+  registry: github
+  url: https://github.com/vultr/model-catalog-python
+  language: Python
+  official: true
+  version: null
+  published: '2026-10-08'
+  source_repo: https://github.com/vultr/model-catalog-python
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: cluster-api-provider-vultr
+  registry: github
+  url: https://github.com/vultr/cluster-api-provider-vultr
+  language: Go
+  official: true
+  version: null
+  published: '2026-09-25'
+  source_repo: https://github.com/vultr/cluster-api-provider-vultr
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: iam-management-api
+  registry: github
+  url: https://github.com/vultr/iam-management-api
+  language: HTML
+  official: true
+  version: null
+  published: '2026-06-01'
+  source_repo: https://github.com/vultr/iam-management-api
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr-node
+  registry: github
+  url: https://github.com/vultr/vultr-node
+  language: JavaScript
+  official: true
+  version: null
+  published: '2025-08-14'
+  source_repo: https://github.com/vultr/vultr-node
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr-java
+  registry: github
+  url: https://github.com/vultr/vultr-java
+  language: Java
+  official: true
+  version: null
+  published: '2025-08-14'
+  source_repo: https://github.com/vultr/vultr-java
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr-ruby
+  registry: github
+  url: https://github.com/vultr/vultr-ruby
+  language: Ruby
+  official: true
+  version: null
+  published: '2025-08-14'
+  source_repo: https://github.com/vultr/vultr-ruby
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr-php
+  registry: github
+  url: https://github.com/vultr/vultr-php
+  language: PHP
+  official: true
+  version: null
+  published: '2025-08-14'
+  source_repo: https://github.com/vultr/vultr-php
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr-python-client
+  registry: github
+  url: https://github.com/vultr/vultr-python-client
+  language: Python
+  official: true
+  version: null
+  published: '2025-08-13'
+  source_repo: https://github.com/vultr/vultr-python-client
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: api-postman-collection
+  registry: github
+  url: https://github.com/vultr/api-postman-collection
+  language: ''
+  official: true
+  version: null
+  published: '2021-12-03'
+  source_repo: https://github.com/vultr/api-postman-collection
+  evidence: repository in github.com/vultr, whose profile names the provider's domain
+- name: vultr
+  registry: npm
+  url: https://www.npmjs.com/package/vultr
+  language: JavaScript
+  official: false
+  version: 0.0.9
+  published: '2018-12-07'
+  evidence: 'name match only: the metadata names neither the provider''s domain nor its GitHub org'
+- name: vultr
+  registry: nuget
+  url: https://www.nuget.org/packages/vultr
+  language: C#
+  official: false
+  version: 1.1.6790.1236
+  published: null
+  evidence: 'name match only: the metadata names neither the provider''s domain nor its GitHub org'
+- name: vultr
+  registry: crates
+  url: https://crates.io/crates/vultr
+  language: Rust
+  official: false
+  version: 0.4.4
+  published: '2026-05-17'
+  evidence: 'name match only: the metadata names neither the provider''s domain nor its GitHub org'

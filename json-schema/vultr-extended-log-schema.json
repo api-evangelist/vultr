@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-extended-log-schema.json",
+  "title": "ExtendedLog",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-iam-openapi.yml#/components/schemas/ExtendedLog",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique id for the audit logs subscription."
+    },
+    "date_created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time that the subscription was created."
+    },
+    "cluster_id": {
+      "type": "integer",
+      "description": "The id of the cluster used for object storage."
+    },
+    "region": {
+      "type": "string",
+      "description": "Code for the region where the cluster is hosted."
+    },
+    "location": {
+      "type": "string",
+      "description": "A description of the location wher ethe cluster is hosted."
+    },
+    "label": {
+      "type": "string",
+      "description": "The label used to identify the subscritpion."
+    },
+    "sub_status": {
+      "type": "string",
+      "description": "The status of the audit logs subscription."
+    },
+    "storage_status": {
+      "type": "string",
+      "description": "The status of the object storage that will be used to store the logs. There may be a delay of about a minute between creating the subscription and the object storage being activated."
+    },
+    "s3_hostname": {
+      "type": "string",
+      "description": "The hostname used to connect to object storage."
+    },
+    "s3_access_key": {
+      "type": "string",
+      "description": "The read only access key used to connect to object storage.  This value will only be set after storage_status is active."
+    },
+    "s3_secret_key": {
+      "type": "string",
+      "description": "The read only secret Key used to connect to object storage.  This value will only be set after storage_status is active."
+    },
+    "bucket_name": {
+      "type": "string",
+      "description": "The name of the bucket on object storage, in which the logs will be stored."
+    },
+    "prefix": {
+      "type": "string",
+      "description": "The vaue that will be used for the prifix part of the object key of each log file that is stored."
+    },
+    "expiration_days": {
+      "type": "number",
+      "description": "The number of days to retain logs before they expire."
+    },
+    "retention_gb": {
+      "type": "number",
+      "description": "The average daily retention for the current pay cycle in gb(1024^3)."
+    },
+    "ingestion_gb": {
+      "type": "number",
+      "description": "The total ingestion for the current pay cycle in gb(1024^3)."
+    },
+    "retention_gb_price": {
+      "type": "number",
+      "description": "The price per gigabite of disk space used for the billing period."
+    },
+    "ingestion_gb_price": {
+      "type": "number",
+      "description": "The price per gigabite of files uploaded during the billig period."
+    },
+    "next_invoice_date": {
+      "type": "string",
+      "description": "The end of the current billing period."
+    },
+    "charges": {
+      "type": "number",
+      "description": "The expected charges for the current billing period."
+    },
+    "storage_used_bytes": {
+      "type": "number",
+      "description": "The current storage usage in bytes."
+    }
+  }
+}

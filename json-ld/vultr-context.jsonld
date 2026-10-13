@@ -1,0 +1,1341 @@
+{
+  "@context": {
+    "@vocab": "https://vultr.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "vultr": "https://vultr.com/schema#",
+    "Organization": "vultr:Organization",
+    "id": {
+      "@id": "vultr:id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "vultr:name",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "vultr:type",
+      "@type": "xsd:string"
+    },
+    "date_created": {
+      "@id": "vultr:date_created",
+      "@type": "xsd:dateTime"
+    },
+    "OrganizationSCIM": "vultr:OrganizationSCIM",
+    "scim_enabled": {
+      "@id": "vultr:scim_enabled",
+      "@type": "xsd:boolean"
+    },
+    "auth_method": {
+      "@id": "vultr:auth_method",
+      "@type": "xsd:string"
+    },
+    "scim_token": {
+      "@id": "vultr:scim_token",
+      "@type": "xsd:string"
+    },
+    "date_added": {
+      "@id": "vultr:date_added",
+      "@type": "xsd:dateTime"
+    },
+    "date_updated": {
+      "@id": "vultr:date_updated",
+      "@type": "xsd:dateTime"
+    },
+    "OrganizationInvitation": "vultr:OrganizationInvitation",
+    "inviter_name": {
+      "@id": "vultr:inviter_name",
+      "@type": "xsd:string"
+    },
+    "inviter_email": {
+      "@id": "vultr:inviter_email",
+      "@type": "xsd:string"
+    },
+    "email_invited": {
+      "@id": "vultr:email_invited",
+      "@type": "xsd:string"
+    },
+    "email_registered": {
+      "@id": "vultr:email_registered",
+      "@type": "xsd:string"
+    },
+    "permissions": {
+      "@id": "vultr:permissions"
+    },
+    "org_id": {
+      "@id": "vultr:org_id",
+      "@type": "xsd:string"
+    },
+    "org_name": {
+      "@id": "vultr:org_name",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "vultr:status",
+      "@type": "xsd:string"
+    },
+    "status_full": {
+      "@id": "vultr:status_full",
+      "@type": "xsd:string"
+    },
+    "date_responded": {
+      "@id": "vultr:date_responded",
+      "@type": "xsd:dateTime"
+    },
+    "expiration_date": {
+      "@id": "vultr:expiration_date",
+      "@type": "xsd:dateTime"
+    },
+    "invite_status": {
+      "@id": "vultr:invite_status",
+      "@type": "xsd:string"
+    },
+    "SuspendedUser": "vultr:SuspendedUser",
+    "user_id": {
+      "@id": "vultr:user_id",
+      "@type": "xsd:integer"
+    },
+    "email": {
+      "@id": "vultr:email",
+      "@type": "xsd:string"
+    },
+    "date_suspended": {
+      "@id": "vultr:date_suspended",
+      "@type": "xsd:dateTime"
+    },
+    "Group": "vultr:Group",
+    "display_name": {
+      "@id": "vultr:display_name",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "vultr:description",
+      "@type": "xsd:string"
+    },
+    "members": {
+      "@id": "vultr:members",
+      "@container": "@list"
+    },
+    "Role": "vultr:Role",
+    "role_type": {
+      "@id": "vultr:role_type",
+      "@type": "xsd:string"
+    },
+    "max_session_duration": {
+      "@id": "vultr:max_session_duration",
+      "@type": "xsd:integer"
+    },
+    "policies": {
+      "@id": "vultr:policies",
+      "@container": "@list"
+    },
+    "GroupAttachedRole": "vultr:GroupAttachedRole",
+    "date_assigned": {
+      "@id": "vultr:date_assigned",
+      "@type": "xsd:dateTime"
+    },
+    "Policy": "vultr:Policy",
+    "policy_document": {
+      "@id": "vultr:policy_document"
+    },
+    "version": {
+      "@id": "vultr:version",
+      "@type": "xsd:string"
+    },
+    "is_system_policy": {
+      "@id": "vultr:is_system_policy",
+      "@type": "xsd:boolean"
+    },
+    "GroupAttachedPolicy": "vultr:GroupAttachedPolicy",
+    "from_role": {
+      "@id": "vultr:from_role",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "vultr:source",
+      "@type": "xsd:string"
+    },
+    "RoleAssignment": "vultr:RoleAssignment",
+    "role_id": {
+      "@id": "vultr:role_id",
+      "@type": "xsd:string"
+    },
+    "role_name": {
+      "@id": "vultr:role_name",
+      "@type": "xsd:string"
+    },
+    "role_description": {
+      "@id": "vultr:role_description",
+      "@type": "xsd:string"
+    },
+    "GroupRoleAssignment": "vultr:GroupRoleAssignment",
+    "group_id": {
+      "@id": "vultr:group_id",
+      "@type": "xsd:string"
+    },
+    "group_name": {
+      "@id": "vultr:group_name",
+      "@type": "xsd:string"
+    },
+    "UserPolicyAssignment": "vultr:UserPolicyAssignment",
+    "policy_id": {
+      "@id": "vultr:policy_id",
+      "@type": "xsd:string"
+    },
+    "policy_name": {
+      "@id": "vultr:policy_name",
+      "@type": "xsd:string"
+    },
+    "policy_description": {
+      "@id": "vultr:policy_description",
+      "@type": "xsd:string"
+    },
+    "GroupPolicyAssignment": "vultr:GroupPolicyAssignment",
+    "RoleTrust": "vultr:RoleTrust",
+    "trust_type": {
+      "@id": "vultr:trust_type",
+      "@type": "xsd:string"
+    },
+    "trusted_user_id": {
+      "@id": "vultr:trusted_user_id",
+      "@type": "xsd:string"
+    },
+    "trusted_group_id": {
+      "@id": "vultr:trusted_group_id",
+      "@type": "xsd:string"
+    },
+    "user_display": {
+      "@id": "vultr:user_display",
+      "@type": "xsd:string"
+    },
+    "group_display": {
+      "@id": "vultr:group_display",
+      "@type": "xsd:string"
+    },
+    "conditions": {
+      "@id": "vultr:conditions"
+    },
+    "valid_until": {
+      "@id": "vultr:valid_until",
+      "@type": "xsd:dateTime"
+    },
+    "AssumedRoleSession": "vultr:AssumedRoleSession",
+    "session_token": {
+      "@id": "vultr:session_token",
+      "@type": "xsd:string"
+    },
+    "session_name": {
+      "@id": "vultr:session_name",
+      "@type": "xsd:string"
+    },
+    "expires_at": {
+      "@id": "vultr:expires_at",
+      "@type": "xsd:dateTime"
+    },
+    "assumed_at": {
+      "@id": "vultr:assumed_at",
+      "@type": "xsd:dateTime"
+    },
+    "remaining_duration": {
+      "@id": "vultr:remaining_duration",
+      "@type": "xsd:integer"
+    },
+    "conditions_met": {
+      "@id": "vultr:conditions_met",
+      "@container": "@list"
+    },
+    "source_ip": {
+      "@id": "vultr:source_ip",
+      "@type": "xsd:string"
+    },
+    "EndpointActionMap": "vultr:EndpointActionMap",
+    "endpoint_pattern": {
+      "@id": "vultr:endpoint_pattern",
+      "@type": "xsd:string"
+    },
+    "http_method": {
+      "@id": "vultr:http_method",
+      "@type": "xsd:string"
+    },
+    "required_action": {
+      "@id": "vultr:required_action",
+      "@type": "xsd:string"
+    },
+    "resource_type": {
+      "@id": "vultr:resource_type",
+      "@type": "xsd:string"
+    },
+    "resource_pattern": {
+      "@id": "vultr:resource_pattern",
+      "@type": "xsd:string"
+    },
+    "SCIMUser": "vultr:SCIMUser",
+    "schemas": {
+      "@id": "vultr:schemas",
+      "@container": "@list"
+    },
+    "externalId": {
+      "@id": "vultr:externalId",
+      "@type": "xsd:string"
+    },
+    "userName": {
+      "@id": "vultr:userName",
+      "@type": "xsd:string"
+    },
+    "displayName": {
+      "@id": "vultr:displayName",
+      "@type": "xsd:string"
+    },
+    "emails": {
+      "@id": "vultr:emails",
+      "@container": "@list"
+    },
+    "phoneNumbers": {
+      "@id": "vultr:phoneNumbers",
+      "@container": "@list"
+    },
+    "active": {
+      "@id": "vultr:active",
+      "@type": "xsd:boolean"
+    },
+    "groups": {
+      "@id": "vultr:groups",
+      "@container": "@list"
+    },
+    "meta": {
+      "@id": "vultr:meta"
+    },
+    "SCIMGroup": "vultr:SCIMGroup",
+    "SCIMListResponse": "vultr:SCIMListResponse",
+    "totalResults": {
+      "@id": "vultr:totalResults",
+      "@type": "xsd:integer"
+    },
+    "startIndex": {
+      "@id": "vultr:startIndex",
+      "@type": "xsd:integer"
+    },
+    "itemsPerPage": {
+      "@id": "vultr:itemsPerPage",
+      "@type": "xsd:integer"
+    },
+    "Resources": {
+      "@id": "vultr:Resources",
+      "@container": "@list"
+    },
+    "SCIMPatchOp": "vultr:SCIMPatchOp",
+    "Operations": {
+      "@id": "vultr:Operations",
+      "@container": "@list"
+    },
+    "log": "vultr:log",
+    "resource_id": {
+      "@id": "vultr:resource_id",
+      "@type": "xsd:string"
+    },
+    "log_level": {
+      "@id": "vultr:log_level",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "vultr:message",
+      "@type": "xsd:string"
+    },
+    "timestamp": {
+      "@id": "vultr:timestamp",
+      "@type": "xsd:string"
+    },
+    "metadata": {
+      "@id": "vultr:metadata"
+    },
+    "log-meta": "vultr:log-meta",
+    "next_page_url": {
+      "@id": "vultr:next_page_url",
+      "@type": "xsd:string"
+    },
+    "continue_time": {
+      "@id": "vultr:continue_time",
+      "@type": "xsd:string"
+    },
+    "returned_count": {
+      "@id": "vultr:returned_count",
+      "@type": "xsd:integer"
+    },
+    "unreturned_count": {
+      "@id": "vultr:unreturned_count",
+      "@type": "xsd:integer"
+    },
+    "total_count": {
+      "@id": "vultr:total_count",
+      "@type": "xsd:integer"
+    },
+    "ExtendedLog": "vultr:ExtendedLog",
+    "cluster_id": {
+      "@id": "vultr:cluster_id",
+      "@type": "xsd:integer"
+    },
+    "region": {
+      "@id": "vultr:region",
+      "@type": "xsd:string"
+    },
+    "location": {
+      "@id": "vultr:location",
+      "@type": "xsd:string"
+    },
+    "label": {
+      "@id": "vultr:label",
+      "@type": "xsd:string"
+    },
+    "sub_status": {
+      "@id": "vultr:sub_status",
+      "@type": "xsd:string"
+    },
+    "storage_status": {
+      "@id": "vultr:storage_status",
+      "@type": "xsd:string"
+    },
+    "s3_hostname": {
+      "@id": "vultr:s3_hostname",
+      "@type": "xsd:string"
+    },
+    "s3_access_key": {
+      "@id": "vultr:s3_access_key",
+      "@type": "xsd:string"
+    },
+    "s3_secret_key": {
+      "@id": "vultr:s3_secret_key",
+      "@type": "xsd:string"
+    },
+    "bucket_name": {
+      "@id": "vultr:bucket_name",
+      "@type": "xsd:string"
+    },
+    "prefix": {
+      "@id": "vultr:prefix",
+      "@type": "xsd:string"
+    },
+    "expiration_days": {
+      "@id": "vultr:expiration_days",
+      "@type": "xsd:decimal"
+    },
+    "retention_gb": {
+      "@id": "vultr:retention_gb",
+      "@type": "xsd:decimal"
+    },
+    "ingestion_gb": {
+      "@id": "vultr:ingestion_gb",
+      "@type": "xsd:decimal"
+    },
+    "retention_gb_price": {
+      "@id": "vultr:retention_gb_price",
+      "@type": "xsd:decimal"
+    },
+    "ingestion_gb_price": {
+      "@id": "vultr:ingestion_gb_price",
+      "@type": "xsd:decimal"
+    },
+    "next_invoice_date": {
+      "@id": "vultr:next_invoice_date",
+      "@type": "xsd:string"
+    },
+    "charges": {
+      "@id": "vultr:charges",
+      "@type": "xsd:decimal"
+    },
+    "storage_used_bytes": {
+      "@id": "vultr:storage_used_bytes",
+      "@type": "xsd:decimal"
+    },
+    "ExtendedLogCluster": "vultr:ExtendedLogCluster",
+    "hostname": {
+      "@id": "vultr:hostname",
+      "@type": "xsd:string"
+    },
+    "deploy": {
+      "@id": "vultr:deploy",
+      "@type": "xsd:string"
+    },
+    "Meta": "vultr:Meta",
+    "total": {
+      "@id": "vultr:total",
+      "@type": "xsd:integer"
+    },
+    "links": {
+      "@id": "vultr:links"
+    },
+    "MetaWithoutPagination": "vultr:MetaWithoutPagination",
+    "billing": "vultr:billing",
+    "date": {
+      "@id": "vultr:date",
+      "@type": "xsd:string"
+    },
+    "amount": {
+      "@id": "vultr:amount",
+      "@type": "xsd:decimal"
+    },
+    "balance": {
+      "@id": "vultr:balance",
+      "@type": "xsd:decimal"
+    },
+    "invoice": "vultr:invoice",
+    "vke-cluster": "vultr:vke-cluster",
+    "firewall_group_id": {
+      "@id": "vultr:firewall_group_id",
+      "@type": "xsd:string"
+    },
+    "cluster_subnet": {
+      "@id": "vultr:cluster_subnet",
+      "@type": "xsd:string"
+    },
+    "service_subnet": {
+      "@id": "vultr:service_subnet",
+      "@type": "xsd:string"
+    },
+    "ip": {
+      "@id": "vultr:ip",
+      "@type": "xsd:string"
+    },
+    "endpoint": {
+      "@id": "vultr:endpoint",
+      "@type": "xsd:string"
+    },
+    "ha_controlplanes": {
+      "@id": "vultr:ha_controlplanes",
+      "@type": "xsd:boolean"
+    },
+    "node_pools": {
+      "@id": "vultr:node_pools",
+      "@container": "@list"
+    },
+    "nodepool-instances": "vultr:nodepool-instances",
+    "nodepools": "vultr:nodepools",
+    "tag": {
+      "@id": "vultr:tag",
+      "@type": "xsd:string"
+    },
+    "plan": {
+      "@id": "vultr:plan",
+      "@type": "xsd:string"
+    },
+    "node_quantity": {
+      "@id": "vultr:node_quantity",
+      "@type": "xsd:integer"
+    },
+    "nodes": {
+      "@id": "vultr:nodes",
+      "@container": "@list"
+    },
+    "auto_scaler": {
+      "@id": "vultr:auto_scaler",
+      "@type": "xsd:boolean"
+    },
+    "min_nodes": {
+      "@id": "vultr:min_nodes",
+      "@type": "xsd:integer"
+    },
+    "max_nodes": {
+      "@id": "vultr:max_nodes",
+      "@type": "xsd:integer"
+    },
+    "network": "vultr:network",
+    "v4_subnet": {
+      "@id": "vultr:v4_subnet",
+      "@type": "xsd:string"
+    },
+    "v4_subnet_mask": {
+      "@id": "vultr:v4_subnet_mask",
+      "@type": "xsd:integer"
+    },
+    "vpc": "vultr:vpc",
+    "vpc2": "vultr:vpc2",
+    "ip_block": {
+      "@id": "vultr:ip_block",
+      "@type": "xsd:string"
+    },
+    "prefix_length": {
+      "@id": "vultr:prefix_length",
+      "@type": "xsd:integer"
+    },
+    "instance-vpc2": "vultr:instance-vpc2",
+    "mac_address": {
+      "@id": "vultr:mac_address",
+      "@type": "xsd:string"
+    },
+    "ip_address": {
+      "@id": "vultr:ip_address",
+      "@type": "xsd:string"
+    },
+    "user": "vultr:user",
+    "startup": "vultr:startup",
+    "date_modified": {
+      "@id": "vultr:date_modified",
+      "@type": "xsd:string"
+    },
+    "script": {
+      "@id": "vultr:script",
+      "@type": "xsd:string"
+    },
+    "ssh": "vultr:ssh",
+    "ssh_key": {
+      "@id": "vultr:ssh_key",
+      "@type": "xsd:string"
+    },
+    "snapshot": "vultr:snapshot",
+    "size": {
+      "@id": "vultr:size",
+      "@type": "xsd:integer"
+    },
+    "os_id": {
+      "@id": "vultr:os_id",
+      "@type": "xsd:integer"
+    },
+    "app_id": {
+      "@id": "vultr:app_id",
+      "@type": "xsd:integer"
+    },
+    "subaccount": "vultr:subaccount",
+    "subaccount_name": {
+      "@id": "vultr:subaccount_name",
+      "@type": "xsd:string"
+    },
+    "subaccount_id": {
+      "@id": "vultr:subaccount_id",
+      "@type": "xsd:string"
+    },
+    "activated": {
+      "@id": "vultr:activated",
+      "@type": "xsd:boolean"
+    },
+    "pending_charges": {
+      "@id": "vultr:pending_charges"
+    },
+    "reserved-ip": "vultr:reserved-ip",
+    "ip_type": {
+      "@id": "vultr:ip_type",
+      "@type": "xsd:string"
+    },
+    "subnet": {
+      "@id": "vultr:subnet",
+      "@type": "xsd:string"
+    },
+    "subnet_size": {
+      "@id": "vultr:subnet_size",
+      "@type": "xsd:integer"
+    },
+    "instance_id": {
+      "@id": "vultr:instance_id",
+      "@type": "xsd:string"
+    },
+    "os": "vultr:os",
+    "arch": {
+      "@id": "vultr:arch",
+      "@type": "xsd:string"
+    },
+    "family": {
+      "@id": "vultr:family",
+      "@type": "xsd:string"
+    },
+    "application": "vultr:application",
+    "short_name": {
+      "@id": "vultr:short_name",
+      "@type": "xsd:string"
+    },
+    "deploy_name": {
+      "@id": "vultr:deploy_name",
+      "@type": "xsd:string"
+    },
+    "vendor": {
+      "@id": "vultr:vendor",
+      "@type": "xsd:string"
+    },
+    "image_id": {
+      "@id": "vultr:image_id",
+      "@type": "xsd:string"
+    },
+    "account": "vultr:account",
+    "acls": {
+      "@id": "vultr:acls",
+      "@container": "@list"
+    },
+    "last_payment_date": {
+      "@id": "vultr:last_payment_date",
+      "@type": "xsd:string"
+    },
+    "last_payment_amount": {
+      "@id": "vultr:last_payment_amount",
+      "@type": "xsd:decimal"
+    },
+    "backup": "vultr:backup",
+    "blockstorage": "vultr:blockstorage",
+    "cost": {
+      "@id": "vultr:cost",
+      "@type": "xsd:integer"
+    },
+    "size_gb": {
+      "@id": "vultr:size_gb",
+      "@type": "xsd:integer"
+    },
+    "attached_to_instance": {
+      "@id": "vultr:attached_to_instance",
+      "@type": "xsd:string"
+    },
+    "mount_id": {
+      "@id": "vultr:mount_id",
+      "@type": "xsd:string"
+    },
+    "firewall-group": "vultr:firewall-group",
+    "instance_count": {
+      "@id": "vultr:instance_count",
+      "@type": "xsd:integer"
+    },
+    "rule_count": {
+      "@id": "vultr:rule_count",
+      "@type": "xsd:integer"
+    },
+    "max_rule_count": {
+      "@id": "vultr:max_rule_count",
+      "@type": "xsd:integer"
+    },
+    "firewall-rule": "vultr:firewall-rule",
+    "action": {
+      "@id": "vultr:action",
+      "@type": "xsd:string"
+    },
+    "protocol": {
+      "@id": "vultr:protocol",
+      "@type": "xsd:string"
+    },
+    "port": {
+      "@id": "vultr:port",
+      "@type": "xsd:string"
+    },
+    "notes": {
+      "@id": "vultr:notes",
+      "@type": "xsd:string"
+    },
+    "iso": "vultr:iso",
+    "filename": {
+      "@id": "vultr:filename",
+      "@type": "xsd:string"
+    },
+    "md5sum": {
+      "@id": "vultr:md5sum",
+      "@type": "xsd:string"
+    },
+    "sha512sum": {
+      "@id": "vultr:sha512sum",
+      "@type": "xsd:string"
+    },
+    "iso-public": "vultr:iso-public",
+    "object-storage": "vultr:object-storage",
+    "clusters": "vultr:clusters",
+    "domain": "vultr:domain",
+    "dns_sec": {
+      "@id": "vultr:dns_sec",
+      "@type": "xsd:string"
+    },
+    "dns-soa": "vultr:dns-soa",
+    "nsprimary": {
+      "@id": "vultr:nsprimary",
+      "@type": "xsd:string"
+    },
+    "dns-record": "vultr:dns-record",
+    "data": {
+      "@id": "vultr:data",
+      "@type": "xsd:string"
+    },
+    "priority": {
+      "@id": "vultr:priority",
+      "@type": "xsd:integer"
+    },
+    "ttl": {
+      "@id": "vultr:ttl",
+      "@type": "xsd:integer"
+    },
+    "loadbalancer": "vultr:loadbalancer",
+    "ipv4": {
+      "@id": "vultr:ipv4",
+      "@type": "xsd:string"
+    },
+    "ipv6": {
+      "@id": "vultr:ipv6",
+      "@type": "xsd:string"
+    },
+    "generic_info": {
+      "@id": "vultr:generic_info",
+      "@type": "@id"
+    },
+    "health_check": {
+      "@id": "vultr:health_check",
+      "@type": "@id"
+    },
+    "has_ssl": {
+      "@id": "vultr:has_ssl",
+      "@type": "xsd:boolean"
+    },
+    "http2": {
+      "@id": "vultr:http2",
+      "@type": "xsd:boolean"
+    },
+    "forward_rules": {
+      "@id": "vultr:forward_rules",
+      "@container": "@list"
+    },
+    "instances": {
+      "@id": "vultr:instances",
+      "@container": "@list"
+    },
+    "firewall_rules": {
+      "@id": "vultr:firewall_rules",
+      "@container": "@list"
+    },
+    "plans": "vultr:plans",
+    "vcpu_count": {
+      "@id": "vultr:vcpu_count",
+      "@type": "xsd:integer"
+    },
+    "ram": {
+      "@id": "vultr:ram",
+      "@type": "xsd:integer"
+    },
+    "disk": {
+      "@id": "vultr:disk",
+      "@type": "xsd:integer"
+    },
+    "bandwidth": {
+      "@id": "vultr:bandwidth",
+      "@type": "xsd:integer"
+    },
+    "monthly_cost": {
+      "@id": "vultr:monthly_cost",
+      "@type": "xsd:integer"
+    },
+    "locations": {
+      "@id": "vultr:locations",
+      "@container": "@list"
+    },
+    "disk_count": {
+      "@id": "vultr:disk_count",
+      "@type": "xsd:integer"
+    },
+    "plans-metal": "vultr:plans-metal",
+    "cpu_count": {
+      "@id": "vultr:cpu_count",
+      "@type": "xsd:integer"
+    },
+    "cpu_model": {
+      "@id": "vultr:cpu_model",
+      "@type": "xsd:string"
+    },
+    "cpu_threads": {
+      "@id": "vultr:cpu_threads",
+      "@type": "xsd:integer"
+    },
+    "baremetal": "vultr:baremetal",
+    "main_ip": {
+      "@id": "vultr:main_ip",
+      "@type": "xsd:string"
+    },
+    "default_password": {
+      "@id": "vultr:default_password",
+      "@type": "xsd:string"
+    },
+    "netmask_v4": {
+      "@id": "vultr:netmask_v4",
+      "@type": "xsd:string"
+    },
+    "gateway_v4": {
+      "@id": "vultr:gateway_v4",
+      "@type": "xsd:string"
+    },
+    "v6_network": {
+      "@id": "vultr:v6_network",
+      "@type": "xsd:string"
+    },
+    "v6_main_ip": {
+      "@id": "vultr:v6_main_ip",
+      "@type": "xsd:string"
+    },
+    "v6_network_size": {
+      "@id": "vultr:v6_network_size",
+      "@type": "xsd:integer"
+    },
+    "tags": {
+      "@id": "vultr:tags",
+      "@container": "@list"
+    },
+    "user_scheme": {
+      "@id": "vultr:user_scheme",
+      "@type": "xsd:string"
+    },
+    "baremetal-ipv4": "vultr:baremetal-ipv4",
+    "netmask": {
+      "@id": "vultr:netmask",
+      "@type": "xsd:string"
+    },
+    "gateway": {
+      "@id": "vultr:gateway",
+      "@type": "xsd:string"
+    },
+    "reverse": {
+      "@id": "vultr:reverse",
+      "@type": "xsd:string"
+    },
+    "baremetal-ipv6": "vultr:baremetal-ipv6",
+    "network_size": {
+      "@id": "vultr:network_size",
+      "@type": "xsd:integer"
+    },
+    "instance": "vultr:instance",
+    "power_status": {
+      "@id": "vultr:power_status",
+      "@type": "xsd:string"
+    },
+    "server_status": {
+      "@id": "vultr:server_status",
+      "@type": "xsd:string"
+    },
+    "allowed_bandwidth": {
+      "@id": "vultr:allowed_bandwidth",
+      "@type": "xsd:integer"
+    },
+    "v6_networks": {
+      "@id": "vultr:v6_networks",
+      "@container": "@list"
+    },
+    "internal_ip": {
+      "@id": "vultr:internal_ip",
+      "@type": "xsd:string"
+    },
+    "kvm": {
+      "@id": "vultr:kvm",
+      "@type": "xsd:string"
+    },
+    "features": {
+      "@id": "vultr:features",
+      "@container": "@list"
+    },
+    "dbaas-meta": "vultr:dbaas-meta",
+    "database": "vultr:database",
+    "plan_disk": {
+      "@id": "vultr:plan_disk",
+      "@type": "xsd:integer"
+    },
+    "plan_ram": {
+      "@id": "vultr:plan_ram",
+      "@type": "xsd:integer"
+    },
+    "plan_vcpus": {
+      "@id": "vultr:plan_vcpus",
+      "@type": "xsd:integer"
+    },
+    "plan_replicas": {
+      "@id": "vultr:plan_replicas",
+      "@type": "xsd:integer"
+    },
+    "database_engine": {
+      "@id": "vultr:database_engine",
+      "@type": "xsd:string"
+    },
+    "database_engine_version": {
+      "@id": "vultr:database_engine_version",
+      "@type": "xsd:string"
+    },
+    "vpc_id": {
+      "@id": "vultr:vpc_id",
+      "@type": "xsd:string"
+    },
+    "dbname": {
+      "@id": "vultr:dbname",
+      "@type": "xsd:string"
+    },
+    "ferretdb_credentials": {
+      "@id": "vultr:ferretdb_credentials",
+      "@type": "@id"
+    },
+    "host": {
+      "@id": "vultr:host",
+      "@type": "xsd:string"
+    },
+    "public_host": {
+      "@id": "vultr:public_host",
+      "@type": "xsd:string"
+    },
+    "password": {
+      "@id": "vultr:password",
+      "@type": "xsd:string"
+    },
+    "maintenance_dow": {
+      "@id": "vultr:maintenance_dow",
+      "@type": "xsd:string"
+    },
+    "maintenance_time": {
+      "@id": "vultr:maintenance_time",
+      "@type": "xsd:string"
+    },
+    "latest_backup": {
+      "@id": "vultr:latest_backup",
+      "@type": "xsd:string"
+    },
+    "trusted_ips": {
+      "@id": "vultr:trusted_ips",
+      "@container": "@list"
+    },
+    "mysql_sql_modes": {
+      "@id": "vultr:mysql_sql_modes",
+      "@container": "@list"
+    },
+    "mysql_require_primary_key": {
+      "@id": "vultr:mysql_require_primary_key",
+      "@type": "xsd:boolean"
+    },
+    "mysql_slow_query_log": {
+      "@id": "vultr:mysql_slow_query_log",
+      "@type": "xsd:boolean"
+    },
+    "mysql_long_query_time": {
+      "@id": "vultr:mysql_long_query_time",
+      "@type": "xsd:integer"
+    },
+    "pg_available_extensions": {
+      "@id": "vultr:pg_available_extensions",
+      "@container": "@list"
+    },
+    "redis_eviction_policy": {
+      "@id": "vultr:redis_eviction_policy",
+      "@type": "xsd:string"
+    },
+    "cluster_time_zone": {
+      "@id": "vultr:cluster_time_zone",
+      "@type": "xsd:string"
+    },
+    "read_replicas": {
+      "@id": "vultr:read_replicas",
+      "@container": "@list"
+    },
+    "dbaas-plan": "vultr:dbaas-plan",
+    "number_of_nodes": {
+      "@id": "vultr:number_of_nodes",
+      "@type": "xsd:integer"
+    },
+    "supported_engines": {
+      "@id": "vultr:supported_engines"
+    },
+    "max_connections": {
+      "@id": "vultr:max_connections"
+    },
+    "database-usage": "vultr:database-usage",
+    "memory": {
+      "@id": "vultr:memory",
+      "@type": "@id"
+    },
+    "cpu": {
+      "@id": "vultr:cpu",
+      "@type": "@id"
+    },
+    "database-user": "vultr:database-user",
+    "username": {
+      "@id": "vultr:username",
+      "@type": "xsd:string"
+    },
+    "encryption": {
+      "@id": "vultr:encryption",
+      "@type": "xsd:string"
+    },
+    "access_control": {
+      "@id": "vultr:access_control",
+      "@type": "@id"
+    },
+    "dbaas-alerts": "vultr:dbaas-alerts",
+    "message_type": {
+      "@id": "vultr:message_type",
+      "@type": "xsd:string"
+    },
+    "recommendation": {
+      "@id": "vultr:recommendation",
+      "@type": "xsd:string"
+    },
+    "maintenance_scheduled": {
+      "@id": "vultr:maintenance_scheduled",
+      "@type": "xsd:string"
+    },
+    "table_count": {
+      "@id": "vultr:table_count",
+      "@type": "xsd:integer"
+    },
+    "dbaas-migration": "vultr:dbaas-migration",
+    "method": {
+      "@id": "vultr:method",
+      "@type": "xsd:string"
+    },
+    "error": {
+      "@id": "vultr:error",
+      "@type": "xsd:string"
+    },
+    "credentials": {
+      "@id": "vultr:credentials",
+      "@type": "@id"
+    },
+    "database-latest-backup": "vultr:database-latest-backup",
+    "time": {
+      "@id": "vultr:time",
+      "@type": "xsd:string"
+    },
+    "database-oldest-backup": "vultr:database-oldest-backup",
+    "database-connections": "vultr:database-connections",
+    "used": {
+      "@id": "vultr:used",
+      "@type": "xsd:integer"
+    },
+    "available": {
+      "@id": "vultr:available",
+      "@type": "xsd:integer"
+    },
+    "max": {
+      "@id": "vultr:max",
+      "@type": "xsd:integer"
+    },
+    "connection-pool": "vultr:connection-pool",
+    "mode": {
+      "@id": "vultr:mode",
+      "@type": "xsd:string"
+    },
+    "dbaas-available-options": "vultr:dbaas-available-options",
+    "enumerals": {
+      "@id": "vultr:enumerals",
+      "@container": "@list"
+    },
+    "min_value": {
+      "@id": "vultr:min_value"
+    },
+    "max_value": {
+      "@id": "vultr:max_value"
+    },
+    "alt_values": {
+      "@id": "vultr:alt_values",
+      "@container": "@list"
+    },
+    "units": {
+      "@id": "vultr:units",
+      "@type": "xsd:string"
+    },
+    "database-db": "vultr:database-db",
+    "private-networks": "vultr:private-networks",
+    "backup-schedule": "vultr:backup-schedule",
+    "enabled": {
+      "@id": "vultr:enabled",
+      "@type": "xsd:boolean"
+    },
+    "next_scheduled_time_utc": {
+      "@id": "vultr:next_scheduled_time_utc",
+      "@type": "xsd:string"
+    },
+    "hour": {
+      "@id": "vultr:hour",
+      "@type": "xsd:integer"
+    },
+    "dow": {
+      "@id": "vultr:dow",
+      "@type": "xsd:integer"
+    },
+    "dom": {
+      "@id": "vultr:dom",
+      "@type": "xsd:integer"
+    },
+    "forwarding-rule": "vultr:forwarding-rule",
+    "frontend_protocol": {
+      "@id": "vultr:frontend_protocol",
+      "@type": "xsd:string"
+    },
+    "frontend_port": {
+      "@id": "vultr:frontend_port",
+      "@type": "xsd:integer"
+    },
+    "backend_protocol": {
+      "@id": "vultr:backend_protocol",
+      "@type": "xsd:string"
+    },
+    "backend_port": {
+      "@id": "vultr:backend_port",
+      "@type": "xsd:integer"
+    },
+    "loadbalancer-firewall-rule": "vultr:loadbalancer-firewall-rule",
+    "registry": "vultr:registry",
+    "urn": {
+      "@id": "vultr:urn",
+      "@type": "xsd:string"
+    },
+    "storage": {
+      "@id": "vultr:storage",
+      "@type": "@id"
+    },
+    "public": {
+      "@id": "vultr:public",
+      "@type": "xsd:boolean"
+    },
+    "root_user": {
+      "@id": "vultr:root_user",
+      "@type": "@id"
+    },
+    "registry-storage": "vultr:registry-storage",
+    "bytes": {
+      "@id": "vultr:bytes"
+    },
+    "mb": {
+      "@id": "vultr:mb"
+    },
+    "gb": {
+      "@id": "vultr:gb"
+    },
+    "tb": {
+      "@id": "vultr:tb"
+    },
+    "updated_at": {
+      "@id": "vultr:updated_at",
+      "@type": "xsd:string"
+    },
+    "registry-repository": "vultr:registry-repository",
+    "image": {
+      "@id": "vultr:image",
+      "@type": "xsd:string"
+    },
+    "added_at": {
+      "@id": "vultr:added_at",
+      "@type": "xsd:string"
+    },
+    "pull_count": {
+      "@id": "vultr:pull_count",
+      "@type": "xsd:integer"
+    },
+    "artifact_count": {
+      "@id": "vultr:artifact_count",
+      "@type": "xsd:integer"
+    },
+    "registry-user": "vultr:registry-user",
+    "root": {
+      "@id": "vultr:root",
+      "@type": "xsd:boolean"
+    },
+    "registry-region": "vultr:registry-region",
+    "base_url": {
+      "@id": "vultr:base_url",
+      "@type": "xsd:string"
+    },
+    "data_center": {
+      "@id": "vultr:data_center"
+    },
+    "registry-plan": "vultr:registry-plan",
+    "vanity_name": {
+      "@id": "vultr:vanity_name",
+      "@type": "xsd:string"
+    },
+    "max_storage_mb": {
+      "@id": "vultr:max_storage_mb",
+      "@type": "xsd:integer"
+    },
+    "monthly_price": {
+      "@id": "vultr:monthly_price",
+      "@type": "xsd:integer"
+    },
+    "registry-docker-credentials": "vultr:registry-docker-credentials",
+    "auths": {
+      "@id": "vultr:auths",
+      "@type": "@id"
+    },
+    "registry-kubernetes-docker-credentials": "vultr:registry-kubernetes-docker-credentials",
+    "apiVersion": {
+      "@id": "vultr:apiVersion",
+      "@type": "xsd:string"
+    },
+    "kind": {
+      "@id": "vultr:kind",
+      "@type": "xsd:string"
+    },
+    "get_network_200_response": "vultr:get_network_200_response",
+    "update_network_request": "vultr:update_network_request",
+    "list_networks_200_response": "vultr:list_networks_200_response",
+    "networks": {
+      "@id": "vultr:networks",
+      "@container": "@list"
+    },
+    "create_network_request": "vultr:create_network_request",
+    "get_vpc_200_response": "vultr:get_vpc_200_response",
+    "update_vpc_request": "vultr:update_vpc_request",
+    "list_vpcs_200_response": "vultr:list_vpcs_200_response",
+    "vpcs": {
+      "@id": "vultr:vpcs",
+      "@container": "@list"
+    },
+    "create_vpc_request": "vultr:create_vpc_request",
+    "get_vpc2_200_response": "vultr:get_vpc2_200_response",
+    "update_vpc2_request": "vultr:update_vpc2_request",
+    "list_vpc2_200_response": "vultr:list_vpc2_200_response",
+    "create_vpc2_request": "vultr:create_vpc2_request",
+    "attach_vpc2_nodes_request": "vultr:attach_vpc2_nodes_request",
+    "detach_vpc2_nodes_request": "vultr:detach_vpc2_nodes_request",
+    "update_user_request": "vultr:update_user_request",
+    "api_enabled": {
+      "@id": "vultr:api_enabled",
+      "@type": "xsd:boolean"
+    },
+    "list_users_200_response": "vultr:list_users_200_response",
+    "users": {
+      "@id": "vultr:users",
+      "@container": "@list"
+    },
+    "create_user_request": "vultr:create_user_request",
+    "get_startup_script_200_response": "vultr:get_startup_script_200_response",
+    "startup_script": {
+      "@id": "vultr:startup_script",
+      "@type": "@id"
+    },
+    "update_startup_script_request": "vultr:update_startup_script_request",
+    "list_startup_scripts_200_response": "vultr:list_startup_scripts_200_response",
+    "startup_scripts": {
+      "@id": "vultr:startup_scripts",
+      "@container": "@list"
+    },
+    "create_startup_script_request": "vultr:create_startup_script_request",
+    "get_ssh_key_200_response": "vultr:get_ssh_key_200_response",
+    "update_ssh_key_request": "vultr:update_ssh_key_request",
+    "list_ssh_keys_200_response": "vultr:list_ssh_keys_200_response",
+    "ssh_keys": {
+      "@id": "vultr:ssh_keys",
+      "@container": "@list"
+    },
+    "create_ssh_key_request": "vultr:create_ssh_key_request",
+    "get_snapshot_200_response": "vultr:get_snapshot_200_response",
+    "put_snapshots_snapshot_id_request": "vultr:put_snapshots_snapshot_id_request",
+    "list_snapshots_200_response": "vultr:list_snapshots_200_response",
+    "snapshots": {
+      "@id": "vultr:snapshots",
+      "@container": "@list"
+    },
+    "create_snapshot_request": "vultr:create_snapshot_request",
+    "create_snapshot_create_from_url_request": "vultr:create_snapshot_create_from_url_request",
+    "url": {
+      "@id": "vultr:url",
+      "@type": "xsd:string"
+    },
+    "uefi": {
+      "@id": "vultr:uefi",
+      "@type": "xsd:string"
+    },
+    "list_subaccounts_200_response": "vultr:list_subaccounts_200_response",
+    "subaccounts": {
+      "@id": "vultr:subaccounts",
+      "@container": "@list"
+    },
+    "create_subaccount_request": "vultr:create_subaccount_request",
+    "create_subaccount_201_response": "vultr:create_subaccount_201_response"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Vultr API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Vultr's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-13) from openapi/vultr-iam-openapi.yml, openapi/vultr-openapi.yml.",
+  "dcterms:created": "2026-10-13",
+  "dcterms:source": [
+    "openapi/vultr-iam-openapi.yml",
+    "openapi/vultr-openapi.yml"
+  ]
+}

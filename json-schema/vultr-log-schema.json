@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-log-schema.json",
+  "title": "log",
+  "description": "Log line information",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-iam-openapi.yml#/components/schemas/log",
+  "type": "object",
+  "x-tags": [
+    "log"
+  ],
+  "required": [
+    "resource_id",
+    "resource_type",
+    "log_level",
+    "message",
+    "timestamp"
+  ],
+  "properties": {
+    "resource_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The UUID for the resource that was interacted with.  Only set if the logged interaction relates to a specific resource with a UUID."
+    },
+    "resource_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The type of resource that was interacted with."
+    },
+    "log_level": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The type of the configuration option.\n* `info`\n* `debug`\n* `warning`\n* `error`\n* `critical`"
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A message relating to the event that is being logged."
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The UTC timestamp of the time at which the log was generated."
+    },
+    "metadata": {
+      "type": "object",
+      "minLength": 1,
+      "description": "A set of data that is specific to the logged event.  The properties of this object can varry depending on the source of the log.",
+      "required": [
+        "user_id",
+        "ip_address"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The UUID for the user who triggered the event that is being logged."
+        },
+        "ip_address": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The IP address from which the request that generated the log originated."
+        },
+        "username": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The email address of a user who is logging in.<br>*This field is only included in the metadata for logs relating to users logging in.*"
+        },
+        "http_status_code": {
+          "type": "integer",
+          "minLength": 1,
+          "description": "The status code returned for and API request.<br>*This field is only included in the metadata for logs relating to API requests.*"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The HTTP request method of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*\n* `GET`\n* `POST`\n* `PUT`\n* `PATCH`\n* `DELETE`"
+        },
+        "request_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The URI path of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*"
+        },
+        "request_body": {
+          "type": "string",
+          "description": "The request body provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*"
+        },
+        "query_parameters": {
+          "type": "string",
+          "description": "The query string provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*"
+        }
+      }
+    }
+  }
+}

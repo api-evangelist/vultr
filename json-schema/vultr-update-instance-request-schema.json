@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-update-instance-request-schema.json",
+  "title": "update_instance_request",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-openapi.yml#/components/schemas/update_instance_request",
+  "properties": {
+    "app_id": {
+      "description": "Reinstall the instance with this [Application id](#operation/list-applications).",
+      "type": "integer"
+    },
+    "image_id": {
+      "description": "Reinstall the instance with this [Application image_id](#operation/list-applications).",
+      "type": "string"
+    },
+    "backups": {
+      "description": "Enable automatic backups for the instance.\n\n* enabled\n* disabled",
+      "type": "string"
+    },
+    "firewall_group_id": {
+      "description": "The [Firewall Group id](#operation/list-firewall-groups) to attach to this Instance.",
+      "type": "string"
+    },
+    "enable_ipv6": {
+      "description": "Enable IPv6.\n\n* true",
+      "type": "boolean"
+    },
+    "os_id": {
+      "description": "Reinstall the instance with this [ISO id](#operation/list-isos).",
+      "type": "string"
+    },
+    "user_data": {
+      "description": "The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api/) to attach to this instance.",
+      "type": "string"
+    },
+    "tag": {
+      "deprecated": true,
+      "description": "Use `tags` instead. The user-supplied tag.",
+      "type": "string"
+    },
+    "plan": {
+      "description": "Upgrade the instance with this [Plan id](#operation/list-plans).",
+      "type": "string"
+    },
+    "ddos_protection": {
+      "description": "Enable DDoS Protection (there is an additional charge for this).\n\n* true\n* false",
+      "type": "boolean"
+    },
+    "attach_private_network": {
+      "deprecated": true,
+      "description": "Use `attach_vpc` instead. An array of [Private Network ids](#operation/list-networks) to attach to this Instance. This parameter takes precedence over `enable_private_network`. Please choose one parameter.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "attach_vpc": {
+      "description": "An array of [VPC IDs](#operation/list-vpcs) to attach to this Instance. This parameter takes precedence over `enable_vpc`. Please choose one parameter.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "attach_vpc2": {
+      "description": "An array of [VPC IDs](#operation/list-vpc2) to attach to this Instance. This parameter takes precedence over `enable_vpc2`. Please choose one parameter.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "detach_private_network": {
+      "deprecated": true,
+      "description": "Use `detach_vpc` instead. An array of [Private Network ids](#operation/list-networks) to detach from this Instance. This parameter takes precedence over `enable_private_network`.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "detach_vpc": {
+      "description": "An array of [VPC IDs](#operation/list-vpcs) to detach from this Instance. This parameter takes precedence over `enable_vpc`.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "detach_vpc2": {
+      "description": "An array of [VPC IDs](#operation/list-vpc2) to detach from this Instance. This parameter takes precedence over `enable_vpc2`.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "enable_private_network": {
+      "deprecated": true,
+      "description": "Use `enable_vpc` instead.\n\nIf `true`, private networking support will be added to the new server.\n\nThis parameter attaches a single network. When no network exists in the region, it will be automatically created.\n\nIf there are multiple private networks in the instance's region, use `attach_private_network` instead to specify a network.",
+      "type": "boolean"
+    },
+    "enable_vpc": {
+      "description": "If `true`, VPC support will be added to the new server.\n\nThis parameter attaches a single VPC. When no VPC exists in the region, it will be automatically created.\n\nIf there are multiple VPCs in the instance's region, use `attach_vpc` instead to specify a VPC.",
+      "type": "boolean"
+    },
+    "enable_vpc2": {
+      "description": "If `true`, VPC 2.0 support will be added to the new server.\n\nThis parameter attaches a single VPC 2.0 netowrk. When no VPC 2.0 network exists in the region, it will be automatically created.\n\nIf there are multiple VPC 2.0 networks in the instance's region, use `attach_vpc2` instead to specify a VPC 2.0 network.",
+      "type": "boolean"
+    },
+    "label": {
+      "description": "The user supplied label.",
+      "type": "string"
+    },
+    "tags": {
+      "description": "Tags to apply to the instance.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "user_scheme": {
+      "description": "Linux-only: The user scheme used for logging into this instance. The instance must be reinstalled for this change to take effect.\n\n* root\n* limited",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

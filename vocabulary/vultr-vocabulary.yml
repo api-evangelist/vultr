@@ -1,0 +1,456 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/vultr-iam-openapi.yml
+- openapi/vultr-openapi.yml
+vocabulary:
+  name: Vultr Domain Vocabulary
+  description: 'Terms declared by Vultr''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: Organizations
+    definition: Manage organizations
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: Organization Membership Management
+    definition: Manage users inside organizations (membership, roles, suspensions)
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: Organization Invitations
+    definition: Manage invitations for users to join organizations
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: SCIM Settings
+    definition: Manage SCIM enablement and tokens for organizations
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: SCIM Users
+    definition: SCIM 2.0 compliant endpoints for managing users
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: SCIM Groups
+    definition: SCIM 2.0 compliant endpoints for managing groups
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Groups
+    definition: Non-SCIM group management endpoints
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Roles
+    definition: Endpoints for managing IAM roles within an organization
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Policies
+    definition: Endpoints for managing IAM policies within an organization
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Role-Policy Mappings
+    definition: Manage the attachment and detachment of IAM policies to roles
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Role-User Mappings
+    definition: Manage role assignments to users
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Role-Group Mappings
+    definition: Manage role assignments to groups
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Policy-User Mappings
+    definition: Manage direct policy attachments to users
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Policy-Group Mappings
+    definition: Manage direct policy attachments to groups
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Role Trusts
+    definition: Manage trust relationships between roles
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Assumed Roles
+    definition: Manage temporary role assumptions
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: IAM Endpoint Actions
+    definition: View available IAM endpoint-to-action mappings
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: User Resources
+    definition: Endpoints for viewing user-specific IAM resources (groups, roles, policies)
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: Logs
+    definition: Endpoints for viewing logs and for managing an audit logs subscription
+    tags:
+    - Resource Group
+    source: openapi/vultr-iam-openapi.yml
+  - term: account
+    definition: Read-only information about your [user account](https://my.vultr.com/settings/#settingsprofile) and [billing](https://my.vultr.com/billing/#billinghistory)
+      information.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: application
+    definition: '[One-Click](https://www.vultr.com/features/one-click-apps/) and [Marketplace](https://www.vultr.com/marketplace/) Applications
+      are ready-to-run with minimal configuration. We have an extensive [documentation library](https://www.vultr.com/docs/category/apps/) for
+      our Applications. There are two types of Applications: `marketplace` and `one-click`. This is denoted by the `type` field in the Applica'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: backup
+    definition: 'A backup is a scheduled, automatic, point-in-time image of an instance. We do not stop the instance when taking a backup. Booting
+      from a backup is similar to rebooting after a non-graceful restart. [Snapshots](#tag/snapshot) are physically the same as backups, but snapshots
+      are manual while backups run automatically on a schedule. Backups can be converted into snapshots. See our [Automatic Backup '
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: baremetal
+    definition: '[Bare Metal](https://www.vultr.com/products/bare-metal/) servers give you access to the underlying physical hardware in a single-tenant
+      environment without a virtualization layer.'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: billing
+    definition: Read-only [billing](https://my.vultr.com/billing/#billinghistory) information for your [user account](https://my.vultr.com/settings/#settingsprofile).
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: block
+    definition: '[Block Storage](https://www.vultr.com/products/block-storage/) volumes are highly-available, redundant, SSD backed, and expandable
+      from 10 GB to 40,000 GB depending on the type. Block storage volumes can be formatted with your choice of filesystems and moved between
+      server instances as needed. [See our FAQ](https://www.vultr.com/docs/block-storage/) for details.'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: Container Registry
+    definition: Store and manage public and private container images for rapid deployment to Vultr Managed Kubernetes.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: dns
+    definition: Vultr offers [free DNS hosting](https://www.vultr.com/docs/introduction-to-vultr-dns/) for customers' domains. The nameservers
+      are on an AnyCAST network and ensure fast DNS resolution. When you manage your DNS through the API, you can view the results [in your customer
+      portal](https://my.vultr.com/dns/).
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: firewall
+    definition: Vultr offers a [web-based firewall](https://www.vultr.com/docs/vultr-firewall/) solution to protect one or more compute instances.
+      [Firewall groups](https://my.vultr.com/firewall/) can manage multiple servers with a standard ruleset. You can control multiple groups with
+      the API.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: instances
+    definition: Vultr [Cloud instances](https://www.vultr.com/products/cloud-compute/) can be [deployed](https://my.vultr.com/) with your preferred
+      operating system or pre-installed application in seconds. [High Frequency Compute](https://www.vultr.com/products/high-frequency-compute/)
+      instances are powered by high clock speed CPU's and NVMe local storage to power your most demanding applications. [Dedicated Clou
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: iso
+    definition: '[Upload](https://www.vultr.com/features/upload-iso/) and boot instances from your ISO, or choose one from our [public ISO library](https://my.vultr.com/iso/public/).
+      See our [ISO documentation](https://www.vultr.com/docs/requirements-for-uploading-an-os-iso-to-vultr/).'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: kubernetes
+    definition: Vultr Kubernetes Engine is a managed Kubernetes offering.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: load-balancer
+    definition: '[Load Balancers](https://www.vultr.com/docs/vultr-load-balancers/) sit in front of your application and distribute incoming traffic
+      across multiple Instances. When you control the load balancer via the API, you can inspect the results in the [customer portal](https://my.vultr.com/loadbalancers/).'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: managed-databases
+    definition: '[Vultr Managed Databases](https://www.vultr.com/docs/vultr-managed-databases/) is a managed database offering supporting MySQL,
+      PostgreSQL, FerretDB + PostgreSQL, and Redis.'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: s3
+    definition: '[Object Storage](https://www.vultr.com/docs/vultr-object-storage/) is S3 API compatible. Objects uploaded to object storage can
+      be accessed privately or publicly on the web. Object storage supports a virtually unlimited number of objects. Control your Object Storage
+      via the API or browse in the [Customer Portal](https://my.vultr.com/objectstorage/).'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: os
+    definition: We have a wide range of [operating systems](https://www.vultr.com/features/operating-systems/) available to deploy server instances.
+      You can also [upload an ISO](#tag/iso) or choose from our public ISO library.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: plans
+    definition: A Plan is a particular configuration of vCPU, RAM, SSD, and bandwidth to deploy an [Instance](#tag/instances). Not all Plans are
+      available in all [Regions](#tag/region). You can browse plans in the [Customer Portal](https://my.vultr.com/deploy/) or get a list of Plans
+      from the API.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: private Networks
+    definition: '**Deprecated**: use [VPCs](#tag/VPCs) instead.[Private Networks](https://www.vultr.com/docs/configuring-private-network/) are
+      fully isolated networks accessible only by instances on your account. Each private network is only available in one Region and cannot span
+      across regions. An [instance](#tag/instances) can connect to [multiple private networks](https://www.vultr.com/docs/multiple-private-ne'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: VPCs
+    definition: '[VPCs](https://www.vultr.com/docs/how-to-create-a-vultr-virtual-private-cloud-vpc/) are fully isolated networks accessible only
+      by instances on your account. Each VPC is only available in one region and cannot span across regions. An [instance](#tag/instances) can
+      connect to multiple VPCs and you may have up to 5 VPCs per [region](#tag/region).'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: VPC2
+    definition: '[VPCs](https://www.vultr.com/docs/how-to-create-a-vultr-virtual-private-cloud-vpc/) are fully isolated networks accessible only
+      by instances on your account. Each VPC is only available in one region and cannot span across regions. An [instance](#tag/instances) can
+      connect to multiple VPCs and you may have up to 5 VPCs per [region](#tag/region).'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: reserved-ip
+    definition: IP addresses can be [reserved](https://my.vultr.com/network/) and moved between [instances](#tag/instances). Reserved IPs can
+      also be used as [floating addresses](https://www.vultr.com/docs/high-availability-on-vultr-with-floating-ip-and-bgp/) for high-availability.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: region
+    definition: Instances can be deployed in many [Regions](https://www.vultr.com/features/datacenter-locations/) on multiple continents. Choose
+      any of our worldwide locations to deploy servers near your office or customers for low-latency.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: snapshot
+    definition: 'A snapshot is a point-in-time image of an instance. We do not stop the instance when taking a snapshot. Booting from a snapshot
+      is similar to rebooting after a non-graceful restart. Snapshots are physically the same as [backups](#tag/backup), but snapshots are manual
+      while backups run automatically on a schedule. See our [Snapshot Quickstart Guide](https://www.vultr.com/docs/vultr-vps-snapshots/) '
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: subaccount
+    definition: Sub-accounts are separate Vultr accounts that are directly linked to your account. These accounts function similarly to normal
+      Vultr accounts with some additional billing and administrative features available to your account.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: ssh
+    definition: You can add [SSH keys](https://www.vultr.com/docs/how-do-i-generate-ssh-keys/) to your [account](https://my.vultr.com/settings/#settingssshkeys/),
+      which can be copied to new instances when first deployed. Updating a key does not update any running instances. If you [reinstall](#operation/reinstall-instance)
+      an instance (erasing all its data), it will inherit the updated key.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: startup
+    definition: 'Vultr allows you to assign [two types of scripts to a server](https://www.vultr.com/docs/vultr-startup-scripts-quickstart-guide/).
+      Boot scripts configure new deployments, and PXE scripts automatically install operating systems. Assign startup scripts to your servers
+      through the API or on your [Startup Scripts page](https://my.vultr.com/startup/) in the customer portal. **Note**: There is a size li'
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: users
+    definition: Vultr supports [multiple users](https://my.vultr.com/settings/#settingsusers) in each account, and each user has [individual access
+      permissions](https://my.vultr.com/users/manage/?USERID=new). Users have unique API keys, which respect the permission for that user.
+    tags:
+    - Resource Group
+    source: openapi/vultr-openapi.yml
+  - term: Organization
+    definition: 'Object declared by the contract with fields: id, name, type, date_created.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/Organization
+  - term: OrganizationSCIM
+    definition: 'Object declared by the contract with fields: scim_enabled, auth_method, scim_token, date_added, date_updated.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/OrganizationSCIM
+  - term: OrganizationInvitation
+    definition: 'Object declared by the contract with fields: id, inviter_name, inviter_email, email_invited, email_registered, permissions, org_id,
+      org_name, status, status_full, date_created, date_responded. (2 more)'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/OrganizationInvitation
+  - term: SuspendedUser
+    definition: 'Object declared by the contract with fields: user_id, name, email, date_suspended.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/SuspendedUser
+  - term: Group
+    definition: 'Object declared by the contract with fields: id, display_name, description, date_created, members.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/Group
+  - term: Role
+    definition: 'Object declared by the contract with fields: id, name, description, role_type, max_session_duration, date_created, policies.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/Role
+  - term: GroupAttachedRole
+    definition: 'Object declared by the contract with fields: id, name, description, role_type, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/GroupAttachedRole
+  - term: Policy
+    definition: 'Object declared by the contract with fields: id, name, description, policy_document, version, date_created, is_system_policy.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/Policy
+  - term: GroupAttachedPolicy
+    definition: 'Object declared by the contract with fields: id, name, description, policy_document, from_role, source, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/GroupAttachedPolicy
+  - term: RoleAssignment
+    definition: 'Object declared by the contract with fields: user_id, role_id, role_name, role_description, role_type, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/RoleAssignment
+  - term: GroupRoleAssignment
+    definition: 'Object declared by the contract with fields: group_id, group_name, role_id, role_name, role_description, role_type, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/GroupRoleAssignment
+  - term: UserPolicyAssignment
+    definition: 'Object declared by the contract with fields: user_id, policy_id, policy_name, policy_description, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/UserPolicyAssignment
+  - term: GroupPolicyAssignment
+    definition: 'Object declared by the contract with fields: group_id, group_name, policy_id, policy_name, policy_description, date_assigned.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/GroupPolicyAssignment
+  - term: RoleTrust
+    definition: 'Object declared by the contract with fields: id, role_name, trust_type, trusted_user_id, trusted_group_id, user_display, group_display,
+      conditions, valid_until, date_created.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/RoleTrust
+  - term: AssumedRoleSession
+    definition: 'Object declared by the contract with fields: session_token, user_id, role_id, session_name, auth_method, expires_at, assumed_at,
+      remaining_duration, conditions_met, source_ip.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/AssumedRoleSession
+  - term: EndpointActionMap
+    definition: 'Object declared by the contract with fields: id, endpoint_pattern, http_method, required_action, resource_type, resource_pattern,
+      description, date_created.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/EndpointActionMap
+  - term: SCIMUser
+    definition: 'Object declared by the contract with fields: schemas, id, externalId, userName, name, displayName, emails, phoneNumbers, active,
+      groups, meta.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/SCIMUser
+  - term: SCIMGroup
+    definition: 'Object declared by the contract with fields: schemas, id, externalId, displayName, members, meta.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/SCIMGroup
+  - term: SCIMListResponse
+    definition: 'Object declared by the contract with fields: schemas, totalResults, startIndex, itemsPerPage, Resources.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/SCIMListResponse
+  - term: SCIMPatchOp
+    definition: 'Object declared by the contract with fields: schemas, Operations.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/SCIMPatchOp
+  - term: log
+    definition: Log line information
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/log
+  - term: log-meta
+    definition: 'Object declared by the contract with fields: next_page_url, continue_time, returned_count, unreturned_count, total_count.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/log-meta
+  - term: ExtendedLog
+    definition: 'Object declared by the contract with fields: id, date_created, cluster_id, region, location, label, sub_status, storage_status,
+      s3_hostname, s3_access_key, s3_secret_key, bucket_name. (9 more)'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/ExtendedLog
+  - term: ExtendedLogCluster
+    definition: 'Object declared by the contract with fields: id, region, hostname, name, deploy.'
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/ExtendedLogCluster
+  - term: Meta
+    definition: Pagination metadata
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/Meta
+  - term: MetaWithoutPagination
+    definition: Result Count metadata
+    tags:
+    - Object
+    source: openapi/vultr-iam-openapi.yml#/components/schemas/MetaWithoutPagination
+  - term: invoice
+    definition: 'Object declared by the contract with fields: id, date, description, amount, balance.'
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/invoice
+  - term: vke-cluster
+    definition: VKE Cluster
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/vke-cluster
+  - term: nodepool-instances
+    definition: Instance that belongs to a nodepool
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/nodepool-instances
+  - term: nodepools
+    definition: NodePool
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/nodepools
+  - term: network
+    definition: Network information.
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/network
+  - term: vpc
+    definition: VPC information.
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/vpc
+  - term: vpc2
+    definition: VPC 2.0 information.
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/vpc2
+  - term: instance-vpc2
+    definition: VPC 2.0 information.
+    tags:
+    - Object
+    source: openapi/vultr-openapi.yml#/components/schemas/instance-vpc2

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-assumed-role-session-schema.json",
+  "title": "AssumedRoleSession",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-iam-openapi.yml#/components/schemas/AssumedRoleSession",
+  "type": "object",
+  "properties": {
+    "session_token": {
+      "type": "string",
+      "description": "The session token"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the user who assumed the role"
+    },
+    "role_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the role that was assumed"
+    },
+    "session_name": {
+      "type": "string",
+      "description": "Name of the session"
+    },
+    "auth_method": {
+      "type": "string",
+      "description": "Authentication method used"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the session expires"
+    },
+    "assumed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the role was assumed"
+    },
+    "remaining_duration": {
+      "type": "integer",
+      "description": "Remaining seconds until expiration"
+    },
+    "conditions_met": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which conditions were met"
+    },
+    "source_ip": {
+      "type": "string",
+      "description": "IP address of the request"
+    }
+  }
+}

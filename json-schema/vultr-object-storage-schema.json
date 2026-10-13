@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-object-storage-schema.json",
+  "title": "object-storage",
+  "description": "Object Storage information.",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/vultr-schema-openapi.json#/components/schemas/object-storage",
+  "type": "object",
+  "x-tags": [
+    "s3"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "A unique ID for the Object Storage."
+    },
+    "date_created": {
+      "type": "string",
+      "description": "Date the Object Store was created."
+    },
+    "cluster_id": {
+      "type": "integer",
+      "description": "The [Cluster id](#operation/list-object-storage-clusters)."
+    },
+    "region": {
+      "type": "string",
+      "description": "The [Region id](#operation/list-regions) for this Object Storage."
+    },
+    "label": {
+      "type": "string",
+      "description": "The user-supplied label for this Object Storage."
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of this Object Storage.\n\n* active\n* pending"
+    },
+    "s3_hostname": {
+      "type": "string",
+      "description": "The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage."
+    },
+    "s3_access_key": {
+      "type": "string",
+      "description": "The Object Storage access key."
+    },
+    "s3_secret_key": {
+      "type": "string",
+      "description": "The Object Storage secret key."
+    }
+  }
+}

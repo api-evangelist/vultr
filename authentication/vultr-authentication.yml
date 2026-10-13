@@ -1,0 +1,17 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/vultr-openapi.yml
+summary:
+  types:
+  - http
+schemes:
+- name: API Key
+  type: http
+  scheme: bearer
+  description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys\
+    \ in the Vultr customer portal. Please do not share API keys publicly, or embed them in\
+    \ client-side code. It is a good security practice to restrict their use by IP address in\
+    \ the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate\
+    \ a request, send your API Key as a bearer token in the request "
+  sources:
+  - openapi/vultr-openapi.yml

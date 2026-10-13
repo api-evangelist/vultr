@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/vultr/main/json-schema/vultr-role-trust-schema.json",
+  "title": "RoleTrust",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/vultr-iam-openapi.yml#/components/schemas/RoleTrust",
+  "type": "object",
+  "required": [
+    "id",
+    "role_name",
+    "trust_type",
+    "date_created"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "role_name": {
+      "type": "string",
+      "description": "Name of the role that can be assumed"
+    },
+    "trust_type": {
+      "type": "string",
+      "enum": [
+        "TemporaryAssumption"
+      ],
+      "description": "Type of trust relationship"
+    },
+    "trusted_user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "User that can assume the role (if user trust)"
+    },
+    "trusted_group_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Group that can assume the role (if group trust)"
+    },
+    "user_display": {
+      "type": "string",
+      "description": "Display name of the trusted user (if user trust)"
+    },
+    "group_display": {
+      "type": "string",
+      "description": "Display name of the trusted group (if group trust)"
+    },
+    "conditions": {
+      "type": "object",
+      "description": "Conditions that must be met to assume the role"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this trust relationship expires"
+    },
+    "date_created": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,23 +1,220 @@
 aid: vultr
 name: Vultr
-description: 'Vultr is a company surfaced via the API Evangelist harvest backlog (source: market-gap:object-storage)
-  and added to the network as a stub for full-pipeline profiling.'
+description: Vultr is a global cloud infrastructure provider offering Cloud Compute, Bare Metal, GPU, Kubernetes (VKE), Managed Databases, S3-compatible Object Storage, Block Storage, networking (VPC, load balancers, DNS, firewalls) and Serverless Inference across worldwide regions. Everything in the customer portal is scriptable through the RESTful Vultr API v2 at api.vultr.com/v2 (Bearer API key, cursor pagination), with a separate IAM & SCIM Management API, an official hosted MCP server at mcp.vultr.com, a first-party CLI and SDKs in Go, Node, Python, PHP, Ruby, Java and C#.
 url: https://raw.githubusercontent.com/api-evangelist/vultr/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:market-gap:object-storage
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
 specificationVersion: '0.20'
 created: '2026-10-13'
 modified: '2026-10-13'
 tags:
 - Company
-apis: []
+- Cloud
+- Infrastructure
+- Compute
+- Object Storage
+- Kubernetes
+- Databases
+- GPU
+- MCP
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: RateLimits
+  url: rate-limits/vultr-rate-limits.yml
+- type: AgenticAccess
+  url: agentic-access/vultr-agentic-access.yml
+- type: Spectral
+  url: rules/vultr-rules.yml
+- type: JSONLD
+  url: json-ld/vultr-context.jsonld
+- type: Vocabulary
+  url: vocabulary/vultr-vocabulary.yml
+- type: DataModel
+  url: data-model/vultr-data-model.yml
+- type: ErrorCatalog
+  url: errors/vultr-problem-types.yml
+- type: Conformance
+  url: conformance/vultr-conformance.yml
+- type: LLMsTxt
+  url: llms/vultr-llms.txt
+- type: WellKnown
+  url: well-known/vultr-well-known.yml
+- type: Hosts
+  url: hosts/vultr-hosts.yml
+- type: Vendors
+  url: vendors/vultr-vendors.yml
+- type: SDKs
+  url: packages/vultr-packages.yml
+- type: Packages
+  url: packages/vultr-packages.yml
+- type: GettingStarted
+  url: https://docs.vultr.com/inference-cookbook/rocm/getting-started/first-deployment
+- type: Authentication
+  url: authentication/vultr-authentication.yml
+- type: DomainSecurity
+  url: security/vultr-domain-security.yml
 - type: Website
   url: https://www.vultr.com
+- type: Documentation
+  url: https://docs.vultr.com
+- type: GitHubOrganization
+  url: https://github.com/vultr
+- type: Blog
+  url: https://blogs.vultr.com
+- type: ChangeLog
+  url: https://docs.vultr.com/platform/api-opensource-changelog
+- type: CLI
+  url: https://docs.vultr.com/reference/vultr-cli
+- type: MCPServer
+  url: mcp/vultr-mcp.yml
+apis:
+- aid: vultr:vultr-api
+  name: Vultr API v2
+  description: RESTful Vultr API v2 covering instances, bare metal, object storage, block storage, Kubernetes, managed databases, networking, DNS, billing and account resources. Bearer API key authentication, cursor-based pagination, 30 requests/second per IP rate limit.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Cloud
+  - Compute
+  - Object Storage
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://raw.githubusercontent.com/vultr/vultr-java/HEAD/api/openapi.yaml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+- aid: vultr:vultr-iam-management-api
+  name: Vultr IAM & SCIM Management API
+  description: Vultr IAM and SCIM management API for users, groups, roles, policies and SCIM provisioning on Vultr organizations, published in the vultr/iam-management-api repository.
+  humanURL: https://github.com/vultr/iam-management-api
+  baseURL: https://api.vultr.com
+  tags:
+  - IAM
+  - SCIM
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://raw.githubusercontent.com/vultr/iam-management-api/main/iam-management-api.yml
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-schema-api
+  name: Vultr Schema API
+  description: 'The Vultr API v2 is a set of HTTP endpoints that adhere to RESTful design principles and CRUD actions with predictable URIs. It
+
+    uses standard HTTP response codes, authentication, and verbs. The API has consistent and well-formed JSON requests and responses with cursor-based
+
+    pagination to simplify li'
+  humanURL: https://github.com/vultr/api-postman-collection
+  baseURL: https://api.vultr.com/v2
+  properties:
+  - type: OpenAPI
+    url: openapi/_original/vultr-schema-openapi.json
+  - type: JSONSchema
+    url: json-schema/vultr-loadbalancer-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-instance-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-baremetal-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-vke-cluster-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-firewall-rule-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-object-storage-schema.json
+- aid: vultr:vultr-iam-management-api-api
+  name: Vultr Iam Management Api API
+  description: Complete Identity, Access Management, and SCIM provisioning endpoints for users, groups, roles, policies, and sessions.
+  humanURL: https://github.com/vultr/iam-management-api
+  baseURL: https://api.vultr.com
+  properties:
+  - type: OpenAPI
+    url: openapi/_original/vultr-iam-management-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-schema-api
+  name: Vultr Schema API
+  description: 'The Vultr API v2 is a set of HTTP endpoints that adhere to RESTful design principles and CRUD actions with predictable URIs. It
+
+    uses standard HTTP response codes, authentication, and verbs. The API has consistent and well-formed JSON requests and responses with cursor-based
+
+    pagination to simplify li'
+  humanURL: https://github.com/vultr/api-postman-collection
+  baseURL: https://api.vultr.com/v2
+  properties:
+  - type: OpenAPI
+    url: openapi/_original/vultr-schema-openapi.json
+  - type: JSONSchema
+    url: json-schema/vultr-loadbalancer-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-instance-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-baremetal-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-vke-cluster-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-firewall-rule-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-object-storage-schema.json
+- aid: vultr:vultr-iam-management-api-api
+  name: Vultr Iam Management Api API
+  description: Complete Identity, Access Management, and SCIM provisioning endpoints for users, groups, roles, policies, and sessions.
+  humanURL: https://github.com/vultr/iam-management-api
+  baseURL: https://api.vultr.com
+  properties:
+  - type: OpenAPI
+    url: openapi/_original/vultr-iam-management-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+x-enrichment:
+  status: enriched
+  pass: local-v5
+  date: '2026-10-13'
