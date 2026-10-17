@@ -1,0 +1,4761 @@
+openapi: 3.2.0
+info:
+  title: Vultr Instances API
+  version: '2.0'
+  description: 'Operations tagged instances across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Instances
+  x-displayName: Instances
+  description: Vultr Cloud instances can be deployed with your preferred operating system or pre-installed application in seconds. High Frequency Compute instances are powered by high clock speed CPU's and NVMe local storage to power your most demanding applications. Dedicated Cloud instances have dedicated CPU, SSD drives, and RAM.
+paths:
+  /instances:
+    get:
+      summary: List Instances
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/instance'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                instance:
+                  value:
+                    instances:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      os: CentOS SELinux 8 x64
+                      ram: 2048
+                      disk: 55
+                      main_ip: 192.0.2.123
+                      vcpu_count: 1
+                      region: atl
+                      plan: vc2-6c-16gb
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      status: active
+                      allowed_bandwidth: 2000
+                      netmask_v4: 255.255.252.0
+                      gateway_v4: 192.0.2.1
+                      power_status: running
+                      server_status: ok
+                      v6_network: '2001:0db8:1112:18fb::'
+                      v6_main_ip: 2001:0db8:1112:18fb:0200:00ff:fe00:0000
+                      v6_network_size: 64
+                      label: Example Instance
+                      internal_ip: ''
+                      kvm: https://my.vultr.com/subs/vps/novnc/api.php?data=00example11223344
+                      hostname: my_hostname
+                      tag: Example Tag
+                      os_id: 215
+                      app_id: 0
+                      image_id: ''
+                      firewall_group_id: ''
+                      features:
+                      - ddos_protection
+                      - ipv6
+                      - auto_backups
+                    meta:
+                      total: 3
+                      links:
+                        next: WxYzExampleNext
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: list-instances
+      description: List all VPS instances in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      - schema:
+          type: string
+        in: query
+        name: tag
+        description: Filter by specific tag.
+      - schema:
+          type: string
+        in: query
+        name: label
+        description: Filter by label.
+      - schema:
+          type: string
+        in: query
+        name: main_ip
+        description: Filter by main ip address.
+    post:
+      summary: Create Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"plan\" : \"vc2-6c-16gb\",\n    \"label\" : \"Example Instance\",\n    \"os_id\" : 215,\n    \"user_data\" : \"QmFzZTY0IEV4YW1wbGUgRGF0YQ==\",\n    \"backups\" : \"enabled\",\n    \"hostname\": \"my_hostname\"\n  }'"
+      responses:
+        '202':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    $ref: '#/components/schemas/instance'
+              examples:
+                instance:
+                  value:
+                    instance:
+                      id: 4f0f12e5-1f84-404f-aa84-85f431ea5ec2
+                      os: CentOS 8 Stream
+                      ram: 1024
+                      disk: 0
+                      main_ip: 0.0.0.0
+                      vcpu_count: 1
+                      region: ewr
+                      plan: vc2-1c-1gb
+                      date_created: '2021-09-14T13:22:20+00:00'
+                      status: pending
+                      allowed_bandwidth: 1000
+                      netmask_v4: ''
+                      gateway_v4: 0.0.0.0
+                      power_status: running
+                      server_status: none
+                      v6_network: ''
+                      v6_main_ip: ''
+                      v6_network_size: 0
+                      label: ''
+                      internal_ip: ''
+                      kvm: ''
+                      hostname: my_hostname
+                      tag: ''
+                      os_id: 401
+                      app_id: 0
+                      image_id: ''
+                      firewall_group_id: ''
+                      features: []
+                      default_password: v5{Fkvb#2ycPGwHs
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: create-instance
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                  description: The [Region id](#operation/list-regions) where the Instance is located.
+                plan:
+                  type: string
+                  description: The [Plan id](#operation/list-plans) to use when deploying this instance.
+                os_id:
+                  type: integer
+                  description: The [Operating System id](#operation/list-os) to use when deploying this instance.
+                ipxe_chain_url:
+                  type: string
+                  description: The URL location of the iPXE chainloader.
+                iso_id:
+                  type: string
+                  description: The [ISO id](#operation/list-isos) to use when deploying this instance.
+                script_id:
+                  type: string
+                  description: The [Startup Script id](#operation/list-startup-scripts) to use when deploying this instance.
+                snapshot_id:
+                  type: string
+                  description: The [Snapshot id](#operation/list-snapshots) to use when deploying the instance.
+                enable_ipv6:
+                  type: boolean
+                  description: 'Enable IPv6.
+
+
+                    * true
+
+                    * false'
+                attach_private_network:
+                  type: array
+                  description: An array of [Private Network ids](#operation/list-networks) to attach to this Instance. This parameter takes precedence over `enable_private_network`. Please choose one parameter.
+                  items:
+                    type: string
+                label:
+                  type: string
+                  description: A user-supplied label for this instance.
+                sshkey_id:
+                  type: array
+                  description: The [SSH Key id](#operation/list-ssh-keys) to install on this instance.
+                  items:
+                    type: string
+                backups:
+                  type: string
+                  description: 'Enable automatic backups for the instance.
+
+
+                    * enabled
+
+                    * disabled'
+                app_id:
+                  type: integer
+                  description: The [Application id](#operation/list-applications) to use when deploying this instance.
+                image_id:
+                  type: string
+                  description: The [Application image_id](#operation/list-applications) to use when deploying this instance.
+                user_data:
+                  type: string
+                  description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api) to attach to this instance.
+                ddos_protection:
+                  type: boolean
+                  description: 'Enable DDoS protection (there is an additional charge for this).
+
+
+                    * true
+
+                    * false'
+                activation_email:
+                  type: boolean
+                  description: 'Notify by email after deployment.
+
+
+                    * true
+
+                    * false (default)'
+                hostname:
+                  type: string
+                  description: The hostname to use when deploying this instance.
+                tag:
+                  type: string
+                  description: The user-supplied tag.
+                firewall_group_id:
+                  type: string
+                  description: The [Firewall Group id](#operation/list-firewall-groups) to attach to this Instance.
+                reserved_ipv4:
+                  type: string
+                  description: ID of the floating IP to use as the main IP of this server.
+                enable_private_network:
+                  type: boolean
+                  description: 'If `true`, private networking support will be added to the new server.
+
+
+                    This parameter attaches a single network. When no network exists in the region, it will be automatically created.
+
+
+                    If there are multiple private networks in the instance''s region, use `attach_private_network` instead to specify a network.'
+              required:
+              - region
+              - plan
+            examples:
+              request:
+                value:
+                  region: ewr
+                  plan: vc2-6c-16gb
+                  label: Example Instance
+                  os_id: 215
+                  user_data: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+                  backups: enabled
+                  hostname: my_hostname
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      description: 'Create a new VPS Instance in a `region` with the desired `plan`. Choose one of the following to deploy the instance:
+
+
+        * `os_id`
+
+        * `iso_id`
+
+        * `snapshot_id`
+
+        * `app_id`
+
+        * `image_id`
+
+
+        Supply other attributes as desired.'
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    $ref: '#/components/schemas/instance'
+              examples:
+                instance:
+                  value:
+                    instance:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      os: Ubuntu 20.04 x64
+                      ram: 16384
+                      disk: 384
+                      main_ip: 192.0.2.123
+                      vcpu_count: 4
+                      region: ewr
+                      plan: vc2-6c-16gb
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      status: active
+                      allowed_bandwidth: 5000
+                      netmask_v4: 255.255.254.0
+                      gateway_v4: 192.0.2.1
+                      power_status: running
+                      server_status: ok
+                      v6_network: ''
+                      v6_main_ip: ''
+                      v6_network_size: 0
+                      label: Example Instance
+                      internal_ip: ''
+                      kvm: https://my.vultr.com/subs/vps/novnc/api.php?data=00example11223344
+                      hostname: my_hostname
+                      tag: Example Tag
+                      os_id: 215
+                      app_id: 0
+                      image_id: ''
+                      firewall_group_id: ''
+                      features:
+                      - ddos_protection
+                      - ipv6
+                      - auto_backups
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-instance
+      description: Get information about an Instance.
+      security:
+      - API Key: []
+    patch:
+      summary: Update Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"Example Instance\",\n    \"tag\" : \"Example Tag\",\n    \"plan\" : \"vc2-24c-97gb\"\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    $ref: '#/components/schemas/instance'
+              examples:
+                example:
+                  value:
+                    instance:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      os: Ubuntu 20.04 x64
+                      ram: 16384
+                      disk: 384
+                      main_ip: 192.0.2.123
+                      vcpu_count: 4
+                      region: ewr
+                      plan: vc2-24c-97gb
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      status: active
+                      allowed_bandwidth: 5000
+                      netmask_v4: 255.255.254.0
+                      gateway_v4: 192.0.2.1
+                      power_status: running
+                      server_status: ok
+                      v6_network: ''
+                      v6_main_ip: ''
+                      v6_network_size: 0
+                      label: Example Instance
+                      internal_ip: ''
+                      kvm: https://my.vultr.com/subs/vps/novnc/api.php?data=00example11223344
+                      hostname: my_hostname
+                      tag: Example Tag
+                      os_id: 215
+                      app_id: 0
+                      image_id: ''
+                      firewall_group_id: ''
+                      features:
+                      - ddos_protection
+                      - ipv6
+                      - auto_backups
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-instance
+      description: 'Update information for an Instance. All attributes are optional. If not set, the attributes will retain their original values.
+
+
+        **Note:** Changing `os_id`, `app_id` or `image_id` may take a few extra seconds to complete.'
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app_id:
+                  type: integer
+                  description: Reinstall the instance with this [Application id](#operation/list-applications).
+                image_id:
+                  type: string
+                  description: Reinstall the instance with this [Application image_id](#operation/list-applications).
+                backups:
+                  description: 'Enable automatic backups for the instance.
+
+
+                    * enable
+
+                    * disable'
+                  type: string
+                firewall_group_id:
+                  type: string
+                  description: The [Firewall Group id](#operation/list-firewall-groups) to attach to this Instance.
+                enable_ipv6:
+                  type: boolean
+                  description: 'Enable IPv6.
+
+
+                    * true
+
+                    * false'
+                os_id:
+                  type: string
+                  description: Reinstall the instance with this [ISO id](#operation/list-isos).
+                user_data:
+                  type: string
+                  description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api) to attach to this instance.
+                tag:
+                  type: string
+                  description: The user-supplied tag.
+                plan:
+                  type: string
+                  description: Upgrade the instance with this [Plan id](#operation/list-plans).
+                ddos_protection:
+                  description: 'Enable DDoS Protection (there is an additional charge for this).
+
+
+                    * true
+
+                    * false'
+                  type: boolean
+                attach_private_network:
+                  type: array
+                  description: An array of [Private Network ids](#operation/list-networks) to attach to this Instance. This parameter takes precedence over `enable_private_network`. Please choose one parameter.
+                  items:
+                    type: string
+                detach_private_network:
+                  type: array
+                  description: An array of [Private Network ids](#operation/list-networks) to detach from this Instance. This parameter takes precedence over `enable_private_network`.
+                  items:
+                    type: string
+                enable_private_network:
+                  type: boolean
+                  description: 'If `true`, private networking support will be added to the new server.
+
+
+                    This parameter attaches a single network. When no network exists in the region, it will be automatically created.
+
+
+                    If there are multiple private networks in the instance''s region, use `attach_private_network` instead to specify a network.'
+                label:
+                  type: string
+                  description: The user supplied label
+            examples:
+              request:
+                value:
+                  label: Example Instance
+                  tag: Example Tag
+                  plan: vc2-24c-97gb
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    delete:
+      summary: Delete Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-instance
+      description: Delete an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/halt:
+    post:
+      summary: Halt Instances
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/halt\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_ids\" : [\n      \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\",\n      \"1d651bd2-b93c-4bb6-8b91-0546fd765f15\",\n      \"c2790719-278d-474c-8dff-cb35d6e5503f\"\n    ]\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: halt-instances
+      description: Halt Instances.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_ids:
+                  type: array
+                  description: The [Instance IDs](#operation/list-instances) to halt.
+                  items:
+                    type: string
+            examples:
+              example:
+                value:
+                  instance_ids:
+                  - cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  - 1d651bd2-b93c-4bb6-8b91-0546fd765f15
+                  - c2790719-278d-474c-8dff-cb35d6e5503f
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/reboot:
+    post:
+      summary: Reboot instances
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/reboot\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_ids\" : [\n      \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\",\n      \"1d651bd2-b93c-4bb6-8b91-0546fd765f15\",\n      \"c2790719-278d-474c-8dff-cb35d6e5503f\"\n    ]\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: reboot-instances
+      description: Reboot Instances.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_ids:
+                  type: array
+                  description: The [Instance IDs](#operation/list-instances) to reboot.
+                  items:
+                    type: string
+            examples:
+              example:
+                value:
+                  instance_ids:
+                  - cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  - 1d651bd2-b93c-4bb6-8b91-0546fd765f15
+                  - c2790719-278d-474c-8dff-cb35d6e5503f
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/start:
+    post:
+      summary: Start instances
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/start\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_ids\" : [\n      \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\",\n      \"1d651bd2-b93c-4bb6-8b91-0546fd765f15\",\n      \"c2790719-278d-474c-8dff-cb35d6e5503f\"\n    ]\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: start-instances
+      description: Start Instances.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_ids:
+                  type: array
+                  description: The [Instance IDs](#operation/list-instances) to start.
+                  items:
+                    type: string
+            examples:
+              example:
+                value:
+                  instance_ids:
+                  - cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  - 1d651bd2-b93c-4bb6-8b91-0546fd765f15
+                  - c2790719-278d-474c-8dff-cb35d6e5503f
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/start:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Start instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/start\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: start-instance
+      description: Start an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/reboot:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Reboot Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/reboot\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: reboot-instance
+      description: Reboot an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/reinstall:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Reinstall Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/reinstall\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"hostname\" : \"my_new_hostname\"\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    $ref: '#/components/schemas/instance'
+              examples:
+                example:
+                  value:
+                    instance:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      os: Ubuntu 20.04 x64
+                      ram: 16384
+                      disk: 384
+                      main_ip: 192.0.2.123
+                      vcpu_count: 4
+                      region: ewr
+                      plan: vc2-6c-16gb
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      status: active
+                      allowed_bandwidth: 5000
+                      netmask_v4: 255.255.254.0
+                      gateway_v4: 192.0.2.1
+                      power_status: running
+                      server_status: ok
+                      v6_network: ''
+                      v6_main_ip: ''
+                      v6_network_size: 0
+                      label: Example Instance
+                      internal_ip: ''
+                      kvm: https://my.vultr.com/subs/vps/novnc/api.php?data=00example11223344
+                      hostname: my_new_hostname
+                      tag: Example Tag
+                      os_id: 215
+                      app_id: 0
+                      image_id: ''
+                      firewall_group_id: ''
+                      features:
+                      - ddos_protection
+                      - ipv6
+                      - auto_backups
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: reinstall-instance
+      description: 'Reinstall an Instance using an optional `hostname`.
+
+
+        **Note:** This action may take a few extra seconds to complete.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hostname:
+                  type: string
+                  description: The hostname to use when reinstalling this instance.
+            examples:
+              request:
+                value:
+                  hostname: my_new_hostname
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/bandwidth:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Instance Bandwidth
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/bandwidth\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bandwidth:
+                    type: object
+                    description: This object will contain objects that represent days in the month (UTC). The date is denoted by the nested objects keys.
+                    properties:
+                      '2020-10-10':
+                        $ref: '#/components/schemas/bandwidth'
+                      '2020-10-11':
+                        $ref: '#/components/schemas/bandwidth'
+              examples:
+                bandwidth:
+                  value:
+                    bandwidth:
+                      '2020-07-25':
+                        incoming_bytes: 15989787
+                        outgoing_bytes: 25327729
+                      '2020-07-26':
+                        incoming_bytes: 13964112
+                        outgoing_bytes: 22257069
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-bandwidth
+      description: 'Get bandwidth information about an Instance.
+
+
+        The `bandwidth` object in a successful response contains objects representing a day in the month. The date is denoted by the nested object keys. Days begin and end in the UTC timezone. The bandwidth utilization data contained within the date object is refreshed periodically. We do not recommend using this endpoint to gather real-time metrics.'
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/neighbors:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Instance neighbors
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/neighbors\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  neighbors:
+                    type: array
+                    description: An array of [Instance ids](#operation/list-instances) in the same location as this Instance.
+                    items:
+                      type: string
+              examples:
+                response:
+                  value:
+                    neighbors:
+                    - 478dbfe7-43f8-4dc8-940c-8bb61f547400
+                    - a8047e6b-16bd-42be-8351-58df7e5ab89c
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-neighbors
+      security:
+      - API Key: []
+      description: Get a list of other instances in the same location as this Instance.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/private-networks:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: List instance Private Networks
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/private-networks\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  private_networks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/private-networks'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    private_networks:
+                    - network_id: d325e78b-bcec-4d4e-b9b8-9c294f37b04d
+                      mac_address: 00:00:5e:00:53:5e
+                      ip_address: 10.99.0.123
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-instance-private-networks
+      security:
+      - API Key: []
+      description: List the private networks for an Instance.
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/iso:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Instance ISO Status
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/iso\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iso_status:
+                    type: object
+                    properties:
+                      iso_id:
+                        description: The [ISO id](#operation/list-isos).
+                        type: string
+                      state:
+                        type: string
+                        description: 'The status of this ISO.
+
+                          * ready
+
+                          * attached'
+              examples:
+                response:
+                  value:
+                    iso_status:
+                      state: ready
+                      iso_id: 0532a75b-14e8-48b8-b27e-1ebcf382a804
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-iso-status
+      description: Get the ISO status for an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/iso/attach:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+    post:
+      summary: Attach ISO to Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/iso/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"iso_id\" : \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iso_status:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      iso_id:
+                        type: string
+              examples:
+                example:
+                  value:
+                    iso_status:
+                      status: ismounting
+                      iso_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: attach-instance-iso
+      description: Attach an ISO to an Instance.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                iso_id:
+                  description: The [ISO id](#operation/list-isos) to attach to this Instance.
+                  type: string
+            examples:
+              request:
+                value:
+                  iso_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/iso/detach:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Detach ISO from instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/iso/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iso_status:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+              examples:
+                example:
+                  value:
+                    iso_status:
+                      status: isunmounting
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: detach-instance-iso
+      description: Detach the ISO from an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/private-networks/attach:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Attach Private Network to Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/private-networks/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"network_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: attach-instance-network
+      description: Attach Private Network to an Instance.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                network_id:
+                  type: string
+                  description: The [Private Network id](#operation/list-networks) to attach to this Instance.
+            examples:
+              example:
+                value:
+                  network_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/private-networks/detach:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Detach Private Network from Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/private-networks/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"network_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: detach-instance-network
+      description: Detach Private Network from an Instance.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                network_id:
+                  type: string
+                  description: The [Private Network id](#operation/list-networks) to detach from this Instance.
+            examples:
+              example:
+                value:
+                  network_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/backup-schedule:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Set Instance Backup Schedule
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/backup-schedule\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"type\": \"daily\",\n    \"hour\": 10,\n    \"dow\": 1,\n    \"dom\": 1\n  }'"
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-instance-backup-schedule
+      description: Set the backup schedule for an Instance in UTC. The `type` is required.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: 'Type of backup schedule:
+
+
+                    |   | Value | Description |
+
+                    | - | ------ | ------------- |
+
+                    |   | daily | Back up once per day at `hour`. |
+
+                    |   | weekly | Back up once per week on `dow` at `hour`. |
+
+                    |   | monthly | Back up each month at `dom` at `hour`. |
+
+                    |   | daily\_alt\_even | Back up on even dates at `hour`. |
+
+                    |   | daily\_alt\_odd | Back up on odd dates at `hour`. |'
+                hour:
+                  description: Hour of day to run in UTC.
+                  type: integer
+                dow:
+                  description: 'Day of week to run.
+
+
+                    |   | Value | Description |
+
+                    | - | ------ | ------------- |
+
+                    |   | 1 | Sunday |
+
+                    |   | 2 | Monday |
+
+                    |   | 3 | Tuesday |
+
+                    |   | 4 | Wednesday |
+
+                    |   | 5 | Thursday |
+
+                    |   | 6 | Friday |
+
+                    |   | 7 | Saturday |'
+                  type: integer
+                dom:
+                  description: Day of month to run. Use values between 1 and 28.
+                  type: integer
+              required:
+              - type
+            examples:
+              request:
+                value:
+                  type: daily
+                  hour: 10
+                  dow: 1
+                  dom: 1
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    get:
+      summary: Get Instance Backup Schedule
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/backup-schedule\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  backup_schedule:
+                    $ref: '#/components/schemas/backup-schedule'
+              examples:
+                backup-schedule:
+                  value:
+                    backup_schedule:
+                      enabled: true
+                      type: daily
+                      next_scheduled_time_utc: '2020-07-28 00:00:00'
+                      hour: 10
+                      dow: 1
+                      dom: 1
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-backup-schedule
+      description: Get the backup schedule for an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/restore:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Restore Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/restore\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"backup_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: object
+                    properties:
+                      restore_type:
+                        type: string
+                      restore_id:
+                        type: string
+                      status:
+                        type: string
+              examples:
+                example:
+                  value:
+                    status:
+                      restore_type: backup_id
+                      restore_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      status: inprogress
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: restore-instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backup_id:
+                  type: string
+                  description: The [Backup id](#operation/list-backups) used to restore this instance.
+                snapshot_id:
+                  type: string
+                  description: The [Snapshot id](#operation/list-snapshots) used to restore this instance.
+            examples:
+              request:
+                value:
+                  backup_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      description: Restore an Instance from either `backup_id` or `snapshot_id`.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv4:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: List Instance IPv4 Information
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv4\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ipv4s:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/baremetal-ipv4'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                ipv4:
+                  value:
+                    ipv4s:
+                    - ip: 192.0.2.123
+                      netmask: 255.255.254.0
+                      gateway: 192.0.2.1
+                      type: main_ip
+                      reverse: host1.example.com
+                    - ip: 203.0.113.123
+                      netmask: 255.255.255.255
+                      gateway: ''
+                      type: secondary_ip
+                      reverse: host2.example.com
+                    - ip: 10.99.0.123
+                      netmask: 255.255.0.0
+                      gateway: ''
+                      type: private
+                      reverse: ''
+                    meta:
+                      total: 3
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-ipv4
+      security:
+      - API Key: []
+      description: List the IPv4 information for an Instance.
+      parameters:
+      - schema:
+          type: boolean
+        in: query
+        name: public_network
+        description: 'List only Public networks.
+
+
+          * yes
+
+          * no'
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: 'Number of items requested per page. Default is 100 and Max is 500.
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create IPv4
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv4\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"reboot\" : true\n  }'"
+      operationId: create-instance-ipv4
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                example:
+                  value:
+                    ipv4:
+                      ip: 192.0.2.123
+                      netmask: 255.255.254.0
+                      gateway: 192.0.2.1
+                      type: secondary_ip
+                      reverse: 192.0.2.123.vultr.com
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Create an IPv4 address for an Instance.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reboot:
+                  type: boolean
+                  description: 'Set if the server is rebooted immediately after the IPv4 address is created.
+
+
+                    * true (default)
+
+                    * false'
+            examples:
+              example:
+                value:
+                  reboot: true
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      tags:
+      - Instances
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv6:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Instance IPv6 Information
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv6\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ipv6s:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/baremetal-ipv6'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                ipv6:
+                  value:
+                    ipv6s:
+                    - ip: 2001:0db8:5:6bb:5400:02ff:fee5:3fe3
+                      network: '2001:0db8:5:6bb::'
+                      network_size: 64
+                      type: main_ip
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-instance-ipv6
+      security:
+      - API Key: []
+      description: Get the IPv6 information for an VPS Instance.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv6/reverse:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Create Instance Reverse IPv6
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv6/reverse\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ip\" : \"2001:0db8:5:6bb:5400:2ff:fee5:2\",\n    \"reverse\" : \"foo.example.com\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-instance-reverse-ipv6
+      description: Create a reverse IPv6 entry for an Instance. The `ip` and `reverse` attributes are required. IP address must be in full, expanded format.
+      parameters: []
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip:
+                  type: string
+                  description: The IPv6 address in full, expanded format.
+                reverse:
+                  type: string
+                  description: The IPv6 reverse entry.
+              required:
+              - ip
+              - reverse
+            examples:
+              request:
+                value:
+                  ip: 2001:0db8:0005:6bb0:5400:2ff0:fee5:0002
+                  reverse: foo.example.com
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    get:
+      summary: List Instance IPv6 Reverse
+      operationId: list-instance-ipv6-reverse
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reverse_ipv6s:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reverse:
+                          type: string
+                          description: The IPv6 reverse entry.
+                        ip:
+                          type: string
+                          description: The IPv6 address.
+              examples:
+                response:
+                  value:
+                    reverse_ipv6s:
+                    - ip: 2001:0db8:5:6bb:5400:2ff:fee5:1
+                      reverse: foo.example.com
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv6/reverse\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      description: List the reverse IPv6 information for an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv4/reverse:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Create Instance Reverse IPv4
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv4/reverse\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ip\" : \"192.0.2.123\",\n    \"reverse\" : \"foo.example.com\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-instance-reverse-ipv4
+      description: Create a reverse IPv4 entry for an Instance. The `ip` and `reverse` attributes are required.
+      parameters: []
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip:
+                  type: string
+                  description: The IPv4 address.
+                reverse:
+                  type: string
+                  description: The IPv4 reverse entry.
+              required:
+              - ip
+              - reverse
+            examples:
+              request:
+                value:
+                  ip: 192.0.2.123
+                  reverse: foo.example.com
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/user-data:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Instance User Data
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/user-data\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_data:
+                    type: object
+                    properties:
+                      data:
+                        type: string
+                        description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api) attached to this instance.
+              examples:
+                response:
+                  value:
+                    user_data:
+                      data: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+      operationId: get-instance-userdata
+      security:
+      - API Key: []
+      description: Get the user-supplied, base64 encoded user data for an Instance.
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/halt:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Halt Instance
+      operationId: halt-instance
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Halt an Instance.
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/halt\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      security:
+      - API Key: []
+      tags:
+      - Instances
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv4/reverse/default:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    post:
+      summary: Set Default Reverse DNS Entry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/reverse/default\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ip\" : \"192.0.2.123\"\n  }'"
+      operationId: post-instances-instance-id-ipv4-reverse-default
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Set a reverse DNS entry for an IPv4 address
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip:
+                  type: string
+              required:
+              - ip
+            examples:
+              example:
+                value:
+                  ip: 192.0.2.123
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      tags:
+      - Instances
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv4/{ipv4}:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    - schema:
+        type: string
+      name: ipv4
+      in: path
+      required: true
+      description: The IPv4 address.
+    delete:
+      summary: Delete IPv4 Address
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv4/{ipv4}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      operationId: delete-instance-ipv4
+      description: Delete an IPv4 address from an Instance.
+      security:
+      - API Key: []
+      parameters: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/ipv6/reverse/{ipv6}:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    - schema:
+        type: string
+      name: ipv6
+      in: path
+      required: true
+      description: The IPv6 address.
+    delete:
+      summary: Delete Instance Reverse IPv6
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/ipv6/reverse/{ipv6}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      operationId: delete-instance-reverse-ipv6
+      description: Delete the reverse IPv6 for an Instance.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/upgrades:
+    parameters:
+    - schema:
+        type: string
+      name: instance-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    get:
+      summary: Get Available Instance Upgrades
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/upgrades\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  upgrades:
+                    type: object
+                    properties:
+                      applications:
+                        type: array
+                        items: {}
+                      plans:
+                        type: array
+                        items: {}
+                      os:
+                        type: array
+                        items: {}
+              examples:
+                example:
+                  value:
+                    upgrades:
+                      os:
+                      - id: 900
+                        name: Example CentOS 6 x64
+                        arch: x64
+                        family: centos
+                      - id: 901
+                        name: Example CentOS 6 i386
+                        arch: i386
+                        family: centos
+                      applications:
+                      - id: 1
+                        name: LEMP
+                        short_name: lemp
+                        deploy_name: LEMP on CentOS 6 x64
+                        type: one-click
+                        vendor: vultr
+                        image_id: ''
+                      - id: 39
+                        name: LEMP
+                        short_name: lemp
+                        deploy_name: LEMP on CentOS 7 x64
+                        type: one-click
+                        vendor: vultr
+                        image_id: ''
+                      - id: 1028
+                        name: OpenLiteSpeed WordPress
+                        short_name: openlitespeedwordpress
+                        deploy_name: OpenLiteSpeed WordPress on Ubuntu 20.04 x64
+                        type: marketplace
+                        vendor: LiteSpeed_Technologies
+                        image_id: openlitespeed-wordpress
+                      plans:
+                      - vc2-2c-4gb
+                      - vc2-4c-8gb
+                      - vc2-6c-16gb
+                      - vc2-8c-64gb
+                      - vc2-16c-64gb
+                      - vc2-24c-97gb
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-instance-upgrades
+      description: Get available upgrades for an Instance
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: type
+        description: 'Filter upgrade by type:
+
+
+          - all (applications, os, plans)
+
+          - applications
+
+          - os
+
+          - plans'
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpcs:
+    get:
+      description: List the VPCs for an Instance.
+      operationId: list-instance-vpcs
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of items requested per page. Default is 100 and Max is 500.
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    vpcs:
+                    - id: d325e78b-bcec-4d4e-b9b8-9c294f37b04d
+                      mac_address: 00:00:5e:00:53:5e
+                      ip_address: 10.99.0.123
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+              schema:
+                $ref: '#/components/schemas/list_instance_vpcs_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List instance VPCs
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpcs\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpc2:
+    get:
+      description: List the VPC 2.0 networks for an Instance.
+      operationId: list-instance-vpc2
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of items requested per page. Default is 100 and Max is 500.
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    vpcs:
+                    - id: d325e78b-bcec-4d4e-b9b8-9c294f37b04d
+                      mac_address: 00:00:5e:00:53:5e
+                      ip_address: 10.99.0.123
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+              schema:
+                $ref: '#/components/schemas/list_instance_vpc2_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Instance VPC 2.0 Networks
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpc2\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpcs/attach:
+    post:
+      description: Attach a VPC to an Instance.
+      operationId: attach-instance-vpc
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  vpc_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+            schema:
+              $ref: '#/components/schemas/attach_instance_vpc_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Attach VPC to Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpcs/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"vpc_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpcs/detach:
+    post:
+      description: Detach a VPC from an Instance.
+      operationId: detach-instance-vpc
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  vpc_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+            schema:
+              $ref: '#/components/schemas/detach_instance_vpc_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Detach VPC from Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpcs/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"vpc_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpc2/attach:
+    post:
+      description: Attach a VPC 2.0 Network to an Instance.
+      operationId: attach-instance-vpc2
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  vpc_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  ip_address: 10.1.144.4
+            schema:
+              $ref: '#/components/schemas/attach_instance_vpc2_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Attach VPC 2.0 Network to Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpc2/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"vpc_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n    \"ip_address\": \"10.1.144.4\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /instances/{instance-id}/vpc2/detach:
+    post:
+      description: Detach a VPC 2.0 Network from an Instance.
+      operationId: detach-instance-vpc2
+      parameters:
+      - description: The [Instance ID](#operation/list-instances).
+        explode: false
+        in: path
+        name: instance-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  vpc_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+            schema:
+              $ref: '#/components/schemas/detach_instance_vpc2_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Detach VPC 2.0 Network from Instance
+      tags:
+      - Instances
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/instances/{instance-id}/vpc2/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"vpc_id\": \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    baremetal-ipv6:
+      title: baremetal-ipv6
+      type: object
+      x-tags:
+      - baremetal
+      description: Bare Metal IPv6 information.
+      properties:
+        ip:
+          type: string
+          description: A unique ID for the IPv6 address.
+        network:
+          type: string
+          description: The IPv6 subnet.
+        network_size:
+          type: integer
+          description: The IPv6 network size in bits.
+        type:
+          type: string
+          description: 'The type of IP address.
+
+
+            * main_ip'
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    private-networks:
+      title: private-networks
+      type: object
+      x-tags:
+      - private-networks
+      description: Private Network information.
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Private Network.
+        mac_address:
+          type: string
+          description: The assigned MAC address.
+        ip_address:
+          type: string
+          description: The assigned IP address.
+      x-examples:
+        example-1: {}
+    instance:
+      title: instance
+      type: object
+      x-tags:
+      - instances
+      description: Instance information.
+      x-examples: {}
+      properties:
+        id:
+          type: string
+          description: A unique ID for the VPS Instance.
+        os:
+          type: string
+          description: The [Operating System name](#operation/list-os).
+        ram:
+          type: integer
+          description: The amount of RAM in MB.
+        disk:
+          type: integer
+          description: The size of the disk in GB.
+        main_ip:
+          type: string
+          description: The main IPv4 address.
+        vcpu_count:
+          type: integer
+          description: Number of vCPUs.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the Instance is located.
+        default_password:
+          type: string
+          description: The default password assigned at deployment.
+        date_created:
+          type: string
+          description: The date this instance was created.
+        status:
+          type: string
+          description: 'The current status.
+
+
+            * active
+
+            * halted
+
+            * rebooting
+
+            * resizing'
+        power_status:
+          type: string
+          description: 'The power-on status.
+
+
+            * running'
+        server_status:
+          type: string
+          description: 'The server health status.
+
+
+            * ok'
+        allowed_bandwidth:
+          type: integer
+          description: Monthly bandwidth quota in GB.
+        netmask_v4:
+          type: string
+          description: The IPv4 netmask in dot-decimal notation.
+        gateway_v4:
+          type: string
+          description: The gateway IP address.
+        v6_networks:
+          type: array
+          description: An array of IPv6 objects.
+          items:
+            type: object
+            description: An IPv6 object.
+            properties:
+              network:
+                type: string
+                description: The IPv6 subnet.
+              main_ip:
+                type: string
+                description: The main IPv6 network address.
+              network_size:
+                description: The IPv6 network size in bits.
+                type: integer
+        hostname:
+          type: string
+          description: The hostname for this instance.
+        label:
+          type: string
+          description: The user-supplied label for this instance.
+        tag:
+          type: string
+          description: The user-supplied tag for this instance.
+        internal_ip:
+          type: string
+          description: The [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api) that can be supplied for tools such as cloudinit.
+        kvm:
+          type: string
+          description: HTTPS link to the Vultr noVNC Web Console.
+        os_id:
+          type: integer
+          description: The [Operating System id](#operation/list-os) used by this instance.
+        app_id:
+          type: integer
+          description: The [Application id](#operation/list-applications) used by this instance.
+        image_id:
+          type: string
+          description: The [Application image_id](#operation/list-applications) used by this instance.
+        firewall_group_id:
+          type: string
+          description: The [Firewall Group id](#operation/list-firewall-groups) linked to this Instance.
+        features:
+          type: array
+          description: '"auto_backups", "ipv6", "ddos_protection"'
+          items:
+            type: string
+        plan:
+          type: string
+          description: A unique ID for the Plan.
+    backup-schedule:
+      title: backup-schedule
+      type: object
+      x-tags:
+      - backup-schedule
+      description: Backup schedule information.
+      properties:
+        enabled:
+          type: boolean
+          description: 'Indicates if backup is enabled:
+
+
+            * true
+
+            * false'
+        type:
+          type: string
+          description: 'Type of backup schedule:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | daily | Back up once per day at `hour`. |
+
+            |   | weekly | Back up once per week on `dow` at `hour`. |
+
+            |   | monthly | Back up each month at `dom` at `hour`. |
+
+            |   | daily\_alt\_even | Back up on even dates at `hour`. |
+
+            |   | daily\_alt\_odd | Back up on odd dates at `hour`. |'
+        next_scheduled_time_utc:
+          type: string
+          description: Time of next backup run in UTC.
+        hour:
+          type: integer
+          description: Scheduled hour of day in UTC.
+        dow:
+          description: 'Day of week to run.
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | 1 | Sunday |
+
+            |   | 2 | Monday |
+
+            |   | 3 | Tuesday |
+
+            |   | 4 | Wednesday |
+
+            |   | 5 | Thursday |
+
+            |   | 6 | Friday |
+
+            |   | 7 | Saturday |'
+          type: integer
+        dom:
+          description: Day of month to run. Use values between 1 and 28.
+          type: integer
+    baremetal-ipv4:
+      title: baremetal-ipv4
+      type: object
+      x-tags:
+      - baremetal
+      description: Bare Metal IPv4 information.
+      x-examples:
+        ipv4 example:
+          ip: 192.0.2.123
+          netmask: 255.255.254.0
+          gateway: 192.0.2.123
+          type: main_ip
+          reverse: 192.0.2.123.vultr.com
+          mac_address: 00:00:5e:00:53:5e
+      properties:
+        ip:
+          type: string
+          description: The IPv4 address.
+        netmask:
+          type: string
+          description: The IPv4 netmask in dot-decimal notation.
+        gateway:
+          type: string
+          description: The gateway IP address.
+        type:
+          type: string
+          description: 'The type of IP address.
+
+
+            * main_ip'
+        reverse:
+          type: string
+          description: The reverse DNS information for this IP address.
+        mac_address:
+          type: string
+          description: The MAC address associated with this IP address.
+    bandwidth:
+      title: bandwidth
+      type: object
+      description: Bandwidth information.
+      x-examples: {}
+      x-tags:
+      - bandwidth
+      properties:
+        incoming_bytes:
+          type: integer
+          description: Total bytes received by this instance on the date (UTC) denoted by the object key.
+        outgoing_bytes:
+          description: Total bytes sent by this instance on the date (UTC) denoted by the object key.
+          type: integer
+    restore_instance_202_response_status:
+      example:
+        restore_id: restore_id
+        restore_type: restore_type
+        status: status
+      properties:
+        restore_type:
+          type: string
+        restore_id:
+          type: string
+        status:
+          type: string
+      type: object
+    list_instance_private_networks_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        private_networks:
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+      properties:
+        private_networks:
+          items:
+            $ref: '#/components/schemas/private-networks_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    create_instance_reverse_ipv4_request:
+      properties:
+        ip:
+          description: The IPv4 address.
+          type: string
+        reverse:
+          description: The IPv4 reverse entry.
+          type: string
+      required:
+      - ip
+      - reverse
+      type: object
+    list_instance_vpcs_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        private_networks:
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        private_networks:
+          items:
+            $ref: '#/components/schemas/vpc'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    detach_instance_iso_202_response_iso_status:
+      example:
+        state: state
+      properties:
+        state:
+          description: 'State of the ISO
+
+
+            * isunmounting'
+          type: string
+      type: object
+    attach_instance_vpc_request:
+      properties:
+        vpc_id:
+          description: The [VPC ID](#operation/list-vpcs) to attach to this Instance.
+          type: string
+      type: object
+    instance-vpc2:
+      description: VPC 2.0 information.
+      example:
+        mac_address: mac_address
+        id: id
+        ip_address: ip_address
+      properties:
+        id:
+          description: A unique ID for the VPC.
+          type: string
+        mac_address:
+          description: The MAC address to use for this instance on the attached VPC 2.0 network.
+          type: string
+        ip_address:
+          description: The IP address to use for this instance on the attached VPC 2.0 network.
+          type: string
+      required:
+      - id
+      title: instance-vpc2
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          mac_address: 00:00:5e:00:53:5e
+          ip_block: 10.99.0.0
+      x-tags:
+      - VPC
+    instance_2:
+      description: Instance information.
+      example:
+        firewall_group_id: firewall_group_id
+        user_scheme: user_scheme
+        os_id: 2
+        server_status: server_status
+        internal_ip: internal_ip
+        allowed_bandwidth: 5
+        features:
+        - features
+        - features
+        hostname: hostname
+        vcpu_count: 1
+        id: id
+        tag: tag
+        app_id: 7
+        plan: plan
+        netmask_v4: netmask_v4
+        ram: 0
+        gateway_v4: gateway_v4
+        kvm: kvm
+        os: os
+        main_ip: main_ip
+        power_status: power_status
+        date_created: date_created
+        default_password: default_password
+        label: label
+        tags:
+        - tags
+        - tags
+        disk: 6
+        v6_networks:
+        - network_size: 5
+          main_ip: main_ip
+          network: network
+        - network_size: 5
+          main_ip: main_ip
+          network: network
+        region: region
+        image_id: image_id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the VPS Instance.
+          type: string
+        os:
+          description: The [Operating System name](#operation/list-os).
+          type: string
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The size of the disk in GB.
+          type: integer
+        main_ip:
+          description: The main IPv4 address.
+          type: string
+        vcpu_count:
+          description: Number of vCPUs.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the Instance is located.
+          type: string
+        default_password:
+          description: The default password assigned at deployment. Only available for ten minutes after deployment.
+          type: string
+        date_created:
+          description: The date this instance was created.
+          type: string
+        status:
+          description: 'The current status.
+
+
+            * active
+
+            * pending
+
+            * suspended
+
+            * resizing'
+          type: string
+        power_status:
+          description: 'The power-on status.
+
+
+            * running
+
+            * stopped'
+          type: string
+        server_status:
+          description: 'The server health status.
+
+
+            * none
+
+            * locked
+
+            * installingbooting
+
+            * ok'
+          type: string
+        allowed_bandwidth:
+          description: Monthly bandwidth quota in GB.
+          type: integer
+        netmask_v4:
+          description: The IPv4 netmask in dot-decimal notation.
+          type: string
+        gateway_v4:
+          description: The gateway IP address.
+          type: string
+        v6_networks:
+          description: An array of IPv6 objects.
+          items:
+            $ref: '#/components/schemas/instance_v6_networks_inner'
+          type: array
+        hostname:
+          description: The hostname for this instance.
+          type: string
+        label:
+          description: The user-supplied label for this instance.
+          type: string
+        tag:
+          deprecated: true
+          description: Use `tags` instead. The user-supplied tag for this instance.
+          type: string
+        internal_ip:
+          description: The internal IP used by this instance, if set. Only relevant when a VPC is attached.
+          type: string
+        kvm:
+          description: HTTPS link to the Vultr noVNC Web Console.
+          type: string
+        os_id:
+          description: The [Operating System id](#operation/list-os) used by this instance.
+          type: integer
+        app_id:
+          description: The [Application id](#operation/list-applications) used by this instance.
+          type: integer
+        image_id:
+          description: The [Application image_id](#operation/list-applications) used by this instance.
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) linked to this Instance.
+          type: string
+        features:
+          description: '"auto_backups", "ipv6", "ddos_protection"'
+          items:
+            type: string
+          type: array
+        plan:
+          description: A unique ID for the Plan.
+          type: string
+        tags:
+          description: Tags to apply to the instance.
+          items:
+            type: string
+          type: array
+        user_scheme:
+          description: 'The user scheme.
+
+
+            * root
+
+            * limited'
+          type: string
+      title: instance
+      type: object
+      x-tags:
+      - instances
+      x-examples: {}
+    get_ipv6_baremetal_200_response:
+      example:
+        ipv6s:
+        - network_size: 0
+          ip: ip
+          type: type
+          network: network
+        - network_size: 0
+          ip: ip
+          type: type
+          network: network
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ipv6s:
+          items:
+            $ref: '#/components/schemas/baremetal-ipv6_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    get_bandwidth_baremetal_200_response:
+      example:
+        bandwidth:
+          '2020-10-11':
+            incoming_bytes: 0
+            outgoing_bytes: 6
+          '2020-10-10':
+            incoming_bytes: 0
+            outgoing_bytes: 6
+      properties:
+        bandwidth:
+          $ref: '#/components/schemas/get_bandwidth_baremetal_200_response_bandwidth'
+      type: object
+    backup-schedule_2:
+      description: Backup schedule information.
+      example:
+        dom: 1
+        hour: 0
+        next_scheduled_time_utc: next_scheduled_time_utc
+        type: type
+        dow: 6
+        enabled: true
+      properties:
+        enabled:
+          description: 'Indicates if backup is enabled:
+
+
+            * true
+
+            * false'
+          type: boolean
+        type:
+          description: 'Type of backup schedule:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | daily | Back up once per day at `hour`. |
+
+            |   | weekly | Back up once per week on `dow` at `hour`. |
+
+            |   | monthly | Back up each month at `dom` at `hour`. |
+
+            |   | daily\_alt\_even | Back up on even dates at `hour`. |
+
+            |   | daily\_alt\_odd | Back up on odd dates at `hour`. |'
+          type: string
+        next_scheduled_time_utc:
+          description: Time of next backup run in UTC.
+          type: string
+        hour:
+          description: Scheduled hour of day in UTC.
+          type: integer
+        dow:
+          description: 'Day of week to run.
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | 1 | Sunday |
+
+            |   | 2 | Monday |
+
+            |   | 3 | Tuesday |
+
+            |   | 4 | Wednesday |
+
+            |   | 5 | Thursday |
+
+            |   | 6 | Friday |
+
+            |   | 7 | Saturday |'
+          type: integer
+        dom:
+          description: Day of month to run. Use values between 1 and 28.
+          type: integer
+      title: backup-schedule
+      type: object
+      x-tags:
+      - backup-schedule
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    bandwidth_2:
+      description: Bandwidth information.
+      example:
+        incoming_bytes: 0
+        outgoing_bytes: 6
+      properties:
+        incoming_bytes:
+          description: Total bytes received by this instance on the date (UTC) denoted by the object key.
+          type: integer
+        outgoing_bytes:
+          description: Total bytes sent by this instance on the date (UTC) denoted by the object key.
+          type: integer
+      title: bandwidth
+      type: object
+      x-examples: {}
+      x-tags:
+      - bandwidth
+    reboot_instances_request:
+      properties:
+        instance_ids:
+          description: The [Instance IDs](#operation/list-instances) to reboot.
+          items:
+            type: string
+          type: array
+      type: object
+    baremetal-ipv6_2:
+      description: Bare Metal IPv6 information.
+      example:
+        network_size: 0
+        ip: ip
+        type: type
+        network: network
+      properties:
+        ip:
+          description: A unique ID for the IPv6 address.
+          type: string
+        network:
+          description: The IPv6 subnet.
+          type: string
+        network_size:
+          description: The IPv6 network size in bits.
+          type: integer
+        type:
+          description: 'The type of IP address.
+
+
+            * main_ip'
+          type: string
+      title: baremetal-ipv6
+      type: object
+      x-tags:
+      - baremetal
+    list_instance_ipv6_reverse_200_response_reverse_ipv6s_inner:
+      example:
+        ip: ip
+        reverse: reverse
+      properties:
+        reverse:
+          description: The IPv6 reverse entry.
+          type: string
+        ip:
+          description: The IPv6 address.
+          type: string
+      type: object
+    reinstall_instance_request:
+      properties:
+        hostname:
+          description: The hostname to use when reinstalling this instance.
+          type: string
+      type: object
+    get_instance_userdata_200_response_user_data:
+      example:
+        data: data
+      properties:
+        data:
+          description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api/) attached to this instance.
+          type: string
+      type: object
+    detach_instance_vpc_request:
+      properties:
+        vpc_id:
+          description: The [VPC ID](#operation/list-vpcs) to detach from this Instance.
+          type: string
+      type: object
+    create_instance_202_response:
+      example:
+        instance:
+          firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+      properties:
+        instance:
+          $ref: '#/components/schemas/instance_2'
+      type: object
+    post_instances_instance_id_ipv4_reverse_default_request:
+      properties:
+        ip:
+          type: string
+      required:
+      - ip
+      type: object
+    create_instance_backup_schedule_request:
+      properties:
+        type:
+          description: 'Type of backup schedule:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | daily | Back up once per day at `hour`. |
+
+            |   | weekly | Back up once per week on `dow` at `hour`. |
+
+            |   | monthly | Back up each month at `dom` at `hour`. |
+
+            |   | daily\_alt\_even | Back up on even dates at `hour`. |
+
+            |   | daily\_alt\_odd | Back up on odd dates at `hour`. |'
+          type: string
+        hour:
+          description: Hour of day to run in UTC.
+          type: integer
+        dow:
+          description: 'Day of week to run.
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | 1 | Sunday |
+
+            |   | 2 | Monday |
+
+            |   | 3 | Tuesday |
+
+            |   | 4 | Wednesday |
+
+            |   | 5 | Thursday |
+
+            |   | 6 | Friday |
+
+            |   | 7 | Saturday |'
+          type: integer
+        dom:
+          description: Day of month to run. Use values between 1 and 28.
+          type: integer
+      required:
+      - type
+      type: object
+    detach_instance_iso_202_response:
+      example:
+        iso_status:
+          state: state
+      properties:
+        iso_status:
+          $ref: '#/components/schemas/detach_instance_iso_202_response_iso_status'
+      type: object
+    get_instance_upgrades_200_response:
+      example:
+        upgrades:
+          os:
+          - ''
+          - ''
+          plans:
+          - ''
+          - ''
+          applications:
+          - ''
+          - ''
+      properties:
+        upgrades:
+          $ref: '#/components/schemas/get_instance_upgrades_200_response_upgrades'
+      type: object
+    get_ipv4_baremetal_200_response:
+      example:
+        ipv4s:
+        - netmask: netmask
+          mac_address: mac_address
+          ip: ip
+          type: type
+          reverse: reverse
+          gateway: gateway
+        - netmask: netmask
+          mac_address: mac_address
+          ip: ip
+          type: type
+          reverse: reverse
+          gateway: gateway
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ipv4s:
+          items:
+            $ref: '#/components/schemas/baremetal-ipv4_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    baremetal-ipv4_2:
+      description: Bare Metal IPv4 information.
+      example:
+        netmask: netmask
+        mac_address: mac_address
+        ip: ip
+        type: type
+        reverse: reverse
+        gateway: gateway
+      properties:
+        ip:
+          description: The IPv4 address.
+          type: string
+        netmask:
+          description: The IPv4 netmask in dot-decimal notation.
+          type: string
+        gateway:
+          description: The gateway IP address.
+          type: string
+        type:
+          description: 'The type of IP address.
+
+
+            * main_ip'
+          type: string
+        reverse:
+          description: The reverse DNS information for this IP address.
+          type: string
+        mac_address:
+          description: The MAC address associated with this IP address.
+          type: string
+      title: baremetal-ipv4
+      type: object
+      x-tags:
+      - baremetal
+      x-examples:
+        ipv4 example:
+          ip: 192.0.2.123
+          netmask: 255.255.254.0
+          gateway: 192.0.2.123
+          type: main_ip
+          reverse: 192.0.2.123.vultr.com
+          mac_address: 00:00:5e:00:53:5e
+    get_instance_iso_status_200_response_iso_status:
+      example:
+        iso_id: iso_id
+        state: state
+      properties:
+        iso_id:
+          description: The [ISO id](#operation/list-isos).
+          type: string
+        state:
+          description: 'The status of this ISO.
+
+            * ready
+
+            * attached'
+          type: string
+      type: object
+    update_instance_request:
+      properties:
+        app_id:
+          description: Reinstall the instance with this [Application id](#operation/list-applications).
+          type: integer
+        image_id:
+          description: Reinstall the instance with this [Application image_id](#operation/list-applications).
+          type: string
+        backups:
+          description: 'Enable automatic backups for the instance.
+
+
+            * enabled
+
+            * disabled'
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) to attach to this Instance.
+          type: string
+        enable_ipv6:
+          description: 'Enable IPv6.
+
+
+            * true'
+          type: boolean
+        os_id:
+          description: Reinstall the instance with this [ISO id](#operation/list-isos).
+          type: string
+        user_data:
+          description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api/) to attach to this instance.
+          type: string
+        tag:
+          deprecated: true
+          description: Use `tags` instead. The user-supplied tag.
+          type: string
+        plan:
+          description: Upgrade the instance with this [Plan id](#operation/list-plans).
+          type: string
+        ddos_protection:
+          description: 'Enable DDoS Protection (there is an additional charge for this).
+
+
+            * true
+
+            * false'
+          type: boolean
+        attach_private_network:
+          deprecated: true
+          description: Use `attach_vpc` instead. An array of [Private Network ids](#operation/list-networks) to attach to this Instance. This parameter takes precedence over `enable_private_network`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        attach_vpc:
+          description: An array of [VPC IDs](#operation/list-vpcs) to attach to this Instance. This parameter takes precedence over `enable_vpc`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        attach_vpc2:
+          description: An array of [VPC IDs](#operation/list-vpc2) to attach to this Instance. This parameter takes precedence over `enable_vpc2`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        detach_private_network:
+          deprecated: true
+          description: Use `detach_vpc` instead. An array of [Private Network ids](#operation/list-networks) to detach from this Instance. This parameter takes precedence over `enable_private_network`.
+          items:
+            type: string
+          type: array
+        detach_vpc:
+          description: An array of [VPC IDs](#operation/list-vpcs) to detach from this Instance. This parameter takes precedence over `enable_vpc`.
+          items:
+            type: string
+          type: array
+        detach_vpc2:
+          description: An array of [VPC IDs](#operation/list-vpc2) to detach from this Instance. This parameter takes precedence over `enable_vpc2`.
+          items:
+            type: string
+          type: array
+        enable_private_network:
+          deprecated: true
+          description: 'Use `enable_vpc` instead.
+
+
+            If `true`, private networking support will be added to the new server.
+
+
+            This parameter attaches a single network. When no network exists in the region, it will be automatically created.
+
+
+            If there are multiple private networks in the instance''s region, use `attach_private_network` instead to specify a network.'
+          type: boolean
+        enable_vpc:
+          description: 'If `true`, VPC support will be added to the new server.
+
+
+            This parameter attaches a single VPC. When no VPC exists in the region, it will be automatically created.
+
+
+            If there are multiple VPCs in the instance''s region, use `attach_vpc` instead to specify a VPC.'
+          type: boolean
+        enable_vpc2:
+          description: 'If `true`, VPC 2.0 support will be added to the new server.
+
+
+            This parameter attaches a single VPC 2.0 netowrk. When no VPC 2.0 network exists in the region, it will be automatically created.
+
+
+            If there are multiple VPC 2.0 networks in the instance''s region, use `attach_vpc2` instead to specify a VPC 2.0 network.'
+          type: boolean
+        label:
+          description: The user supplied label.
+          type: string
+        tags:
+          description: Tags to apply to the instance.
+          items:
+            type: string
+          type: array
+        user_scheme:
+          description: 'Linux-only: The user scheme used for logging into this instance. The instance must be reinstalled for this change to take effect.
+
+
+            * root
+
+            * limited'
+          type: string
+      type: object
+    private-networks_2:
+      deprecated: true
+      description: Private Network information.
+      example:
+        mac_address: mac_address
+        id: id
+        ip_address: ip_address
+      properties:
+        id:
+          description: A unique ID for the Private Network.
+          type: string
+        mac_address:
+          description: The assigned MAC address.
+          type: string
+        ip_address:
+          description: The assigned IP address.
+          type: string
+      title: private-networks
+      type: object
+      x-tags:
+      - private-networks
+      x-examples:
+        example-1: {}
+    create_instance_ipv4_request:
+      properties:
+        reboot:
+          description: 'Set if the server is rebooted immediately after the IPv4 address is created.
+
+
+            * true (default)
+
+            * false'
+          type: boolean
+      type: object
+    attach_instance_vpc2_request:
+      properties:
+        vpc_id:
+          description: The [VPC ID](#operation/list-vpc2) to attach to this Instance.
+          type: string
+        ip_address:
+          description: 'The IP address to use for this instance on the attached VPC 2.0 network.  '
+          type: string
+      required:
+      - vpc_id
+      type: object
+    vpc:
+      description: VPC information.
+      example:
+        date_created: date_created
+        v4_subnet_mask: 0
+        description: description
+        v4_subnet: v4_subnet
+        id: id
+        region: region
+      properties:
+        id:
+          description: A unique ID for the VPC.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the VPC is located.
+          type: string
+        date_created:
+          description: Date the VPC was created.
+          type: string
+        description:
+          description: A description of the VPC.
+          type: string
+        v4_subnet:
+          description: 'The IPv4 VPC address. For example: 10.99.0.0'
+          type: string
+        v4_subnet_mask:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+      required:
+      - id
+      title: vpc
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          description: Example VPC
+          v4_subnet: 10.99.0.0
+          v4_subnet_mask: 24
+      x-tags:
+      - VPCs
+    attach_instance_iso_202_response_iso_status:
+      example:
+        iso_id: iso_id
+        state: state
+      properties:
+        state:
+          description: 'State of the ISO
+
+
+            * ismounting'
+          type: string
+        iso_id:
+          description: The [ISO id](#operation/list-isos) being attached.
+          type: string
+      type: object
+    list_instance_ipv6_reverse_200_response:
+      example:
+        reverse_ipv6s:
+        - ip: ip
+          reverse: reverse
+        - ip: ip
+          reverse: reverse
+      properties:
+        reverse_ipv6s:
+          items:
+            $ref: '#/components/schemas/list_instance_ipv6_reverse_200_response_reverse_ipv6s_inner'
+          type: array
+      type: object
+    restore_instance_request:
+      properties:
+        backup_id:
+          description: The [Backup id](#operation/list-backups) used to restore this instance.
+          type: string
+        snapshot_id:
+          description: The [Snapshot id](#operation/list-snapshots) used to restore this instance.
+          type: string
+      type: object
+    get_instance_neighbors_200_response:
+      example:
+        neighbors:
+        - neighbors
+        - neighbors
+      properties:
+        neighbors:
+          description: An array of [Instance ids](#operation/list-instances) in the same location as this Instance.
+          items:
+            type: string
+          type: array
+      type: object
+    create_instance_reverse_ipv6_request:
+      properties:
+        ip:
+          description: The IPv6 address in full, expanded format.
+          type: string
+        reverse:
+          description: The IPv6 reverse entry.
+          type: string
+      required:
+      - ip
+      - reverse
+      type: object
+    create_instance_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) where the Instance is located.
+          type: string
+        plan:
+          description: The [Plan id](#operation/list-plans) to use when deploying this instance.
+          type: string
+        os_id:
+          description: The [Operating System id](#operation/list-os) to use when deploying this instance.
+          type: integer
+        ipxe_chain_url:
+          description: The URL location of the iPXE chainloader.
+          type: string
+        iso_id:
+          description: The [ISO id](#operation/list-isos) to use when deploying this instance.
+          type: string
+        script_id:
+          description: The [Startup Script id](#operation/list-startup-scripts) to use when deploying this instance.
+          type: string
+        snapshot_id:
+          description: The [Snapshot id](#operation/list-snapshots) to use when deploying the instance.
+          type: string
+        enable_ipv6:
+          description: 'Enable IPv6.
+
+
+            * true'
+          type: boolean
+        disable_public_ipv4:
+          description: 'Don''t set up a public IPv4 address when IPv6 is enabled. Will not do anything unless `enable_ipv6` is also `true`.
+
+
+            * true'
+          type: boolean
+        attach_private_network:
+          deprecated: true
+          description: Use `attach_vpc` instead. An array of [Private Network ids](#operation/list-networks) to attach to this Instance. This parameter takes precedence over `enable_private_network`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        attach_vpc:
+          description: An array of [VPC IDs](#operation/list-vpcs) to attach to this Instance. This parameter takes precedence over `enable_vpc`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        attach_vpc2:
+          description: An array of [VPC IDs](#operation/list-vpc2) to attach to this Instance. This parameter takes precedence over `enable_vpc2`. Please choose one parameter.
+          items:
+            type: string
+          type: array
+        label:
+          description: A user-supplied label for this instance.
+          type: string
+        sshkey_id:
+          description: The [SSH Key id](#operation/list-ssh-keys) to install on this instance.
+          items:
+            type: string
+          type: array
+        backups:
+          description: 'Enable automatic backups for the instance.
+
+
+            * enabled
+
+            * disabled'
+          type: string
+        app_id:
+          description: The [Application id](#operation/list-applications) to use when deploying this instance.
+          type: integer
+        image_id:
+          description: The [Application image_id](#operation/list-applications) to use when deploying this instance.
+          type: string
+        user_data:
+          description: The user-supplied, base64 encoded [user data](https://www.vultr.com/docs/manage-instance-user-data-with-the-vultr-metadata-api/) to attach to this instance.
+          type: string
+        ddos_protection:
+          description: 'Enable DDoS protection (there is an additional charge for this).
+
+
+            * true
+
+            * false'
+          type: boolean
+        activation_email:
+          description: 'Notify by email after deployment.
+
+
+            * true
+
+            * false (default)'
+          type: boolean
+        hostname:
+          description: The hostname to use when deploying this instance.
+          type: string
+        tag:
+          deprecated: true
+          description: Use `tags` instead. The user-supplied tag.
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) to attach to this Instance.
+          type: string
+        reserved_ipv4:
+          description: ID of the floating IP to use as the main IP of this server.
+          type: string
+        enable_private_network:
+          deprecated: true
+          description: 'Use `enable_vpc` instead.
+
+
+            If `true`, private networking support will be added to the new server.
+
+
+            This parameter attaches a single network. When no network exists in the region, it will be automatically created.
+
+
+            If there are multiple private networks in the instance''s region, use `attach_private_network` instead to specify a network.'
+          type: boolean
+        enable_vpc:
+          description: 'If `true`, VPC support will be added to the new server.
+
+
+            This parameter attaches a single VPC. When no VPC exists in the region, it will be automatically created.
+
+
+            If there are multiple VPCs in the instance''s region, use `attach_vpc` instead to specify a network.'
+          type: boolean
+        enable_vpc2:
+          description: 'If `true`, VPC 2.0 support will be added to the new server.
+
+
+            This parameter attaches a single VPC 2.0 network. When no VPC 2.0 network exists in the region, it will be automatically created.
+
+
+            If there are multiple VPC 2.0 networks in the instance''s region, use `attach_vpc2` instead to specify a network.'
+          type: boolean
+        tags:
+          description: Tags to apply to the instance
+          items:
+            type: string
+          type: array
+        user_scheme:
+          description: 'Linux-only: The user scheme used for logging into this instance. By default, the "root" user is configured. Alternatively, a limited user with sudo permissions can be selected.
+
+
+            * root
+
+            * limited'
+          type: string
+      required:
+      - plan
+      - region
+      type: object
+    list_instances_200_response:
+      example:
+        instances:
+        - firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+        - firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        instances:
+          items:
+            $ref: '#/components/schemas/instance_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    get_instance_userdata_200_response:
+      example:
+        user_data:
+          data: data
+      properties:
+        user_data:
+          $ref: '#/components/schemas/get_instance_userdata_200_response_user_data'
+      type: object
+    restore_instance_202_response:
+      example:
+        status:
+          restore_id: restore_id
+          restore_type: restore_type
+          status: status
+      properties:
+        status:
+          $ref: '#/components/schemas/restore_instance_202_response_status'
+      type: object
+    attach_instance_network_request:
+      properties:
+        network_id:
+          description: The [Private Network id](#operation/list-networks) to attach to this Instance.
+          type: string
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    attach_instance_iso_request:
+      properties:
+        iso_id:
+          description: The [ISO id](#operation/list-isos) to attach to this Instance.
+          type: string
+      type: object
+    get_bandwidth_baremetal_200_response_bandwidth:
+      description: This object will contain objects that represent days in the month (UTC). The date is denoted by the nested objects keys.
+      example:
+        '2020-10-11':
+          incoming_bytes: 0
+          outgoing_bytes: 6
+        '2020-10-10':
+          incoming_bytes: 0
+          outgoing_bytes: 6
+      properties:
+        '2020-10-10':
+          $ref: '#/components/schemas/bandwidth_2'
+        '2020-10-11':
+          $ref: '#/components/schemas/bandwidth_2'
+      type: object
+    get_instance_upgrades_200_response_upgrades:
+      example:
+        os:
+        - ''
+        - ''
+        plans:
+        - ''
+        - ''
+        applications:
+        - ''
+        - ''
+      properties:
+        applications:
+          items: {}
+          type: array
+        plans:
+          items: {}
+          type: array
+        os:
+          items: {}
+          type: array
+      type: object
+    halt_instances_request:
+      properties:
+        instance_ids:
+          description: The [Instance IDs](#operation/list-instances) to halt.
+          items:
+            type: string
+          type: array
+      type: object
+    get_instance_backup_schedule_200_response:
+      example:
+        backup_schedule:
+          dom: 1
+          hour: 0
+          next_scheduled_time_utc: next_scheduled_time_utc
+          type: type
+          dow: 6
+          enabled: true
+      properties:
+        backup_schedule:
+          $ref: '#/components/schemas/backup-schedule_2'
+      type: object
+    detach_instance_network_request:
+      properties:
+        network_id:
+          description: The [Private Network id](#operation/list-networks) to detach from this Instance.
+          type: string
+      type: object
+    start_instances_request:
+      properties:
+        instance_ids:
+          description: The [Instance IDs](#operation/list-instances) to start.
+          items:
+            type: string
+          type: array
+      type: object
+    attach_instance_iso_202_response:
+      example:
+        iso_status:
+          iso_id: iso_id
+          state: state
+      properties:
+        iso_status:
+          $ref: '#/components/schemas/attach_instance_iso_202_response_iso_status'
+      type: object
+    list_instance_vpc2_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        vpcs:
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+      properties:
+        vpcs:
+          items:
+            $ref: '#/components/schemas/instance-vpc2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    instance_v6_networks_inner:
+      description: An IPv6 object.
+      example:
+        network_size: 5
+        main_ip: main_ip
+        network: network
+      properties:
+        network:
+          description: The IPv6 subnet.
+          type: string
+        main_ip:
+          description: The main IPv6 network address.
+          type: string
+        network_size:
+          description: The IPv6 network size in bits.
+          type: integer
+      type: object
+    get_instance_iso_status_200_response:
+      example:
+        iso_status:
+          iso_id: iso_id
+          state: state
+      properties:
+        iso_status:
+          $ref: '#/components/schemas/get_instance_iso_status_200_response_iso_status'
+      type: object
+    detach_instance_vpc2_request:
+      properties:
+        vpc_id:
+          description: The [VPC ID](#operation/list-vpc2) to detach from this Instance.
+          type: string
+      required:
+      - vpc_id
+      type: object
+    list_instance_private_networks_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        private_networks:
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+      properties:
+        private_networks:
+          items:
+            $ref: '#/components/schemas/private-networks_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    list_instance_vpcs_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        private_networks:
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        private_networks:
+          items:
+            $ref: '#/components/schemas/vpc'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    instance_3:
+      description: Instance information.
+      example:
+        firewall_group_id: firewall_group_id
+        user_scheme: user_scheme
+        os_id: 2
+        server_status: server_status
+        internal_ip: internal_ip
+        allowed_bandwidth: 5
+        features:
+        - features
+        - features
+        hostname: hostname
+        vcpu_count: 1
+        id: id
+        tag: tag
+        app_id: 7
+        plan: plan
+        netmask_v4: netmask_v4
+        ram: 0
+        gateway_v4: gateway_v4
+        kvm: kvm
+        os: os
+        main_ip: main_ip
+        power_status: power_status
+        date_created: date_created
+        default_password: default_password
+        label: label
+        tags:
+        - tags
+        - tags
+        disk: 6
+        v6_networks:
+        - network_size: 5
+          main_ip: main_ip
+          network: network
+        - network_size: 5
+          main_ip: main_ip
+          network: network
+        region: region
+        image_id: image_id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the VPS Instance.
+          type: string
+        os:
+          description: The [Operating System name](#operation/list-os).
+          type: string
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The size of the disk in GB.
+          type: integer
+        main_ip:
+          description: The main IPv4 address.
+          type: string
+        vcpu_count:
+          description: Number of vCPUs.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the Instance is located.
+          type: string
+        default_password:
+          description: The default password assigned at deployment. Only available for ten minutes after deployment.
+          type: string
+        date_created:
+          description: The date this instance was created.
+          type: string
+        status:
+          description: 'The current status.
+
+
+            * active
+
+            * pending
+
+            * suspended
+
+            * resizing'
+          type: string
+        power_status:
+          description: 'The power-on status.
+
+
+            * running
+
+            * stopped'
+          type: string
+        server_status:
+          description: 'The server health status.
+
+
+            * none
+
+            * locked
+
+            * installingbooting
+
+            * ok'
+          type: string
+        allowed_bandwidth:
+          description: Monthly bandwidth quota in GB.
+          type: integer
+        netmask_v4:
+          description: The IPv4 netmask in dot-decimal notation.
+          type: string
+        gateway_v4:
+          description: The gateway IP address.
+          type: string
+        v6_networks:
+          description: An array of IPv6 objects.
+          items:
+            $ref: '#/components/schemas/instance_v6_networks_inner'
+          type: array
+        hostname:
+          description: The hostname for this instance.
+          type: string
+        label:
+          description: The user-supplied label for this instance.
+          type: string
+        tag:
+          deprecated: true
+          description: Use `tags` instead. The user-supplied tag for this instance.
+          type: string
+        internal_ip:
+          description: The internal IP used by this instance, if set. Only relevant when a VPC is attached.
+          type: string
+        kvm:
+          description: HTTPS link to the Vultr noVNC Web Console.
+          type: string
+        os_id:
+          description: The [Operating System id](#operation/list-os) used by this instance.
+          type: integer
+        app_id:
+          description: The [Application id](#operation/list-applications) used by this instance.
+          type: integer
+        image_id:
+          description: The [Application image_id](#operation/list-applications) used by this instance.
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) linked to this Instance.
+          type: string
+        features:
+          description: '"auto_backups", "ipv6", "ddos_protection"'
+          items:
+            type: string
+          type: array
+        plan:
+          description: A unique ID for the Plan.
+          type: string
+        tags:
+          description: Tags to apply to the instance.
+          items:
+            type: string
+          type: array
+        user_scheme:
+          description: 'The user scheme.
+
+
+            * root
+
+            * limited'
+          type: string
+      title: instance
+      type: object
+      x-tags:
+      - instances
+      x-examples: {}
+    get_ipv6_baremetal_200_response_2:
+      example:
+        ipv6s:
+        - network_size: 0
+          ip: ip
+          type: type
+          network: network
+        - network_size: 0
+          ip: ip
+          type: type
+          network: network
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ipv6s:
+          items:
+            $ref: '#/components/schemas/baremetal-ipv6_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    backup-schedule_3:
+      description: Backup schedule information.
+      example:
+        dom: 1
+        hour: 0
+        next_scheduled_time_utc: next_scheduled_time_utc
+        type: type
+        dow: 6
+        enabled: true
+      properties:
+        enabled:
+          description: 'Indicates if backup is enabled:
+
+
+            * true
+
+            * false'
+          type: boolean
+        type:
+          description: 'Type of backup schedule:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | daily | Back up once per day at `hour`. |
+
+            |   | weekly | Back up once per week on `dow` at `hour`. |
+
+            |   | monthly | Back up each month at `dom` at `hour`. |
+
+            |   | daily\_alt\_even | Back up on even dates at `hour`. |
+
+            |   | daily\_alt\_odd | Back up on odd dates at `hour`. |'
+          type: string
+        next_scheduled_time_utc:
+          description: Time of next backup run in UTC.
+          type: string
+        hour:
+          description: Scheduled hour of day in UTC.
+          type: integer
+        dow:
+          description: 'Day of week to run.
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | 1 | Sunday |
+
+            |   | 2 | Monday |
+
+            |   | 3 | Tuesday |
+
+            |   | 4 | Wednesday |
+
+            |   | 5 | Thursday |
+
+            |   | 6 | Friday |
+
+            |   | 7 | Saturday |'
+          type: integer
+        dom:
+          description: Day of month to run. Use values between 1 and 28.
+          type: integer
+      title: backup-schedule
+      type: object
+      x-tags:
+      - backup-schedule
+    bandwidth_3:
+      description: Bandwidth information.
+      example:
+        incoming_bytes: 0
+        outgoing_bytes: 6
+      properties:
+        incoming_bytes:
+          description: Total bytes received by this instance on the date (UTC) denoted by the object key.
+          type: integer
+        outgoing_bytes:
+          description: Total bytes sent by this instance on the date (UTC) denoted by the object key.
+          type: integer
+      title: bandwidth
+      type: object
+      x-examples: {}
+      x-tags:
+      - bandwidth
+    baremetal-ipv6_3:
+      description: Bare Metal IPv6 information.
+      example:
+        network_size: 0
+        ip: ip
+        type: type
+        network: network
+      properties:
+        ip:
+          description: A unique ID for the IPv6 address.
+          type: string
+        network:
+          description: The IPv6 subnet.
+          type: string
+        network_size:
+          description: The IPv6 network size in bits.
+          type: integer
+        type:
+          description: 'The type of IP address.
+
+
+            * main_ip'
+          type: string
+      title: baremetal-ipv6
+      type: object
+      x-tags:
+      - baremetal
+    create_instance_202_response_2:
+      example:
+        instance:
+          firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+      properties:
+        instance:
+          $ref: '#/components/schemas/instance_3'
+      type: object
+    get_ipv4_baremetal_200_response_2:
+      example:
+        ipv4s:
+        - netmask: netmask
+          mac_address: mac_address
+          ip: ip
+          type: type
+          reverse: reverse
+          gateway: gateway
+        - netmask: netmask
+          mac_address: mac_address
+          ip: ip
+          type: type
+          reverse: reverse
+          gateway: gateway
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ipv4s:
+          items:
+            $ref: '#/components/schemas/baremetal-ipv4_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    baremetal-ipv4_3:
+      description: Bare Metal IPv4 information.
+      example:
+        netmask: netmask
+        mac_address: mac_address
+        ip: ip
+        type: type
+        reverse: reverse
+        gateway: gateway
+      properties:
+        ip:
+          description: The IPv4 address.
+          type: string
+        netmask:
+          description: The IPv4 netmask in dot-decimal notation.
+          type: string
+        gateway:
+          description: The gateway IP address.
+          type: string
+        type:
+          description: 'The type of IP address.
+
+
+            * main_ip'
+          type: string
+        reverse:
+          description: The reverse DNS information for this IP address.
+          type: string
+        mac_address:
+          description: The MAC address associated with this IP address.
+          type: string
+      title: baremetal-ipv4
+      type: object
+      x-tags:
+      - baremetal
+      x-examples:
+        ipv4 example:
+          ip: 192.0.2.123
+          netmask: 255.255.254.0
+          gateway: 192.0.2.123
+          type: main_ip
+          reverse: 192.0.2.123.vultr.com
+          mac_address: 00:00:5e:00:53:5e
+    private-networks_3:
+      deprecated: true
+      description: Private Network information.
+      example:
+        mac_address: mac_address
+        id: id
+        ip_address: ip_address
+      properties:
+        id:
+          description: A unique ID for the Private Network.
+          type: string
+        mac_address:
+          description: The assigned MAC address.
+          type: string
+        ip_address:
+          description: The assigned IP address.
+          type: string
+      title: private-networks
+      type: object
+      x-tags:
+      - private-networks
+      x-examples:
+        example-1: {}
+    list_instances_200_response_2:
+      example:
+        instances:
+        - firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+        - firewall_group_id: firewall_group_id
+          user_scheme: user_scheme
+          os_id: 2
+          server_status: server_status
+          internal_ip: internal_ip
+          allowed_bandwidth: 5
+          features:
+          - features
+          - features
+          hostname: hostname
+          vcpu_count: 1
+          id: id
+          tag: tag
+          app_id: 7
+          plan: plan
+          netmask_v4: netmask_v4
+          ram: 0
+          gateway_v4: gateway_v4
+          kvm: kvm
+          os: os
+          main_ip: main_ip
+          power_status: power_status
+          date_created: date_created
+          default_password: default_password
+          label: label
+          tags:
+          - tags
+          - tags
+          disk: 6
+          v6_networks:
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          - network_size: 5
+            main_ip: main_ip
+            network: network
+          region: region
+          image_id: image_id
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        instances:
+          items:
+            $ref: '#/components/schemas/instance_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    get_bandwidth_baremetal_200_response_bandwidth_2:
+      description: This object will contain objects that represent days in the month (UTC). The date is denoted by the nested objects keys.
+      example:
+        '2020-10-11':
+          incoming_bytes: 0
+          outgoing_bytes: 6
+        '2020-10-10':
+          incoming_bytes: 0
+          outgoing_bytes: 6
+      properties:
+        '2020-10-10':
+          $ref: '#/components/schemas/bandwidth_3'
+        '2020-10-11':
+          $ref: '#/components/schemas/bandwidth_3'
+      type: object
+    get_instance_backup_schedule_200_response_2:
+      example:
+        backup_schedule:
+          dom: 1
+          hour: 0
+          next_scheduled_time_utc: next_scheduled_time_utc
+          type: type
+          dow: 6
+          enabled: true
+      properties:
+        backup_schedule:
+          $ref: '#/components/schemas/backup-schedule_3'
+      type: object
+    list_instance_vpc2_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        vpcs:
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+        - mac_address: mac_address
+          id: id
+          ip_address: ip_address
+      properties:
+        vpcs:
+          items:
+            $ref: '#/components/schemas/instance-vpc2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

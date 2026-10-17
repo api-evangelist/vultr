@@ -1,0 +1,294 @@
+openapi: 3.2.0
+info:
+  title: Vultr Os API
+  version: '2.0'
+  description: 'Operations tagged os across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Os
+  x-displayName: Operating Systems
+  description: We have a wide range of operating systems available to deploy server instances. You can also upload an ISO or choose from our public ISO library.
+paths:
+  /os:
+    get:
+      summary: List OS
+      tags:
+      - Os
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/os\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  os:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/os'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    os:
+                    - id: 127
+                      name: CentOS 6 x64
+                      arch: x64
+                      family: centos
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+      operationId: list-os
+      description: List the OS images available for installation at Vultr.
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: 'Number of items requested per page. Default is 100 and Max is 500.
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    os:
+      title: os
+      type: object
+      x-tags:
+      - os
+      x-examples:
+        os:
+          id: 127
+          name: CentOS 6 x64
+          arch: x64
+          family: centos
+      description: Operating System information.
+      properties:
+        id:
+          type: integer
+          description: The Operating System id.
+        name:
+          type: string
+          description: The Operating System description.
+        arch:
+          type: string
+          description: The Operating System architecture.
+        family:
+          type: string
+          description: 'The Operating System family. '
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    list_os_200_response:
+      example:
+        os:
+        - name: name
+          id: 0
+          arch: arch
+          family: family
+        - name: name
+          id: 0
+          arch: arch
+          family: family
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        os:
+          items:
+            $ref: '#/components/schemas/os_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    os_2:
+      description: Operating System information.
+      example:
+        name: name
+        id: 0
+        arch: arch
+        family: family
+      properties:
+        id:
+          description: The Operating System id.
+          type: integer
+        name:
+          description: The Operating System description.
+          type: string
+        arch:
+          description: The Operating System architecture.
+          type: string
+        family:
+          description: 'The Operating System family. '
+          type: string
+      title: os
+      type: object
+      x-tags:
+      - os
+      x-examples:
+        os:
+          id: 127
+          name: CentOS 6 x64
+          arch: x64
+          family: centos
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_os_200_response_2:
+      example:
+        os:
+        - name: name
+          id: 0
+          arch: arch
+          family: family
+        - name: name
+          id: 0
+          arch: arch
+          family: family
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        os:
+          items:
+            $ref: '#/components/schemas/os_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    os_3:
+      description: Operating System information.
+      example:
+        name: name
+        id: 0
+        arch: arch
+        family: family
+      properties:
+        id:
+          description: The Operating System id.
+          type: integer
+        name:
+          description: The Operating System description.
+          type: string
+        arch:
+          description: The Operating System architecture.
+          type: string
+        family:
+          description: 'The Operating System family. '
+          type: string
+      title: os
+      type: object
+      x-tags:
+      - os
+      x-examples:
+        os:
+          id: 127
+          name: CentOS 6 x64
+          arch: x64
+          family: centos
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

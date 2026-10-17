@@ -1,0 +1,262 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Policy-User Mappings API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Policy-User Mappings across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Policy-User Mappings
+  description: Manage direct policy attachments to users
+paths:
+  /v2/policies/{id}/users:
+    get:
+      tags:
+      - IAM Policy-User Mappings
+      summary: List Users with Policy
+      operationId: listUsersWithPolicy
+      description: List all users that have this policy directly attached
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of users with this policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        email:
+                          type: string
+                          format: email
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        assigned_date:
+                          type: string
+                          format: date-time
+                        assignment_type:
+                          type: string
+                          enum:
+                          - direct
+                          - inherited
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/policies/{id}/users/{user-id}:
+    post:
+      tags:
+      - IAM Policy-User Mappings
+      summary: Attach Policy to User
+      operationId: attachPolicyToUser
+      description: Attach this policy directly to a user
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: user-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Policy attached to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPolicyAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+      - IAM Policy-User Mappings
+      summary: Detach Policy from User
+      operationId: detachPolicyFromUser
+      description: Remove this policy from a user
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: user-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Policy detached from user
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    UserPolicyAssignment:
+      type: object
+      required:
+      - user_id
+      - policy_id
+      - policy_name
+      - date_assigned
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user with the policy
+        policy_id:
+          type: string
+          format: uuid
+          description: UUID of the attached policy
+        policy_name:
+          type: string
+          description: Name of the attached policy
+        policy_description:
+          type: string
+          description: Description of the attached policy
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the policy was attached to the user
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

@@ -1,0 +1,247 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Endpoint Actions API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Endpoint Actions across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Endpoint Actions
+  description: View available IAM endpoint-to-action mappings
+paths:
+  /v2/endpoint-action-maps:
+    get:
+      tags:
+      - IAM Endpoint Actions
+      summary: List Endpoint Action Maps
+      operationId: listEndpointActionMaps
+      description: List all endpoint-to-action mappings for policy creation
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of endpoint action mappings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_action_maps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EndpointActionMap'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/endpoint-action-maps/available-actions:
+    get:
+      tags:
+      - IAM Endpoint Actions
+      summary: List Available Actions
+      operationId: listAvailableActions
+      description: List all available IAM actions that can be used in policies
+      responses:
+        '200':
+          description: List of available actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: object
+                    description: Actions grouped by resource type
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          action:
+                            type: string
+                            example: compute.instance.Create
+                            description: The IAM action
+                          description:
+                            type: string
+                            example: Create new instance
+                            description: Description of what this action does
+                    example:
+                      instance:
+                      - action: compute.instance.Create
+                        description: Create new instance
+                      - action: compute.instance.Delete
+                        description: Delete instance
+                      backup:
+                      - action: compute.backup.List
+                        description: List all backups
+                      - action: compute.backup.Read
+                        description: Get backup details
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Total number of resource types
+                        example: 24
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/endpoint-action-maps/{id}:
+    get:
+      tags:
+      - IAM Endpoint Actions
+      summary: Get Endpoint Action Map
+      operationId: getEndpointActionMap
+      description: Retrieve a specific endpoint action mapping
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Endpoint action map details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_action_map:
+                    $ref: '#/components/schemas/EndpointActionMap'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    EndpointActionMap:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the mapping
+          example: '224'
+        endpoint_pattern:
+          type: string
+          description: API endpoint pattern with parameters
+          example: /v2/iam/policies/{policy-id}/groups/{group-id}
+        http_method:
+          type: string
+          enum:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          description: HTTP method for the endpoint
+          example: DELETE
+        required_action:
+          type: string
+          description: IAM action required to access this endpoint
+          example: iam.policy.Update
+        resource_type:
+          type: string
+          description: Type of resource this endpoint affects
+          example: policy
+        resource_pattern:
+          type: string
+          description: Pattern for resource matching (if applicable)
+        description:
+          type: string
+          description: Human-readable description of what this endpoint does
+          example: Detach policy from group
+        date_created:
+          type: string
+          format: date-time
+          description: When this mapping was created
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

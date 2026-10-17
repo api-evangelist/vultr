@@ -1,0 +1,567 @@
+openapi: 3.2.0
+info:
+  title: Vultr Logs API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged Logs across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: Logs
+  description: Endpoints for viewing logs and for managing an audit logs subscription
+paths:
+  /v2/logs/:
+    get:
+      tags:
+      - Logs
+      summary: List logs
+      operationId: ListLogs
+      description: Get a list of logs for a specific time period in the last 30 days.
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: start_time
+        description: 'A UTC timestamp for the start of the time period from which to return logs. `start_time` is an inclusive endpoint. Logs with a timestamp equal to, or after `start_time` are included in the response<br>
+
+          <span style="color: red">This field is required if the end_time field is not provided.</span></br>
+
+          **Expected Format:** yyyy-mm-ddThh:mm:ssZ<br>
+
+          **EX:** `2025-06-26T00:00:00Z`<br>
+
+          *start_time must be after to the date added for start_time*<br>
+
+          *start_time and end_time may not be more than 30 days and 1 hour apart*<br>
+
+          *If no start_time is provided a time 30 days and 1 hour prior to the end_time will be used by default*
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: end_time
+        description: 'A UTC timestamp for the end of the time period from which to return logs. `end_time` is an exclusive endpoint.  Only logs with a timestamp before the `end_time` are included in the response. <br>
+
+          <span style="color: red">This field is required if the start_time field is not provided.</span></br>
+
+          **Expected Format:** yyyy-mm-ddThh:mm:ssZ<br>
+
+          **EX:** `2025-06-26T00:00:00Z`<br>
+
+          *end_time must be before the date added for start_time*<br>
+
+          *start_time and end_time may not be more than 30 days and 1 hour apart*<br>
+
+          *If no end_time is provided the current time will be used  by default*'
+      - schema:
+          type: string
+        in: query
+        name: log_level
+        description: 'Filter the logs by the level assigned to the log.
+
+          * `info`
+
+          * `debug`
+
+          * `warning`
+
+          * `error`
+
+          * `critical`'
+      - schema:
+          type: string
+        in: query
+        name: resource_type
+        description: 'Filter the logs by the type of a resource such as an instances, bare-metals, kubernetes, etc.<br>
+
+          *resource_type must be an exact match to the value of the resource type set in the log.*
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: resource_id
+        description: Filter the logs by the UUID of a specific resource such as an instance.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    description: Maximum of 5,000 log records returned per request
+                    items:
+                      $ref: '#/components/schemas/log'
+                  meta:
+                    $ref: '#/components/schemas/log-meta'
+              examples:
+                response:
+                  value:
+                    logs:
+                    - resource_id: xb671a46-66ed-4dfb-b839-543f2c6c0b63
+                      resource_type: instances
+                      log_level: debug
+                      message: Success
+                      timestamp: '2025-06-26T16:45:06+00:00'
+                      metadata: {}
+                    meta:
+                      next_page_url: https://api.vultr.com/v2/logs?end_time=2025-09-18T10:21:20Z&start_time=2025-09-18T00:00:00Z&resource_type=kubernetes
+                      continue_time: '2025-06-26T12:24:03Z'
+                      returned_count: 5000
+                      unreturned_count: 3524
+                      total_count: 8524
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/logs/audit-logs:
+    post:
+      tags:
+      - Logs
+      summary: Create audit logs subscription
+      operationId: CreateAuditLogs
+      description: Create a subscription for audit logging to hold logs in object storage for 400 days. An account may only have one audit logs subscription. Once the subscription is created and the object storage is activated logs are transfered in 15 minute intervals.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - cluster_id
+              - label
+              - expiration_days
+              properties:
+                cluster_id:
+                  type: integer
+                  description: Used to select the cluster on which to host the object storage in which the logs will be stored.  Use the [Get All Clusters](https://www.vultr.com/api/#tag/s3/operation/list-object-storage-clusters) endpoint for available cluster_id values.
+                  example: 2
+                label:
+                  type: string
+                  description: A label to identify the subscription.
+                  example: my_audit_logs
+                expiration_days:
+                  type: integer
+                  description: The number of days to store log files for.  After a log file is upload it can not be deleted until the number of days set for expiration_days has elapsed.  Once that time has elapsed the file will be deleted automaticaly.
+                  example: 400
+      responses:
+        '201':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags:
+      - Logs
+      summary: List audit logs subscriptions
+      operationId: ListAuditLogs
+      description: List existing audit logs subscriptions.
+      responses:
+        '200':
+          description: List of audit logs subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/logs/audit-logs/{id}:
+    get:
+      tags:
+      - Logs
+      summary: Get audit logs subscription
+      operationId: GetExtendedLog
+      description: View information for a specific audit logs subscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Extended log subscription UUID
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - Logs
+      summary: Update audit logs subscription
+      operationId: UpdateExtendedLog
+      description: Update information for a specific audit logs subscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Extended log subscription UUID
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: A label to identify the subscription.
+                  example: my_audit_logs
+                expiration_days:
+                  type: integer
+                  description: The number of days for log files to be stored.  After a log file is upload it can not be deleted until the number of days set for expiration_days has elapsed.  Once that time has elapsed the file will be deleted automaticaly.
+                  example: 400
+      responses:
+        '200':
+          description: Extended Log Details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedLog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/logs/audit-logs/clusters:
+    get:
+      tags:
+      - Logs
+      summary: List audit logs Clusters
+      operationId: ListAuditLogsClusters
+      description: List Clusters available for audit logs.
+      responses:
+        '200':
+          description: List of audit logs clusters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExtendedLogCluster'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    ExtendedLog:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique id for the audit logs subscription.
+          example: e106f15e-ab58-4648-9106-19104b85ff65
+        date_created:
+          type: string
+          format: date-time
+          description: The date and time that the subscription was created.
+          example: '2025-10-24T20:10:16+00:00'
+        cluster_id:
+          type: integer
+          description: The id of the cluster used for object storage.
+          example: 2
+        region:
+          type: string
+          description: Code for the region where the cluster is hosted.
+          example: EWR
+        location:
+          type: string
+          description: A description of the location wher ethe cluster is hosted.
+          example: New Jersey
+        label:
+          type: string
+          description: The label used to identify the subscritpion.
+          example: my_audit_logs
+        sub_status:
+          type: string
+          description: The status of the audit logs subscription.
+          example: active
+        storage_status:
+          type: string
+          description: The status of the object storage that will be used to store the logs. There may be a delay of about a minute between creating the subscription and the object storage being activated.
+          example: active
+        s3_hostname:
+          type: string
+          description: The hostname used to connect to object storage.
+          example: ewr-staging.vultrlabs.com
+        s3_access_key:
+          type: string
+          description: The read only access key used to connect to object storage.  This value will only be set after storage_status is active.
+          example: 0V3QRR3ZODMIPU2LNM49
+        s3_secret_key:
+          type: string
+          description: The read only secret Key used to connect to object storage.  This value will only be set after storage_status is active.
+          example: Zq5sV3DVgd7rUpb3yZqMPSE3L3fBW87AqDPz6jpC
+        bucket_name:
+          type: string
+          description: The name of the bucket on object storage, in which the logs will be stored.
+          example: c2af82b2-0db0-4862-ae0d-3eee783df5ff-auditlog
+        prefix:
+          type: string
+          description: The vaue that will be used for the prifix part of the object key of each log file that is stored.
+          example: '7952126'
+        expiration_days:
+          type: number
+          description: The number of days to retain logs before they expire.
+          example: 400
+        retention_gb:
+          type: number
+          description: The average daily retention for the current pay cycle in gb(1024^3).
+          example: 0
+        ingestion_gb:
+          type: number
+          description: The total ingestion for the current pay cycle in gb(1024^3).
+          example: 0
+        retention_gb_price:
+          type: number
+          description: The price per gigabite of disk space used for the billing period.
+          example: 0
+        ingestion_gb_price:
+          type: number
+          description: The price per gigabite of files uploaded during the billig period.
+          example: 0
+        next_invoice_date:
+          type: string
+          description: The end of the current billing period.
+          example: '2025-11-01'
+        charges:
+          type: number
+          description: The expected charges for the current billing period.
+          example: 0
+        storage_used_bytes:
+          type: number
+          description: The current storage usage in bytes.
+          example: 0
+    log-meta:
+      title: log-meta
+      type: object
+      x-tags:
+      - log-meta
+      required:
+      - next_page_url
+      - continue_time
+      - returned_count
+      - unreturned_count
+      - total_count
+      properties:
+        next_page_url:
+          type: string
+          description: "In the event that there are more logs found for a specified time period than can be returned, this field will contain a URL that can be used to request the next block of logs for the time period.\n\nThe new request is inclusive of the timestamp for the last logs from the previous request. This is done to avoid skipping over any logs that may have the same timestamp as the last log in the previous request, but which may not have been included in that response.\n **Be aware that because of this there will be boundary duplicates between this new request and the previous one.**\n"
+        continue_time:
+          type: string
+          description: 'In the event that there are more logs found for a specified time period that can be returned, this field will be set with a UTC timestamp of where the logs were left off.
+
+            '
+        returned_count:
+          type: integer
+          minLength: 1
+          description: The number of log records that were returned. There is a maximum limit of 5,000 logs returned by any request.
+        unreturned_count:
+          type: integer
+          minLength: 1
+          description: The number of log records from the specified time period that were not returned due to the maximum return limit of 5,000 logs.
+        total_count:
+          type: integer
+          minLength: 1
+          description: The total number of records that were found for the specified time period.
+    ExtendedLogCluster:
+      type: object
+      properties:
+        id:
+          type: int
+          description: The unique id for the audit logs culster.
+          example: 2
+        region:
+          type: string
+          description: The region id where the cluster is located.
+          example: ewr
+        hostname:
+          type: string
+          description: The hostname used to connect to object storage on the cluster.
+          example: ewr1.vultrobjects.com
+        name:
+          type: string
+          description: Location of the cluster.
+          example: New Jersey
+        deploy:
+          type: string
+          description: The Cluster is eligible for Object Storage deployment..
+          example: 'yes'
+    log:
+      title: log
+      type: object
+      x-tags:
+      - log
+      description: Log line information
+      required:
+      - resource_id
+      - resource_type
+      - log_level
+      - message
+      - timestamp
+      properties:
+        resource_id:
+          type: string
+          minLength: 1
+          description: The UUID for the resource that was interacted with.  Only set if the logged interaction relates to a specific resource with a UUID.
+        resource_type:
+          type: string
+          minLength: 1
+          description: The type of resource that was interacted with.
+        log_level:
+          type: string
+          minLength: 1
+          description: 'The type of the configuration option.
+
+            * `info`
+
+            * `debug`
+
+            * `warning`
+
+            * `error`
+
+            * `critical`'
+        message:
+          type: string
+          minLength: 1
+          description: A message relating to the event that is being logged.
+        timestamp:
+          type: string
+          minLength: 1
+          description: The UTC timestamp of the time at which the log was generated.
+        metadata:
+          type: object
+          minLength: 1
+          description: A set of data that is specific to the logged event.  The properties of this object can varry depending on the source of the log.
+          required:
+          - user_id
+          - ip_address
+          properties:
+            user_id:
+              type: string
+              minLength: 1
+              description: The UUID for the user who triggered the event that is being logged.
+            ip_address:
+              type: string
+              minLength: 1
+              description: The IP address from which the request that generated the log originated.
+            username:
+              type: string
+              minLength: 1
+              description: The email address of a user who is logging in.<br>*This field is only included in the metadata for logs relating to users logging in.*
+            http_status_code:
+              type: integer
+              minLength: 1
+              description: The status code returned for and API request.<br>*This field is only included in the metadata for logs relating to API requests.*
+            method:
+              type: string
+              minLength: 1
+              description: 'The HTTP request method of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+
+                * `GET`
+
+                * `POST`
+
+                * `PUT`
+
+                * `PATCH`
+
+                * `DELETE`'
+            request_path:
+              type: string
+              minLength: 1
+              description: The URI path of the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+            request_body:
+              type: string
+              description: The request body provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+            query_parameters:
+              type: string
+              description: The query string provided for the API request being logged.<br>*This field is only included in the metadata for logs relating to API requests.*
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

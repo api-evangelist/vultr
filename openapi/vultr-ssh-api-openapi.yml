@@ -1,0 +1,497 @@
+openapi: 3.2.0
+info:
+  title: Vultr Ssh API
+  version: '2.0'
+  description: 'Operations tagged ssh across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: SSH
+  x-displayName: SSH Keys
+  description: You can add SSH keys to your account, which can be copied to new instances when first deployed. Updating a key does not update any running instances. If you reinstall an instance (erasing all its data), it will inherit the updated key.
+paths:
+  /ssh-keys/{ssh-key-id}:
+    parameters:
+    - schema:
+        type: string
+      name: ssh-key-id
+      in: path
+      required: true
+      description: The [SSH Key id](#operation/list-ssh-keys).
+    get:
+      summary: Get SSH Key
+      tags:
+      - SSH
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/ssh-keys/{ssh-key-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ssh_key:
+                    $ref: '#/components/schemas/ssh'
+              examples:
+                response:
+                  value:
+                    ssh_key:
+                      id: 3b8066a7-b438-455a-9688-44afc9a3597f
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      name: Example SSH Key
+                      ssh_key: ssh-rsa AA... user@example.com
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-ssh-key
+      description: Get information about an SSH Key.
+      security:
+      - API Key: []
+    patch:
+      summary: Update SSH Key
+      tags:
+      - SSH
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/ssh-keys/{ssh-key-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"Example SSH Key\",\n    \"ssh_key\" : \"ssh-rsa AA... user@example.com\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-ssh-key
+      description: Update an SSH Key. The attributes `name` and `ssh_key` are optional. If not set, the attributes will retain their original values. New deployments will use the updated key, but this action does not update previously deployed instances.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The user-supplied name for this SSH Key.
+                ssh_key:
+                  type: string
+                  description: The SSH Key.
+            examples:
+              request:
+                value:
+                  name: Example SSH Key
+                  ssh_key: ssh-rsa AA... user@example.com
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    delete:
+      summary: Delete SSH Key
+      tags:
+      - SSH
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/ssh-keys/{ssh-key-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-ssh-key
+      description: Delete an SSH Key.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /ssh-keys:
+    get:
+      summary: List SSH Keys
+      tags:
+      - SSH
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/ssh-keys\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ssh_keys:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ssh'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    ssh_keys:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      name: Example SSH Key
+                      ssh_key: ssh-rsa AA... user@example.com
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '401':
+          description: Unauthorized
+      operationId: list-ssh-keys
+      description: List all SSH Keys in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: 'Number of items requested per page. Default is 100 and Max is 500.
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create SSH key
+      tags:
+      - SSH
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/ssh-keys\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"Example SSH Key\",\n    \"ssh_key\" : \"ssh-rsa AA... user@example.com\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ssh_key:
+                    $ref: '#/components/schemas/ssh'
+              examples:
+                response:
+                  value:
+                    ssh_key:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      name: Example SSH Key
+                      ssh_key: ssh-rsa AA... user@example.com
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: create-ssh-key
+      description: Create a new SSH Key for use with future instances. This does not update any running instances.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The user-supplied name for this SSH Key.
+                ssh_key:
+                  type: string
+                  description: The SSH Key.
+              required:
+              - name
+              - ssh_key
+            examples:
+              request:
+                value:
+                  name: Example SSH Key
+                  ssh_key: ssh-rsa AA... user@example.com
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    ssh:
+      title: ssh
+      type: object
+      x-examples:
+        ssh-key:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          name: Example SSH Key
+          ssh_key: ssh-rsa AA... user@example.com
+      description: SSH Key information.
+      x-tags:
+      - ssh
+      properties:
+        id:
+          type: string
+          description: A unique ID for the SSH Key.
+        date_created:
+          type: string
+          description: The date this SSH Key was created.
+        name:
+          type: string
+          description: The user-supplied name for this SSH Key.
+        ssh_key:
+          type: string
+          description: The SSH Key.
+    get_ssh_key_200_response:
+      example:
+        ssh_key:
+          date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+      properties:
+        ssh_key:
+          $ref: '#/components/schemas/ssh_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    ssh_2:
+      description: SSH Key information.
+      example:
+        date_created: date_created
+        name: name
+        ssh_key: ssh_key
+        id: id
+      properties:
+        id:
+          description: A unique ID for the SSH Key.
+          type: string
+        date_created:
+          description: The date this SSH Key was created.
+          type: string
+        name:
+          description: The user-supplied name for this SSH Key.
+          type: string
+        ssh_key:
+          description: The SSH Key.
+          type: string
+      title: ssh
+      type: object
+      x-examples:
+        ssh-key:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          name: Example SSH Key
+          ssh_key: ssh-rsa AA... user@example.com
+      x-tags:
+      - ssh
+    create_ssh_key_request:
+      properties:
+        name:
+          description: The user-supplied name for this SSH Key.
+          type: string
+        ssh_key:
+          description: The SSH Key.
+          type: string
+      required:
+      - name
+      - ssh_key
+      type: object
+    update_ssh_key_request:
+      properties:
+        name:
+          description: The user-supplied name for this SSH Key.
+          type: string
+        ssh_key:
+          description: The SSH Key.
+          type: string
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    list_ssh_keys_200_response:
+      example:
+        ssh_keys:
+        - date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+        - date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ssh_keys:
+          items:
+            $ref: '#/components/schemas/ssh_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    get_ssh_key_200_response_2:
+      example:
+        ssh_key:
+          date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+      properties:
+        ssh_key:
+          $ref: '#/components/schemas/ssh_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    ssh_3:
+      description: SSH Key information.
+      example:
+        date_created: date_created
+        name: name
+        ssh_key: ssh_key
+        id: id
+      properties:
+        id:
+          description: A unique ID for the SSH Key.
+          type: string
+        date_created:
+          description: The date this SSH Key was created.
+          type: string
+        name:
+          description: The user-supplied name for this SSH Key.
+          type: string
+        ssh_key:
+          description: The SSH Key.
+          type: string
+      title: ssh
+      type: object
+      x-examples:
+        ssh-key:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          name: Example SSH Key
+          ssh_key: ssh-rsa AA... user@example.com
+      x-tags:
+      - ssh
+    list_ssh_keys_200_response_2:
+      example:
+        ssh_keys:
+        - date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+        - date_created: date_created
+          name: name
+          ssh_key: ssh_key
+          id: id
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        ssh_keys:
+          items:
+            $ref: '#/components/schemas/ssh_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

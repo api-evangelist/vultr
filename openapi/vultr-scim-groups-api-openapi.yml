@@ -1,0 +1,344 @@
+openapi: 3.2.0
+info:
+  title: Vultr SCIM Groups API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged SCIM Groups across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: SCIM Groups
+  description: SCIM 2.0 compliant endpoints for managing groups
+paths:
+  /scim/v2/Groups:
+    post:
+      tags:
+      - SCIM Groups
+      summary: Create SCIM Group
+      operationId: createSCIMGroup
+      description: Create a new group via SCIM 2.0 protocol
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMGroup'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+    get:
+      tags:
+      - SCIM Groups
+      summary: List SCIM Groups
+      operationId: listSCIMGroups
+      description: List groups via SCIM 2.0 protocol with filtering
+      parameters:
+      - name: filter
+        in: query
+        description: SCIM filter expression
+        schema:
+          type: string
+          example: displayName eq "Developers"
+      - name: startIndex
+        in: query
+        description: Starting index for pagination (1-indexed)
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: count
+        in: query
+        description: Number of results per page
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /scim/v2/Groups/{id}:
+    get:
+      tags:
+      - SCIM Groups
+      summary: Get SCIM Group
+      operationId: getSCIMGroup
+      description: Retrieve a specific group via SCIM 2.0 protocol
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+    put:
+      tags:
+      - SCIM Groups
+      summary: Replace SCIM Group
+      operationId: replaceSCIMGroup
+      description: Fully replace a group via SCIM 2.0 protocol
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMGroup'
+      responses:
+        '200':
+          description: Group replaced
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+    patch:
+      tags:
+      - SCIM Groups
+      summary: Patch SCIM Group
+      operationId: patchSCIMGroup
+      description: Partially update a group via SCIM 2.0 protocol
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/SCIMPatchOp'
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMGroup'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+    delete:
+      tags:
+      - SCIM Groups
+      summary: Delete SCIM Group
+      operationId: deleteSCIMGroup
+      description: Delete a group via SCIM 2.0 protocol
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Group deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    SCIMError:
+      description: SCIM Error Response
+      content:
+        application/scim+json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                items:
+                  type: string
+                example:
+                - urn:ietf:params:scim:api:messages:2.0:Error
+              status:
+                type: string
+                example: '400'
+              scimType:
+                type: string
+                example: invalidValue
+              detail:
+                type: string
+                example: Invalid filter syntax
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    SCIMListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            type: object
+    SCIMPatchOp:
+      type: object
+      required:
+      - schemas
+      - Operations
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:PatchOp
+        Operations:
+          type: array
+          items:
+            type: object
+            required:
+            - op
+            properties:
+              op:
+                type: string
+                enum:
+                - add
+                - remove
+                - replace
+              path:
+                type: string
+              value:
+                description: The value to set, add, or replace. Can be string, number, boolean, object, or array.
+                oneOf:
+                - type: string
+                - type: number
+                - type: boolean
+                - type: object
+                - type: array
+                  items: {}
+    SCIMGroup:
+      type: object
+      required:
+      - schemas
+      - displayName
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:schemas:core:2.0:Group
+        id:
+          type: string
+        externalId:
+          type: string
+        displayName:
+          type: string
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              $ref:
+                type: string
+              display:
+                type: string
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            created:
+              type: string
+            lastModified:
+              type: string
+            location:
+              type: string
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

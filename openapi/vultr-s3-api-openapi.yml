@@ -1,0 +1,911 @@
+openapi: 3.2.0
+info:
+  title: Vultr S3 API
+  version: '2.0'
+  description: 'Operations tagged s3 across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: S3
+  x-displayName: Object Storage
+  description: Object Storage is S3 API compatible. Objects uploaded to object storage can be accessed privately or publicly on the web. Object storage supports a virtually unlimited number of objects. Control your Object Storage via the API or browse in the Customer Portal.
+paths:
+  /object-storage:
+    parameters: []
+    get:
+      summary: List Object Storages
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object_storages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/object-storage'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                list of object-storages:
+                  value:
+                    object_storages:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cluster_id: 2
+                      region: ewr
+                      label: Example Object Storage
+                      status: active
+                      s3_hostname: ewr1.vultrobjects.com
+                      s3_access_key: 00example11223344
+                      s3_secret_key: 00example1122334455667788990011
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: list-object-storages
+      description: Get a list of all Object Storage in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Object Storage
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"Example Object Storage\",\n    \"cluster_id\" : 2\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object_storage:
+                    $ref: '#/components/schemas/object-storage'
+              examples:
+                response:
+                  value:
+                    object_storage:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cluster_id: 2
+                      region: ewr
+                      location: New Jersey
+                      label: Example Object Storage
+                      status: pending
+                      s3_hostname: ewr1.vultrobjects.com
+                      s3_access_key: 00example11223344
+                      s3_secret_key: 00example1122334455667788990011
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      operationId: create-object-storage
+      description: Create new Object Storage. The `cluster_id` attribute is required.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cluster_id:
+                  type: integer
+                  description: The [Cluster id](#operation/list-object-storage-clusters) where the Object Storage will be created.
+                label:
+                  type: string
+                  description: The user-supplied label for this Object Storage.
+              required:
+              - cluster_id
+            examples:
+              example request:
+                value:
+                  label: Example Object Storage
+                  cluster_id: 2
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /object-storage/{object-storage-id}:
+    parameters:
+    - schema:
+        type: string
+      name: object-storage-id
+      in: path
+      required: true
+      description: The [Object Storage id](#operation/list-object-storages).
+    get:
+      summary: Get Object Storage
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage/{object-storage-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object_storage:
+                    $ref: '#/components/schemas/object-storage'
+              examples:
+                response:
+                  value:
+                    object_storage:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cluster_id: 2
+                      region: ewr
+                      label: Example Object Storage
+                      status: active
+                      s3_hostname: ewr1.vultrobjects.com
+                      s3_access_key: 00example11223344
+                      s3_secret_key: 00example1122334455667788990011
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-object-storage
+      description: Get information about an Object Storage.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Object Storage
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage/{object-storage-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: delete-object-storage
+      description: Delete an Object Storage.
+      security:
+      - API Key: []
+    put:
+      summary: Update Object Storage
+      operationId: update-object-storage
+      responses:
+        '204':
+          description: No Content
+          headers: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Update the label for an Object Storage.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: The user-supplied label for the Object Storage.
+              required:
+              - label
+            examples:
+              request:
+                value:
+                  label: Updated Object Storage Label
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage/{object-storage-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"Updated Object Storage Label\"\n  }'"
+    servers:
+    - url: https://api.vultr.com/v2
+  /object-storage/{object-storage-id}/regenerate-keys:
+    parameters:
+    - schema:
+        type: string
+      name: object-storage-id
+      in: path
+      required: true
+      description: The [Object Storage id](#operation/list-object-storages).
+    post:
+      summary: Regenerate Object Storage Keys
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage/{object-storage-id}/regenerate-keys\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  s3_credentials:
+                    type: object
+                    properties:
+                      s3_hostname:
+                        type: string
+                        description: The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage.
+                      s3_access_key:
+                        type: string
+                        description: The new Object Storage access key.
+                      s3_secret_key:
+                        type: string
+                        description: The new Object Storage secret key.
+              examples:
+                response:
+                  value:
+                    s3_credentials:
+                      s3_hostname: ewr1.vultrobjects.com
+                      s3_access_key: 00example11223344
+                      s3_secret_key: 00example1122334455667788990011
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: regenerate-object-storage-keys
+      description: Regenerate the keys for an Object Storage.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /object-storage/clusters:
+    get:
+      summary: Get All Clusters
+      tags:
+      - S3
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/object-storage/clusters\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clusters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/clusters'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    clusters:
+                    - id: 2
+                      region: ewr
+                      hostname: ewr1.vultrobjects.com
+                      deploy: 'yes'
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+          headers: {}
+      operationId: list-object-storage-clusters
+      description: Get a list of all Object Storage Clusters.
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    object-storage:
+      title: object-storage
+      type: object
+      x-tags:
+      - s3
+      x-examples:
+        object storage:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          cluster_id: 2
+          region: ewr
+          label: Example Object Storage
+          status: active
+          s3_hostname: ewr1.vultrobjects.com
+          s3_access_key: 00example11223344
+          s3_secret_key: 00example1122334455667788990011
+      description: Object Storage information.
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Object Storage.
+        date_created:
+          type: string
+          description: Date the Object Store was created.
+        cluster_id:
+          type: integer
+          description: The [Cluster id](#operation/list-object-storage-clusters).
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) for this Object Storage.
+        label:
+          type: string
+          description: The user-supplied label for this Object Storage.
+        status:
+          type: string
+          description: 'The status of this Object Storage.
+
+
+            * active
+
+            * pending'
+        s3_hostname:
+          type: string
+          description: The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage.
+        s3_access_key:
+          type: string
+          description: The Object Storage access key.
+        s3_secret_key:
+          type: string
+          description: The Object Storage secret key.
+    clusters:
+      title: clusters
+      type: object
+      x-tags:
+      - s3
+      description: Object Storage Cluster information.
+      x-examples:
+        object storage cluster:
+          id: 1
+          region: ewr
+          hostname: ewr1.vultrobjects.com
+          deploy: 'yes'
+      properties:
+        id:
+          type: integer
+          description: A unique ID for the Object Storage cluster.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the cluster is located.
+        hostname:
+          type: string
+          description: The cluster host name.
+        deploy:
+          type: string
+          description: 'The Cluster is eligible for Object Storage deployment.
+
+
+            * yes
+
+            * no'
+    regenerate_object_storage_keys_201_response:
+      example:
+        s3_credentials:
+          s3_secret_key: s3_secret_key
+          s3_access_key: s3_access_key
+          s3_hostname: s3_hostname
+      properties:
+        s3_credentials:
+          $ref: '#/components/schemas/regenerate_object_storage_keys_201_response_s3_credentials'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_object_storage_clusters_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        clusters:
+        - hostname: hostname
+          id: 0
+          region: region
+          deploy: deploy
+        - hostname: hostname
+          id: 0
+          region: region
+          deploy: deploy
+      properties:
+        clusters:
+          items:
+            $ref: '#/components/schemas/clusters_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    regenerate_object_storage_keys_201_response_s3_credentials:
+      example:
+        s3_secret_key: s3_secret_key
+        s3_access_key: s3_access_key
+        s3_hostname: s3_hostname
+      properties:
+        s3_hostname:
+          description: The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage.
+          type: string
+        s3_access_key:
+          description: The new Object Storage access key.
+          type: string
+        s3_secret_key:
+          description: The new Object Storage secret key.
+          type: string
+      type: object
+    list_object_storages_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        object_storages:
+        - s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+        - s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+      properties:
+        object_storages:
+          items:
+            $ref: '#/components/schemas/object-storage_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    create_object_storage_request:
+      properties:
+        cluster_id:
+          description: The [Cluster id](#operation/list-object-storage-clusters) where the Object Storage will be created.
+          type: integer
+        label:
+          description: The user-supplied label for this Object Storage.
+          type: string
+      required:
+      - cluster_id
+      type: object
+    clusters_2:
+      description: Object Storage Cluster information.
+      example:
+        hostname: hostname
+        id: 0
+        region: region
+        deploy: deploy
+      properties:
+        id:
+          description: A unique ID for the Object Storage cluster.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the cluster is located.
+          type: string
+        hostname:
+          description: The cluster host name.
+          type: string
+        deploy:
+          description: 'The Cluster is eligible for Object Storage deployment.
+
+
+            * yes
+
+            * no'
+          type: string
+      title: clusters
+      type: object
+      x-tags:
+      - s3
+      x-examples:
+        object storage cluster:
+          id: 1
+          region: ewr
+          hostname: ewr1.vultrobjects.com
+          deploy: 'yes'
+    update_object_storage_request:
+      properties:
+        label:
+          description: The user-supplied label for the Object Storage.
+          type: string
+      required:
+      - label
+      type: object
+    object-storage_2:
+      description: Object Storage information.
+      example:
+        s3_secret_key: s3_secret_key
+        cluster_id: 0
+        s3_access_key: s3_access_key
+        date_created: date_created
+        s3_hostname: s3_hostname
+        id: id
+        label: label
+        region: region
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Object Storage.
+          type: string
+        date_created:
+          description: Date the Object Store was created.
+          type: string
+        cluster_id:
+          description: The [Cluster id](#operation/list-object-storage-clusters).
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) for this Object Storage.
+          type: string
+        label:
+          description: The user-supplied label for this Object Storage.
+          type: string
+        status:
+          description: 'The status of this Object Storage.
+
+
+            * active
+
+            * pending'
+          type: string
+        s3_hostname:
+          description: The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage.
+          type: string
+        s3_access_key:
+          description: The Object Storage access key.
+          type: string
+        s3_secret_key:
+          description: The Object Storage secret key.
+          type: string
+      title: object-storage
+      type: object
+      x-tags:
+      - s3
+      x-examples:
+        object storage:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          cluster_id: 2
+          region: ewr
+          label: Example Object Storage
+          status: active
+          s3_hostname: ewr1.vultrobjects.com
+          s3_access_key: 00example11223344
+          s3_secret_key: 00example1122334455667788990011
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    create_object_storage_202_response:
+      example:
+        object_storage:
+          s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+      properties:
+        object_storage:
+          $ref: '#/components/schemas/object-storage_2'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_object_storage_clusters_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        clusters:
+        - hostname: hostname
+          id: 0
+          region: region
+          deploy: deploy
+        - hostname: hostname
+          id: 0
+          region: region
+          deploy: deploy
+      properties:
+        clusters:
+          items:
+            $ref: '#/components/schemas/clusters_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    list_object_storages_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        object_storages:
+        - s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+        - s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+      properties:
+        object_storages:
+          items:
+            $ref: '#/components/schemas/object-storage_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    clusters_3:
+      description: Object Storage Cluster information.
+      example:
+        hostname: hostname
+        id: 0
+        region: region
+        deploy: deploy
+      properties:
+        id:
+          description: A unique ID for the Object Storage cluster.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the cluster is located.
+          type: string
+        hostname:
+          description: The cluster host name.
+          type: string
+        deploy:
+          description: 'The Cluster is eligible for Object Storage deployment.
+
+
+            * yes
+
+            * no'
+          type: string
+      title: clusters
+      type: object
+      x-tags:
+      - s3
+      x-examples:
+        object storage cluster:
+          id: 1
+          region: ewr
+          hostname: ewr1.vultrobjects.com
+          deploy: 'yes'
+    object-storage_3:
+      description: Object Storage information.
+      example:
+        s3_secret_key: s3_secret_key
+        cluster_id: 0
+        s3_access_key: s3_access_key
+        date_created: date_created
+        s3_hostname: s3_hostname
+        id: id
+        label: label
+        region: region
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Object Storage.
+          type: string
+        date_created:
+          description: Date the Object Store was created.
+          type: string
+        cluster_id:
+          description: The [Cluster id](#operation/list-object-storage-clusters).
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) for this Object Storage.
+          type: string
+        label:
+          description: The user-supplied label for this Object Storage.
+          type: string
+        status:
+          description: 'The status of this Object Storage.
+
+
+            * active
+
+            * pending'
+          type: string
+        s3_hostname:
+          description: The [Cluster hostname](#operation/list-object-storage-clusters) for this Object Storage.
+          type: string
+        s3_access_key:
+          description: The Object Storage access key.
+          type: string
+        s3_secret_key:
+          description: The Object Storage secret key.
+          type: string
+      title: object-storage
+      type: object
+      x-tags:
+      - s3
+      x-examples:
+        object storage:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          cluster_id: 2
+          region: ewr
+          label: Example Object Storage
+          status: active
+          s3_hostname: ewr1.vultrobjects.com
+          s3_access_key: 00example11223344
+          s3_secret_key: 00example1122334455667788990011
+    create_object_storage_202_response_2:
+      example:
+        object_storage:
+          s3_secret_key: s3_secret_key
+          cluster_id: 0
+          s3_access_key: s3_access_key
+          date_created: date_created
+          s3_hostname: s3_hostname
+          id: id
+          label: label
+          region: region
+          status: status
+      properties:
+        object_storage:
+          $ref: '#/components/schemas/object-storage_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

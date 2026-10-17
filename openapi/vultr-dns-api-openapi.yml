@@ -1,0 +1,1320 @@
+openapi: 3.2.0
+info:
+  title: Vultr Dns API
+  version: '2.0'
+  description: 'Operations tagged dns across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: DNS
+  x-displayName: DNS
+  description: Vultr offers free DNS hosting for customers' domains. The nameservers are on an AnyCAST network and ensure fast DNS resolution. When you manage your DNS through the API, you can view the results in your customer portal.
+paths:
+  /domains:
+    parameters: []
+    get:
+      summary: List DNS Domains
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  domains:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/domain'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                list of domains:
+                  value:
+                    domains:
+                    - domain: example.com
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      dns_sec: enabled
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: list-dns-domains
+      description: List all DNS Domains in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: 'Number of items requested per page. Default is 100 and Max is 500.
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create DNS Domain
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"domain\" : \"example.com\",\n    \"ip\" : \"192.0.2.123\",\n    \"dns_sec\" : \"enabled\"\n  }'"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  domain:
+                    $ref: '#/components/schemas/domain'
+              examples:
+                response:
+                  value:
+                    domain:
+                      domain: example.com
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      dns_sec: enabled
+      operationId: create-dns-domain
+      description: Create a DNS Domain for `domain`. If no `ip` address is supplied a domain with no records will be created.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  description: Your registered DNS Domain name.
+                ip:
+                  type: string
+                  description: The default IP address for your DNS Domain. If omitted an empty domain zone will be created.
+                dns_sec:
+                  type: string
+                  description: 'Enable or disable DNSSEC.
+
+
+                    * enabled
+
+                    * disabled (default)'
+              required:
+              - domain
+            examples:
+              request:
+                value:
+                  domain: example.com
+                  ip: 192.0.2.123
+                  dns_sec: enabled
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /domains/{dns-domain}:
+    parameters:
+    - schema:
+        type: string
+      name: dns-domain
+      in: path
+      required: true
+      description: The [DNS Domain](#operation/list-dns-domains).
+    get:
+      summary: Get DNS Domain
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  domain:
+                    $ref: '#/components/schemas/domain'
+              examples:
+                response:
+                  value:
+                    domain:
+                      domain: example.com
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      dns_sec: enabled
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-dns-domain
+      security:
+      - API Key: []
+      description: Get information for the DNS Domain.
+    delete:
+      summary: Delete Domain
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-dns-domain
+      security:
+      - API Key: []
+      description: Delete the DNS Domain.
+    put:
+      summary: Update a DNS Domain
+      operationId: update-dns-domain
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"dns_sec\" : \"enabled\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dns_sec:
+                  type: string
+                  description: 'Enable or disable DNSSEC.
+
+
+                    * enabled
+
+                    * disabled'
+              required:
+              - dns_sec
+            examples:
+              request:
+                value:
+                  dns_sec: enabled
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      description: Update the DNS Domain.
+      tags:
+      - DNS
+    servers:
+    - url: https://api.vultr.com/v2
+  /domains/{dns-domain}/soa:
+    parameters:
+    - schema:
+        type: string
+      name: dns-domain
+      in: path
+      required: true
+      description: The [DNS Domain](#operation/list-dns-domains).
+    get:
+      summary: Get SOA information
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/soa\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dns_soa:
+                    $ref: '#/components/schemas/dns-soa'
+              examples:
+                response:
+                  value:
+                    dns_soa:
+                      nsprimary: ns1.vultr.com
+                      email: admin@example.com
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-dns-domain-soa
+      description: Get SOA information for the DNS Domain.
+      security:
+      - API Key: []
+    patch:
+      summary: Update SOA information
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/soa\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"nsprimary\" : \"ns1.vultr.com\",\n    \"email\" : \"admin@example.com\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: update-dns-domain-soa
+      description: Update the SOA information for the DNS Domain. All attributes are optional. If not set, the attributes will retain their original values.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nsprimary:
+                  type: string
+                  description: Set the primary nameserver.
+                email:
+                  type: string
+                  description: Set the contact email address.
+            examples:
+              request:
+                value:
+                  nsprimary: ns1.vultr.com
+                  email: admin@example.com
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /domains/{dns-domain}/dnssec:
+    parameters:
+    - schema:
+        type: string
+      name: dns-domain
+      in: path
+      required: true
+      description: The [DNS Domain](#operation/list-dns-domains).
+    get:
+      summary: Get DNSSec Info
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/dnssec\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dns_sec:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                response:
+                  value:
+                    dns_sec:
+                    - example.com IN DNSKEY 257 3 13 kRrxANp7YTGqVbaWtMy8hhsK0jcG4ajjICZKMb4fKv79Vx/RSn76vNjzIT7/Uo0BXil01Fk8RRQc4nWZctGJBA==
+                    - example.com IN DS 27933 13 1 2d9ac457e5c11a104e25d971d0a6254562bddde7
+                    - example.com IN DS 27933 13 2 8858e7b0dfb881280ce2ca1e0eafcd93d5b53687c21da284d4f8799ba82208a9
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-dns-domain-dnssec
+      security:
+      - API Key: []
+      description: Get the DNSSEC information for the DNS Domain.
+    servers:
+    - url: https://api.vultr.com/v2
+  /domains/{dns-domain}/records:
+    parameters:
+    - schema:
+        type: string
+      name: dns-domain
+      in: path
+      required: true
+      description: The [DNS Domain](#operation/list-dns-domains).
+    post:
+      summary: Create Record
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/records\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"www\",\n    \"type\" : \"A\",\n    \"data\" : \"192.0.2.123\",\n    \"ttl\" : 300,\n    \"priority\" : 0\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/dns-record'
+              examples:
+                response:
+                  value:
+                    record:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      type: A
+                      name: www
+                      data: 192.0.2.123
+                      priority: 0
+                      ttl: 300
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: create-dns-domain-record
+      description: Create a DNS record.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The hostname for this DNS record.
+                type:
+                  type: string
+                  description: 'The DNS record type.
+
+
+                    * A
+
+                    * AAAA
+
+                    * CNAME
+
+                    * NS
+
+                    * MX
+
+                    * SRV
+
+                    * TXT
+
+                    * CAA
+
+                    * SSHFP'
+                data:
+                  type: string
+                  description: The DNS data for this record type.
+                ttl:
+                  type: integer
+                  description: Time to Live in seconds.
+                priority:
+                  type: integer
+                  description: DNS priority. Does not apply to all record types. (Only required for MX and SRV)
+              required:
+              - name
+              - type
+              - data
+            examples:
+              request:
+                value:
+                  name: www
+                  type: A
+                  data: 192.0.2.123
+                  ttl: 300
+                  priority: 0
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    get:
+      summary: List Records
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/records\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dns-record'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    records:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      type: A
+                      name: foo.example.com
+                      data: 192.0.2.123
+                      priority: 0
+                      ttl: 300
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-dns-domain-records
+      description: Get the DNS records for the Domain.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    servers:
+    - url: https://api.vultr.com/v2
+  /domains/{dns-domain}/records/{record-id}:
+    parameters:
+    - schema:
+        type: string
+      name: dns-domain
+      in: path
+      required: true
+      description: The [DNS Domain](#operation/list-dns-domains).
+    - schema:
+        type: string
+      name: record-id
+      in: path
+      required: true
+      description: The [DNS Record id](#operation/list-dns-domain-records).
+    get:
+      summary: Get Record
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/records/{record-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/dns-record'
+              examples:
+                response:
+                  value:
+                    record:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      type: A
+                      name: www
+                      data: 192.0.2.123
+                      priority: 0
+                      ttl: 300
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-dns-domain-record
+      description: Get information for a DNS Record.
+      security:
+      - API Key: []
+    patch:
+      summary: Update Record
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/records/{record-id}}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"CNAME\",\n    \"data\" : \"foo.example.com\",\n    \"ttl\" : 300,\n    \"priority\" : 0\n  }'"
+      responses:
+        '204':
+          description: No Content
+      operationId: update-dns-domain-record
+      description: Update the information for a DNS record. All attributes are optional. If not set, the attributes will retain their original values.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The hostname for this DNS record.
+                data:
+                  type: string
+                  description: The DNS data for this record type.
+                ttl:
+                  type: integer
+                  description: Time to Live in seconds.
+                priority:
+                  type: integer
+                  description: DNS priority. Does not apply to all record types.
+            examples:
+              request:
+                value:
+                  name: CNAME
+                  data: foo.example.com
+                  ttl: 300
+                  priority: 0
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Record
+      tags:
+      - DNS
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/domains/{dns-domain}/records/{record-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-dns-domain-record
+      description: Delete the DNS record.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    dns-record:
+      title: dns-record
+      type: object
+      x-tags:
+      - dns
+      description: DNS Record information.
+      x-examples:
+        dns-record:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          type: A
+          name: foo.example.com
+          data: 192.0.2.123
+          priority: 0
+          ttl: 300
+      properties:
+        id:
+          description: A unique ID for the DNS Record.
+          type: string
+        type:
+          type: string
+          description: 'The DNS record type.
+
+
+            * A
+
+            * AAAA
+
+            * CNAME
+
+            * NS
+
+            * MX
+
+            * SRV
+
+            * TXT
+
+            * CAA
+
+            * SSHFP'
+        name:
+          type: string
+          description: The hostname for this DNS record.
+        data:
+          type: string
+          description: The DNS data for this record type.
+        priority:
+          type: integer
+          description: DNS priority. Does not apply to all record types.
+        ttl:
+          type: integer
+          description: Time to Live in seconds.
+    dns-soa:
+      title: dns-soa
+      type: object
+      x-tags:
+      - dns
+      description: SOA Record information.
+      x-examples:
+        dns_soa:
+          dns_soa:
+            nsprimary: ns1.vultr.com
+            email: admin@example.com
+      properties:
+        nsprimary:
+          type: string
+          description: Primary nameserver for this domain.
+        email:
+          type: string
+          description: Domain contact email address.
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    domain:
+      title: domain
+      type: object
+      description: DNS Domain information.
+      x-tags:
+      - dns
+      x-examples:
+        list of domains:
+          domain: example.com
+          date_created: '2020-10-10T01:56:20+00:00'
+      properties:
+        domain:
+          type: string
+          description: Your registered domain name.
+        date_created:
+          type: string
+          description: Date the DNS Domain was created.
+        dns_sec:
+          type: string
+          description: 'The domain''s DNSSEC status
+
+
+            * enabled
+
+            * disabled'
+    dns-record_2:
+      description: DNS Record information.
+      example:
+        data: data
+        name: name
+        id: id
+        type: type
+        priority: 0
+        ttl: 6
+      properties:
+        id:
+          description: A unique ID for the DNS Record.
+          type: string
+        type:
+          description: 'The DNS record type.
+
+
+            * A
+
+            * AAAA
+
+            * CNAME
+
+            * NS
+
+            * MX
+
+            * SRV
+
+            * TXT
+
+            * CAA
+
+            * SSHFP'
+          type: string
+        name:
+          description: The hostname for this DNS record.
+          type: string
+        data:
+          description: The DNS data for this record type.
+          type: string
+        priority:
+          description: DNS priority. Does not apply to all record types.
+          type: integer
+        ttl:
+          description: Time to Live in seconds.
+          type: integer
+      title: dns-record
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        dns-record:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          type: A
+          name: foo.example.com
+          data: 192.0.2.123
+          priority: 0
+          ttl: 300
+    create_dns_domain_record_201_response:
+      example:
+        record:
+          data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+      properties:
+        record:
+          $ref: '#/components/schemas/dns-record_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_dns_domains_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        domains:
+        - date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+        - date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+      properties:
+        domains:
+          items:
+            $ref: '#/components/schemas/domain_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    update_dns_domain_record_request:
+      properties:
+        name:
+          description: The hostname for this DNS record.
+          type: string
+        data:
+          description: The DNS data for this record type.
+          type: string
+        ttl:
+          description: Time to Live in seconds.
+          type: integer
+        priority:
+          description: DNS priority. Does not apply to all record types.
+          type: integer
+      type: object
+    update_dns_domain_request:
+      properties:
+        dns_sec:
+          description: 'Enable or disable DNSSEC.
+
+
+            * enabled
+
+            * disabled'
+          type: string
+      required:
+      - dns_sec
+      type: object
+    create_dns_domain_request:
+      properties:
+        domain:
+          description: Your registered DNS Domain name.
+          type: string
+        ip:
+          description: The default IP address for your DNS Domain. If omitted an empty domain zone will be created.
+          type: string
+        dns_sec:
+          description: 'Enable or disable DNSSEC.
+
+
+            * enabled
+
+            * disabled (default)'
+          type: string
+      required:
+      - domain
+      type: object
+    create_dns_domain_record_request:
+      properties:
+        name:
+          description: The hostname for this DNS record.
+          type: string
+        type:
+          description: 'The DNS record type.
+
+
+            * A
+
+            * AAAA
+
+            * CNAME
+
+            * NS
+
+            * MX
+
+            * SRV
+
+            * TXT
+
+            * CAA
+
+            * SSHFP'
+          type: string
+        data:
+          description: The DNS data for this record type.
+          type: string
+        ttl:
+          description: Time to Live in seconds.
+          type: integer
+        priority:
+          description: DNS priority. Does not apply to all record types. (Only required for MX and SRV)
+          type: integer
+      required:
+      - data
+      - name
+      - type
+      type: object
+    update_dns_domain_soa_request:
+      properties:
+        nsprimary:
+          description: Set the primary nameserver.
+          type: string
+        email:
+          description: Set the contact email address.
+          type: string
+      type: object
+    get_dns_domain_dnssec_200_response:
+      example:
+        dns_sec:
+        - dns_sec
+        - dns_sec
+      properties:
+        dns_sec:
+          items:
+            type: string
+          type: array
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    list_dns_domain_records_200_response:
+      example:
+        records:
+        - data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+        - data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        records:
+          items:
+            $ref: '#/components/schemas/dns-record_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    get_dns_domain_soa_200_response:
+      example:
+        dns_soa:
+          nsprimary: nsprimary
+          email: email
+      properties:
+        dns_soa:
+          $ref: '#/components/schemas/dns-soa_2'
+      type: object
+    create_dns_domain_200_response:
+      example:
+        domain:
+          date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+      properties:
+        domain:
+          $ref: '#/components/schemas/domain_2'
+      type: object
+    dns-soa_2:
+      description: SOA Record information.
+      example:
+        nsprimary: nsprimary
+        email: email
+      properties:
+        nsprimary:
+          description: Primary nameserver for this domain.
+          type: string
+        email:
+          description: Domain contact email address.
+          type: string
+      title: dns-soa
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        dns_soa:
+          dns_soa:
+            nsprimary: ns1.vultr.com
+            email: admin@example.com
+    domain_2:
+      description: DNS Domain information.
+      example:
+        date_created: date_created
+        domain: domain
+        dns_sec: dns_sec
+      properties:
+        domain:
+          description: Your registered domain name.
+          type: string
+        date_created:
+          description: Date the DNS Domain was created.
+          type: string
+        dns_sec:
+          description: 'The domain''s DNSSEC status
+
+
+            * enabled
+
+            * disabled'
+          type: string
+      title: domain
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        list of domains:
+          domain: example.com
+          date_created: 2020-10-10 01:56:20+00:00
+    dns-record_3:
+      description: DNS Record information.
+      example:
+        data: data
+        name: name
+        id: id
+        type: type
+        priority: 0
+        ttl: 6
+      properties:
+        id:
+          description: A unique ID for the DNS Record.
+          type: string
+        type:
+          description: 'The DNS record type.
+
+
+            * A
+
+            * AAAA
+
+            * CNAME
+
+            * NS
+
+            * MX
+
+            * SRV
+
+            * TXT
+
+            * CAA
+
+            * SSHFP'
+          type: string
+        name:
+          description: The hostname for this DNS record.
+          type: string
+        data:
+          description: The DNS data for this record type.
+          type: string
+        priority:
+          description: DNS priority. Does not apply to all record types.
+          type: integer
+        ttl:
+          description: Time to Live in seconds.
+          type: integer
+      title: dns-record
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        dns-record:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          type: A
+          name: foo.example.com
+          data: 192.0.2.123
+          priority: 0
+          ttl: 300
+    create_dns_domain_record_201_response_2:
+      example:
+        record:
+          data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+      properties:
+        record:
+          $ref: '#/components/schemas/dns-record_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_dns_domains_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        domains:
+        - date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+        - date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+      properties:
+        domains:
+          items:
+            $ref: '#/components/schemas/domain_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    list_dns_domain_records_200_response_2:
+      example:
+        records:
+        - data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+        - data: data
+          name: name
+          id: id
+          type: type
+          priority: 0
+          ttl: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        records:
+          items:
+            $ref: '#/components/schemas/dns-record_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    get_dns_domain_soa_200_response_2:
+      example:
+        dns_soa:
+          nsprimary: nsprimary
+          email: email
+      properties:
+        dns_soa:
+          $ref: '#/components/schemas/dns-soa_3'
+      type: object
+    create_dns_domain_200_response_2:
+      example:
+        domain:
+          date_created: date_created
+          domain: domain
+          dns_sec: dns_sec
+      properties:
+        domain:
+          $ref: '#/components/schemas/domain_3'
+      type: object
+    dns-soa_3:
+      description: SOA Record information.
+      example:
+        nsprimary: nsprimary
+        email: email
+      properties:
+        nsprimary:
+          description: Primary nameserver for this domain.
+          type: string
+        email:
+          description: Domain contact email address.
+          type: string
+      title: dns-soa
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        dns_soa:
+          dns_soa:
+            nsprimary: ns1.vultr.com
+            email: admin@example.com
+    domain_3:
+      description: DNS Domain information.
+      example:
+        date_created: date_created
+        domain: domain
+        dns_sec: dns_sec
+      properties:
+        domain:
+          description: Your registered domain name.
+          type: string
+        date_created:
+          description: Date the DNS Domain was created.
+          type: string
+        dns_sec:
+          description: 'The domain''s DNSSEC status
+
+
+            * enabled
+
+            * disabled'
+          type: string
+      title: domain
+      type: object
+      x-tags:
+      - dns
+      x-examples:
+        list of domains:
+          domain: example.com
+          date_created: 2020-10-10 01:56:20+00:00
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

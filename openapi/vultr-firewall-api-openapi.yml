@@ -1,0 +1,1260 @@
+openapi: 3.2.0
+info:
+  title: Vultr Firewall API
+  version: '2.0'
+  description: 'Operations tagged firewall across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Firewall
+  x-displayName: Firewall
+  description: Vultr offers a web-based firewall solution to protect one or more compute instances. Firewall groups can manage multiple servers with a standard ruleset. You can control multiple groups with the API.
+paths:
+  /firewalls:
+    parameters: []
+    get:
+      summary: List Firewall Groups
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/firewall-group'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    firewall_groups:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      description: Example Firewall Group
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:59:20+00:00'
+                      instance_count: 0
+                      rule_count: 0
+                      max_rule_count: 50
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '401':
+          description: Unauthorized
+      operationId: list-firewall-groups
+      description: Get a list of all Firewall Groups.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Firewall Group
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"description\" : \"Example Firewall Group\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_group:
+                    $ref: '#/components/schemas/firewall-group'
+              examples:
+                response:
+                  value:
+                    firewall_group:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      description: Example Firewall Group
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:56:20+00:00'
+                      instance_count: 0
+                      rule_count: 0
+                      max_rule_count: 50
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-firewall-group
+      description: Create a new Firewall Group.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: User-supplied description of this Firewall Group.
+            examples:
+              request:
+                value:
+                  description: Example Firewall Group
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /firewalls/{firewall-group-id}:
+    parameters:
+    - schema:
+        type: string
+      name: firewall-group-id
+      in: path
+      required: true
+      description: The [Firewall Group id](#operation/list-firewall-groups).
+    get:
+      summary: Get Firewall Group
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_group:
+                    $ref: '#/components/schemas/firewall-group'
+              examples:
+                response:
+                  value:
+                    firewall_group:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      description: Example Firewall Group
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:56:20+00:00'
+                      instance_count: 0
+                      rule_count: 0
+                      max_rule_count: 50
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-firewall-group
+      description: Get information for a Firewall Group.
+      security:
+      - API Key: []
+    put:
+      summary: Update Firewall Group
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"description\" : \"Updated Firewall Group Name\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-firewall-group
+      description: Update information for a Firewall Group.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: User-supplied description of this Firewall Group.
+              required:
+              - description
+            examples:
+              request:
+                value:
+                  description: Updated Firewall Group Name
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    delete:
+      summary: Delete Firewall Group
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-firewall-group
+      security:
+      - API Key: []
+      description: Delete a Firewall Group.
+    servers:
+    - url: https://api.vultr.com/v2
+  /firewalls/{firewall-group-id}/rules:
+    parameters:
+    - schema:
+        type: string
+      name: firewall-group-id
+      in: path
+      required: true
+      description: The [Firewall Group id](#operation/list-firewall-groups).
+    get:
+      summary: List Firewall Rules
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}/rules\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_rules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/firewall-rule'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    firewall_rules:
+                    - id: 1
+                      ip_type: v4
+                      action: accept
+                      protocol: tcp
+                      port: '80'
+                      subnet: 192.0.2.0
+                      subnet_size: 24
+                      source: ''
+                      notes: Example Firewall Rule
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-firewall-group-rules
+      description: Get the Firewall Rules for a Firewall Group.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Firewall Rules
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}/rules\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ip_type\" : \"v4\",\n    \"protocol\" : \"tcp\",\n    \"port\" : \"80\",\n    \"subnet\" : \"192.0.2.0\",\n    \"subnet_size\" : 24,\n    \"source\" : \"\",\n    \"notes\" : \"Example Firewall Rule\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_rule:
+                    $ref: '#/components/schemas/firewall-rule'
+              examples:
+                response:
+                  value:
+                    firewall_rule:
+                      id: 1
+                      ip_type: v4
+                      action: accept
+                      protocol: tcp
+                      port: '80'
+                      subnet: 192.0.2.0
+                      subnet_size: 24
+                      source: ''
+                      notes: Example Firewall Rule
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: post-firewalls-firewall-group-id-rules
+      description: Create a Firewall Rule for a Firewall Group. The attributes `ip_type`, `protocol`, `subnet`, and `subnet_size` are required.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip_type:
+                  type: string
+                  description: 'The type of IP rule.
+
+
+                    * v4
+
+                    * v6'
+                protocol:
+                  type: string
+                  description: 'The protocol for this rule.
+
+
+                    * ICMP
+
+                    * TCP
+
+                    * UDP
+
+                    * GRE
+
+                    * ESP
+
+                    * AH
+
+                    '
+                subnet:
+                  type: string
+                  description: 'The IPv4 network in CIDR notation. Example: 192.0.2.123'
+                subnet_size:
+                  type: integer
+                  description: 'The number of bits for the netmask in CIDR notation. Example: 32'
+                port:
+                  type: string
+                  description: TCP/UDP only. This field can be a specific port or a colon separated port range.
+                source:
+                  type: string
+                  description: 'If the source string is given a value of "cloudflare" subnet and subnet_size will both be ignored.
+
+                    Possible values:
+
+
+                    |   | Value | Description |
+
+                    | - | ------ | ------------- |
+
+                    |   | "" | Use the value from `subnet` and `subnet_size`. |
+
+                    |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |
+
+                    |   | [Load Balancer id](#operation/list-load-balancers) | Provide a load balancer ID to use its IPs |
+
+                    '
+                notes:
+                  type: string
+                  description: User-supplied notes for this rule.
+              required:
+              - ip_type
+              - protocol
+              - subnet
+              - subnet_size
+            examples:
+              request:
+                value:
+                  ip_type: v4
+                  protocol: tcp
+                  port: '80'
+                  subnet: 192.0.2.0
+                  subnet_size: 24
+                  source: ''
+                  notes: Example Firewall Rule
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /firewalls/{firewall-group-id}/rules/{firewall-rule-id}:
+    parameters:
+    - schema:
+        type: string
+      name: firewall-group-id
+      in: path
+      required: true
+      description: The [Firewall Group id](#operation/list-firewall-groups).
+    - schema:
+        type: string
+      name: firewall-rule-id
+      in: path
+      required: true
+      description: The [Firewall Rule id](#operation/list-firewall-group-rules).
+    delete:
+      summary: Delete Firewall Rule
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}/rules/{firewall-rule-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-firewall-group-rule
+      description: Delete a Firewall Rule.
+      security:
+      - API Key: []
+    get:
+      summary: Get Firewall Rule
+      operationId: get-firewall-group-rule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firewall_rule:
+                    $ref: '#/components/schemas/firewall-rule'
+              examples:
+                example:
+                  value:
+                    firewall_rule:
+                      id: 1
+                      ip_type: v4
+                      action: accept
+                      protocol: tcp
+                      port: '80'
+                      subnet: 192.0.2.0
+                      subnet_size: 24
+                      source: ''
+                      notes: Example Firewall Rule
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Get a Firewall Rule.
+      security:
+      - API Key: []
+      tags:
+      - Firewall
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/firewalls/{firewall-group-id}/rules/{firewall-rule-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    firewall-rule:
+      title: firewall-rule
+      type: object
+      x-tags:
+      - firewall
+      description: Firewall rule information.
+      x-examples:
+        firewall rule:
+          id: 1
+          action: accept
+          type: v4
+          protocol: tcp
+          port: '80'
+          subnet: 192.0.2.123
+          subnet_size: 24
+          source: ''
+          notes: Example Firewall Rule
+      properties:
+        id:
+          type: integer
+          description: A unique ID for the Firewall Rule.
+        action:
+          type: string
+          description: 'Action to take when this rule is met.
+
+
+            * accept'
+        protocol:
+          type: string
+          description: 'The protocol for this rule.
+
+
+            * ICMP
+
+            * TCP
+
+            * UDP
+
+            * GRE
+
+            '
+        port:
+          type: string
+          description: Port or port range for this rule.
+        subnet:
+          type: string
+          description: 'The IPv4 network in CIDR notation. Example: 192.0.2.123'
+        subnet_size:
+          type: integer
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+        source:
+          type: string
+          description: 'If the source string is given a value of "cloudflare" subnet and subnet_size will both be ignored.
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "" | Use the value from `subnet` and `subnet_size`. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+        notes:
+          type: string
+          description: User-supplied notes for this rule.
+        ip_type:
+          type: string
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6'
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    firewall-group:
+      title: firewall-group
+      type: object
+      x-tags:
+      - firewall
+      x-examples:
+        group:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          description: Example Firewall Group
+          date_created: '2020-10-10T01:56:20+00:00'
+          date_modified: '2020-10-10T01:59:20+00:00'
+          instance_count: 2
+          rule_count: 2
+          max_rule_count: 50
+      description: Firewall Group information.
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Firewall Group.
+        description:
+          type: string
+          description: User-supplied description of this Firewall Group.
+        date_created:
+          type: string
+          description: Date the Firewall Group was originally created.
+        date_modified:
+          type: string
+          description: Date of the last modification to this Firewall Group.
+        instance_count:
+          type: integer
+          description: The number of instances linked to this Firewall Group.
+        rule_count:
+          type: integer
+          description: The number of rules in this Firewall Group.
+        max_rule_count:
+          type: integer
+          description: The maximum number of rules allowed for this Firewall Group.
+    post_firewalls_firewall_group_id_rules_201_response:
+      example:
+        firewall_rule:
+          subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+      properties:
+        firewall_rule:
+          $ref: '#/components/schemas/firewall-rule_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    firewall-group_2:
+      description: Firewall Group information.
+      example:
+        date_modified: date_modified
+        date_created: date_created
+        description: description
+        id: id
+        max_rule_count: 1
+        instance_count: 0
+        rule_count: 6
+      properties:
+        id:
+          description: A unique ID for the Firewall Group.
+          type: string
+        description:
+          description: User-supplied description of this Firewall Group.
+          type: string
+        date_created:
+          description: Date the Firewall Group was originally created.
+          type: string
+        date_modified:
+          description: Date of the last modification to this Firewall Group.
+          type: string
+        instance_count:
+          description: The number of instances linked to this Firewall Group.
+          type: integer
+        rule_count:
+          description: The number of rules in this Firewall Group.
+          type: integer
+        max_rule_count:
+          description: The maximum number of rules allowed for this Firewall Group.
+          type: integer
+      title: firewall-group
+      type: object
+      x-tags:
+      - firewall
+      x-examples:
+        group:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          description: Example Firewall Group
+          date_created: 2020-10-10 01:56:20+00:00
+          date_modified: 2020-10-10 01:59:20+00:00
+          instance_count: 2
+          rule_count: 2
+          max_rule_count: 50
+    post_firewalls_firewall_group_id_rules_request:
+      properties:
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+        protocol:
+          description: 'The protocol for this rule.
+
+
+            * ICMP
+
+            * TCP
+
+            * UDP
+
+            * GRE
+
+            * ESP
+
+            * AH
+
+            '
+          type: string
+        subnet:
+          description: IP address representing a subnet. The IP address format must match with the "ip_type" parameter value.
+          type: string
+        subnet_size:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 32'
+          type: integer
+        port:
+          description: TCP/UDP only. This field can be a specific port or a colon separated port range.
+          type: string
+        source:
+          description: 'If the source string is given a value of "cloudflare" subnet and subnet_size will both be ignored.
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "" | Use the value from `subnet` and `subnet_size`. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |
+
+            |   | [Load Balancer id](#operation/list-load-balancers) | Provide a load balancer ID to use its IPs |
+
+            '
+          type: string
+        notes:
+          description: User-supplied notes for this rule.
+          type: string
+      required:
+      - ip_type
+      - protocol
+      - subnet
+      - subnet_size
+      type: object
+    list_firewall_group_rules_200_response:
+      example:
+        firewall_rules:
+        - subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+        - subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        firewall_rules:
+          items:
+            $ref: '#/components/schemas/firewall-rule_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    create_firewall_group_request:
+      properties:
+        description:
+          description: User-supplied description of this Firewall Group.
+          type: string
+      type: object
+    create_firewall_group_201_response:
+      example:
+        firewall_group:
+          date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+      properties:
+        firewall_group:
+          $ref: '#/components/schemas/firewall-group_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    list_firewall_groups_200_response:
+      example:
+        firewall_groups:
+        - date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+        - date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        firewall_groups:
+          items:
+            $ref: '#/components/schemas/firewall-group_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    firewall-rule_2:
+      description: Firewall rule information.
+      example:
+        subnet: subnet
+        protocol: protocol
+        notes: notes
+        port: port
+        action: action
+        id: 0
+        subnet_size: 6
+        source: source
+        type: type
+        ip_type: ip_type
+      properties:
+        id:
+          description: A unique ID for the Firewall Rule.
+          type: integer
+        type:
+          deprecated: true
+          description: 'This field is deprecated. Use `ip_type` instead.
+
+
+            The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+        action:
+          description: 'Action to take when this rule is met.
+
+
+            * accept'
+          type: string
+        protocol:
+          description: 'The protocol for this rule.
+
+
+            * ICMP
+
+            * TCP
+
+            * UDP
+
+            * GRE
+
+            '
+          type: string
+        port:
+          description: Port or port range for this rule.
+          type: string
+        subnet:
+          description: IP address representing a subnet. The IP address format must match with the "ip_type" parameter value.
+          type: string
+        subnet_size:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+        source:
+          description: 'If the source string is given a value of "cloudflare" subnet and subnet_size will both be ignored.
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "" | Use the value from `subnet` and `subnet_size`. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+          type: string
+        notes:
+          description: User-supplied notes for this rule.
+          type: string
+      title: firewall-rule
+      type: object
+      x-tags:
+      - firewall
+      x-examples:
+        firewall rule:
+          id: 1
+          type: v4
+          ip_type: v4
+          action: accept
+          protocol: tcp
+          port: '80'
+          subnet: 192.0.2.123
+          subnet_size: 24
+          source: ''
+          notes: Example Firewall Rule
+    update_firewall_group_request:
+      properties:
+        description:
+          description: User-supplied description of this Firewall Group.
+          type: string
+      required:
+      - description
+      type: object
+    post_firewalls_firewall_group_id_rules_201_response_2:
+      example:
+        firewall_rule:
+          subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+      properties:
+        firewall_rule:
+          $ref: '#/components/schemas/firewall-rule_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    firewall-group_3:
+      description: Firewall Group information.
+      example:
+        date_modified: date_modified
+        date_created: date_created
+        description: description
+        id: id
+        max_rule_count: 1
+        instance_count: 0
+        rule_count: 6
+      properties:
+        id:
+          description: A unique ID for the Firewall Group.
+          type: string
+        description:
+          description: User-supplied description of this Firewall Group.
+          type: string
+        date_created:
+          description: Date the Firewall Group was originally created.
+          type: string
+        date_modified:
+          description: Date of the last modification to this Firewall Group.
+          type: string
+        instance_count:
+          description: The number of instances linked to this Firewall Group.
+          type: integer
+        rule_count:
+          description: The number of rules in this Firewall Group.
+          type: integer
+        max_rule_count:
+          description: The maximum number of rules allowed for this Firewall Group.
+          type: integer
+      title: firewall-group
+      type: object
+      x-tags:
+      - firewall
+      x-examples:
+        group:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          description: Example Firewall Group
+          date_created: 2020-10-10 01:56:20+00:00
+          date_modified: 2020-10-10 01:59:20+00:00
+          instance_count: 2
+          rule_count: 2
+          max_rule_count: 50
+    list_firewall_group_rules_200_response_2:
+      example:
+        firewall_rules:
+        - subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+        - subnet: subnet
+          protocol: protocol
+          notes: notes
+          port: port
+          action: action
+          id: 0
+          subnet_size: 6
+          source: source
+          type: type
+          ip_type: ip_type
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        firewall_rules:
+          items:
+            $ref: '#/components/schemas/firewall-rule_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    create_firewall_group_201_response_2:
+      example:
+        firewall_group:
+          date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+      properties:
+        firewall_group:
+          $ref: '#/components/schemas/firewall-group_3'
+      type: object
+    list_firewall_groups_200_response_2:
+      example:
+        firewall_groups:
+        - date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+        - date_modified: date_modified
+          date_created: date_created
+          description: description
+          id: id
+          max_rule_count: 1
+          instance_count: 0
+          rule_count: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        firewall_groups:
+          items:
+            $ref: '#/components/schemas/firewall-group_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    firewall-rule_3:
+      description: Firewall rule information.
+      example:
+        subnet: subnet
+        protocol: protocol
+        notes: notes
+        port: port
+        action: action
+        id: 0
+        subnet_size: 6
+        source: source
+        type: type
+        ip_type: ip_type
+      properties:
+        id:
+          description: A unique ID for the Firewall Rule.
+          type: integer
+        type:
+          deprecated: true
+          description: 'This field is deprecated. Use `ip_type` instead.
+
+
+            The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+        action:
+          description: 'Action to take when this rule is met.
+
+
+            * accept'
+          type: string
+        protocol:
+          description: 'The protocol for this rule.
+
+
+            * ICMP
+
+            * TCP
+
+            * UDP
+
+            * GRE
+
+            '
+          type: string
+        port:
+          description: Port or port range for this rule.
+          type: string
+        subnet:
+          description: IP address representing a subnet. The IP address format must match with the "ip_type" parameter value.
+          type: string
+        subnet_size:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+        source:
+          description: 'If the source string is given a value of "cloudflare" subnet and subnet_size will both be ignored.
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "" | Use the value from `subnet` and `subnet_size`. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+          type: string
+        notes:
+          description: User-supplied notes for this rule.
+          type: string
+      title: firewall-rule
+      type: object
+      x-tags:
+      - firewall
+      x-examples:
+        firewall rule:
+          id: 1
+          type: v4
+          ip_type: v4
+          action: accept
+          protocol: tcp
+          port: '80'
+          subnet: 192.0.2.123
+          subnet_size: 24
+          source: ''
+          notes: Example Firewall Rule
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

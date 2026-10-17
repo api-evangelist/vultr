@@ -1,0 +1,373 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Roles API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Roles across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Roles
+  description: Endpoints for managing IAM roles within an organization
+paths:
+  /v2/roles:
+    post:
+      tags:
+      - IAM Roles
+      summary: Create Role
+      operationId: createRole
+      description: Create a new IAM role within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: Name of the role
+                  example: ReadOnlyRole
+                description:
+                  type: string
+                  description: Description of the role
+                  example: Role with read-only access to resources
+                role_type:
+                  type: string
+                  enum:
+                  - assumable
+                  - assignable
+                  description: Type of role - assumable (can be temporarily assumed) or assignable (directly assigned to users/groups)
+                  default: assumable
+                  example: assumable
+                max_session_duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  default: 3600
+                  description: Maximum session duration in seconds (15 min to 12 hours)
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags:
+      - IAM Roles
+      summary: List Roles
+      operationId: listRoles
+      description: List all IAM roles within the organization
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Role'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/roles/{id}:
+    get:
+      tags:
+      - IAM Roles
+      summary: Get Role
+      operationId: getRole
+      description: Retrieve a specific IAM role by ID
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - IAM Roles
+      summary: Update Role
+      operationId: updateRole
+      description: Update an IAM role's attributes
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the role
+                description:
+                  type: string
+                  description: Description of the role
+                role_type:
+                  type: string
+                  enum:
+                  - assumable
+                  - assignable
+                  description: Type of role
+                max_session_duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  description: Maximum session duration in seconds
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - IAM Roles
+      summary: Delete Role
+      operationId: deleteRole
+      description: Soft delete an IAM role
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Role deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/roles/{id}/restore:
+    patch:
+      tags:
+      - IAM Roles
+      summary: Restore Role
+      operationId: restoreRole
+      description: Restore a previously soft-deleted IAM role
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        version:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        is_system_policy:
+          type: boolean
+          description: Whether this is a system-managed policy
+    Role:
+      type: object
+      required:
+      - id
+      - name
+      - role_type
+      - max_session_duration
+      - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        role_type:
+          type: string
+          enum:
+          - assumable
+          - assignable
+          description: Type of role
+          example: assumable
+        max_session_duration:
+          type: integer
+          minimum: 900
+          maximum: 43200
+          default: 3600
+        date_created:
+          type: string
+          format: date-time
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+          description: Attached policies (only included when policies are attached)
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

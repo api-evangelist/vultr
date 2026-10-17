@@ -1,0 +1,437 @@
+openapi: 3.2.0
+info:
+  title: Vultr Region API
+  version: '2.0'
+  description: 'Operations tagged region across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Region
+  x-displayName: Regions
+  description: Instances can be deployed in many Regions on multiple continents. Choose any of our worldwide locations to deploy servers near your office or customers for low-latency.
+paths:
+  /regions:
+    get:
+      summary: List Regions
+      tags:
+      - Region
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/regions\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/region'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                region:
+                  value:
+                    regions:
+                    - id: ams
+                      city: Amsterdam
+                      country: NL
+                      continent: Europe
+                      options:
+                      - ddos_protection
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+      operationId: list-regions
+      description: List all Regions at Vultr.
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /regions/{region-id}/availability:
+    parameters:
+    - schema:
+        type: string
+      name: region-id
+      in: path
+      required: true
+      description: The [Region id](#operation/list-regions).
+    get:
+      summary: List available compute in region
+      tags:
+      - Region
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/regions/{region-id}/availability\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available_plans:
+                    type: array
+                    description: An array of Plans available in this Region.
+                    items:
+                      type: string
+              examples:
+                plans:
+                  value:
+                    available_plans:
+                    - vc2-1c-1gb
+                    - vc2-1c-2gb
+                    - vc2-2c-4gb
+                    - vc2-4c-8gb
+                    - vc2-6c-16gb
+                    - vc2-8c-32gb
+                    - vc2-16c-64gb
+                    - vc2-24c-96gb
+                    - vdc-4vcpu-8gb
+                    - vdc-4vcpu-16gb
+                    - vdc-6vcpu-24gb
+                    - vdc-8vcpu-32gb
+                    - vhf-1c-1gb
+                    - vhf-1c-2gb
+                    - vhf-2c-4gb
+                    - vhf-3c-8gb
+                    - vhf-4c-16gb
+                    - vhf-6c-24gb
+                    - vhf-8c-32gb
+                    - vhf-12c-48gb
+      operationId: list-available-compute-region
+      description: Get a list of the available plans in Region `region-id`. Not all plans are available in all regions. The list can be filtered by `type`.
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: type
+        description: 'Filter the results by type.
+
+
+          |   | Type | Description |
+
+          | - | ------ | ------------- |
+
+          |   | all | All available types |
+
+          |   | vc2 | Cloud Compute |
+
+          |   | vdc | Dedicated Cloud |
+
+          |   | vhf | High Frequency Compute |
+
+          |   | vbm | Bare Metal |
+
+          '
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    region:
+      title: region
+      type: object
+      x-tags:
+      - region
+      description: Region information.
+      x-examples:
+        example:
+          id: ewr
+          city: New Jersey
+          country: US
+          continent: North America
+          options:
+          - ddos_protection
+          - load_balancers
+          - object_storage
+          - kubernetes
+          - block_storage
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Region.
+        country:
+          type: string
+          description: The [two-letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for this Region.
+        options:
+          type: array
+          description: An array of product features available in this Region.
+          items:
+            type: string
+        continent:
+          type: string
+          description: The name of the continent for this Region.
+        city:
+          type: string
+          description: The name of the city for this Region.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_available_plans_region_200_response:
+      example:
+        available_plans:
+        - available_plans
+        - available_plans
+      properties:
+        available_plans:
+          description: An array of Plans available in this Region.
+          items:
+            type: string
+          type: array
+      type: object
+    region_2:
+      description: Region information.
+      example:
+        continent: continent
+        country: country
+        city: city
+        options:
+        - options
+        - options
+        id: id
+      properties:
+        id:
+          description: A unique ID for the Region.
+          type: string
+        country:
+          description: The [two-letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for this Region.
+          type: string
+        options:
+          description: An array of product features available in this Region.
+          items:
+            type: string
+          type: array
+        continent:
+          description: The name of the continent for this Region.
+          type: string
+        city:
+          description: The name of the city for this Region.
+          type: string
+      title: region
+      type: object
+      x-tags:
+      - region
+      x-examples:
+        example:
+          id: ewr
+          city: New Jersey
+          country: US
+          continent: North America
+          options:
+          - ddos_protection
+          - load_balancers
+          - object_storage
+          - kubernetes
+          - block_storage
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    list_regions_200_response:
+      example:
+        regions:
+        - continent: continent
+          country: country
+          city: city
+          options:
+          - options
+          - options
+          id: id
+        - continent: continent
+          country: country
+          city: city
+          options:
+          - options
+          - options
+          id: id
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        regions:
+          items:
+            $ref: '#/components/schemas/region_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    region_3:
+      description: Region information.
+      example:
+        continent: continent
+        country: country
+        city: city
+        options:
+        - options
+        - options
+        id: id
+      properties:
+        id:
+          description: A unique ID for the Region.
+          type: string
+        country:
+          description: The [two-letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for this Region.
+          type: string
+        options:
+          description: An array of product features available in this Region.
+          items:
+            type: string
+          type: array
+        continent:
+          description: The name of the continent for this Region.
+          type: string
+        city:
+          description: The name of the city for this Region.
+          type: string
+      title: region
+      type: object
+      x-tags:
+      - region
+      x-examples:
+        example:
+          id: ewr
+          city: New Jersey
+          country: US
+          continent: North America
+          options:
+          - ddos_protection
+          - load_balancers
+          - object_storage
+          - kubernetes
+          - block_storage
+    list_regions_200_response_2:
+      example:
+        regions:
+        - continent: continent
+          country: country
+          city: city
+          options:
+          - options
+          - options
+          id: id
+        - continent: continent
+          country: country
+          city: city
+          options:
+          - options
+          - options
+          id: id
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        regions:
+          items:
+            $ref: '#/components/schemas/region_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

@@ -1,0 +1,835 @@
+openapi: 3.2.0
+info:
+  title: Vultr Plans API
+  version: '2.0'
+  description: 'Operations tagged plans across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Plans
+  x-displayName: Plans
+  description: A Plan is a particular configuration of vCPU, RAM, SSD, and bandwidth to deploy an Instance. Not all Plans are available in all Regions. You can browse plans in the Customer Portal or get a list of Plans from the API.
+paths:
+  /plans:
+    get:
+      summary: List Plans
+      tags:
+      - Plans
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/plans\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/plans'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    plans:
+                    - id: vhf-8c-32gb
+                      vcpu_count: 8
+                      ram: 32768
+                      disk: 512
+                      disk_count: 1
+                      bandwidth: 6144
+                      monthly_cost: 192
+                      type: vhf
+                      locations:
+                      - sea
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+      operationId: list-plans
+      description: Get a list of all VPS plans at Vultr. The list can be filtered by `type`.
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: type
+        description: 'Filter the results by type.
+
+
+          |   | Type | Description |
+
+          | - | ------ | ------------- |
+
+          |   | all | All available plan types |
+
+          |   | vc2 | Cloud Compute |
+
+          |   | vhf | High Frequency Compute |
+
+          |   | vdc | Dedicated Cloud |'
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      - schema:
+          type: string
+        in: query
+        name: os
+        description: 'Filter the results by operating system.
+
+
+          |   | Type | Description |
+
+          | - | ------ | ------------- |
+
+          |   | windows | All available plans that support windows |'
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /plans-metal:
+    get:
+      summary: List Bare Metal Plans
+      tags:
+      - Plans
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/plans-metal\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/plans-metal'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                bare metal:
+                  value:
+                    plans_metal:
+                    - id: vbm-4c-32gb
+                      cpu_count: 4
+                      cpu_threads: 8
+                      cpu_model: E3-1270v6
+                      ram: 32768
+                      disk: 240
+                      disk_count: 2
+                      bandwidth: 5120
+                      monthly_cost: 300
+                      type: SSD
+                      locations:
+                      - ewr
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+      operationId: list-metal-plans
+      description: Get a list of all Bare Metal plans at Vultr.
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    plans:
+      title: plans
+      type: object
+      x-tags:
+      - plans
+      description: Plans for VPS instances.
+      x-examples:
+        plans:
+          id: vhf-8c-32gb
+          vcpu_count: 8
+          ram: 32768
+          disk: 512
+          disk_count: 1
+          bandwidth: 6144
+          monthly_cost: 192
+          type: vhf
+          locations:
+          - sea
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Plan.
+        name:
+          type: string
+          description: The Plan name.
+        vcpu_count:
+          type: integer
+          description: The number of vCPUs in this Plan.
+        ram:
+          type: integer
+          description: The amount of RAM in MB.
+        disk:
+          type: integer
+          description: The disk size in GB.
+        bandwidth:
+          type: integer
+          description: The monthly bandwidth quota in GB.
+        monthly_cost:
+          type: integer
+          description: The monthly cost in US Dollars.
+        type:
+          type: string
+          description: 'The plan type.
+
+
+            |   | Type | Description |
+
+            | - | ------ | ------------- |
+
+            |   | vc2 | Cloud Compute |
+
+            |   | vhf | High Frequency Compute |
+
+            |   | vdc | Dedicated Cloud |'
+        locations:
+          type: array
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+        disk_count:
+          type: integer
+          description: The number of disks that this plan offers.
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    plans-metal:
+      title: plans-metal
+      type: object
+      x-tags:
+      - plans
+      description: Plans for Bare Metal instances.
+      x-examples:
+        baremetal:
+          id: vbm-4c-32gb
+          cpu_count: 4
+          cpu_threads: 8
+          cpu_model: E3-1270v6
+          ram: 32768
+          disk: 240
+          disk_count: 2
+          bandwidth: 5120
+          monthly_cost: 300
+          type: SSD
+          locations:
+          - ewr
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Bare Metal Plan.
+        cpu_count:
+          type: integer
+          description: The number of CPUs in this Plan.
+        cpu_model:
+          type: string
+          description: The CPU model type for this instance.
+        cpu_threads:
+          type: integer
+          description: The numner of supported threads for this instance.
+        ram:
+          type: integer
+          description: The amount of RAM in MB.
+        disk:
+          type: string
+          description: The disk size in GB.
+        bandwidth:
+          type: integer
+          description: The monthly bandwidth quota in GB.
+        locations:
+          type: array
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+        type:
+          type: string
+          description: 'The plan type.
+
+
+            * SSD'
+        monthly_cost:
+          type: integer
+          description: The monthly cost in US Dollars.
+        disk_count:
+          type: integer
+          description: The number of disks that this plan offers.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_metal_plans_200_response:
+      example:
+        plans:
+        - disk: disk
+          monthly_cost: 5
+          bandwidth: 5
+          cpu_model: cpu_model
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          cpu_threads: 6
+          type: type
+          cpu_count: 0
+          ram: 1
+        - disk: disk
+          monthly_cost: 5
+          bandwidth: 5
+          cpu_model: cpu_model
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          cpu_threads: 6
+          type: type
+          cpu_count: 0
+          ram: 1
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/plans-metal_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    list_plans_200_response:
+      example:
+        plans:
+        - disk: 1
+          vcpu_count: 0
+          monthly_cost: 5
+          bandwidth: 5
+          name: name
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          type: type
+          ram: 6
+        - disk: 1
+          vcpu_count: 0
+          monthly_cost: 5
+          bandwidth: 5
+          name: name
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          type: type
+          ram: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/plans_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    plans_2:
+      description: Plans for VPS instances.
+      example:
+        disk: 1
+        vcpu_count: 0
+        monthly_cost: 5
+        bandwidth: 5
+        name: name
+        locations:
+        - locations
+        - locations
+        disk_count: 2
+        id: id
+        type: type
+        ram: 6
+      properties:
+        id:
+          description: A unique ID for the Plan.
+          type: string
+        name:
+          description: The Plan name.
+          type: string
+        vcpu_count:
+          description: The number of vCPUs in this Plan.
+          type: integer
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The disk size in GB.
+          type: integer
+        bandwidth:
+          description: The monthly bandwidth quota in GB.
+          type: integer
+        monthly_cost:
+          description: The monthly cost in US Dollars.
+          type: integer
+        type:
+          description: 'The plan type.
+
+
+            |   | Type | Description |
+
+            | - | ------ | ------------- |
+
+            |   | vc2 | Cloud Compute |
+
+            |   | vhf | High Frequency Compute |
+
+            |   | vdc | Dedicated Cloud |'
+          type: string
+        locations:
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+          type: array
+        disk_count:
+          description: The number of disks that this plan offers.
+          type: integer
+      title: plans
+      type: object
+      x-tags:
+      - plans
+      x-examples:
+        plans:
+          id: vhf-8c-32gb
+          vcpu_count: 8
+          ram: 32768
+          disk: 512
+          disk_count: 1
+          bandwidth: 6144
+          monthly_cost: 192
+          type: vhf
+          locations:
+          - sea
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    plans-metal_2:
+      description: Plans for Bare Metal instances.
+      example:
+        disk: disk
+        monthly_cost: 5
+        bandwidth: 5
+        cpu_model: cpu_model
+        locations:
+        - locations
+        - locations
+        disk_count: 2
+        id: id
+        cpu_threads: 6
+        type: type
+        cpu_count: 0
+        ram: 1
+      properties:
+        id:
+          description: A unique ID for the Bare Metal Plan.
+          type: string
+        cpu_count:
+          description: The number of CPUs in this Plan.
+          type: integer
+        cpu_model:
+          description: The CPU model type for this instance.
+          type: string
+        cpu_threads:
+          description: The numner of supported threads for this instance.
+          type: integer
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The disk size in GB.
+          type: string
+        bandwidth:
+          description: The monthly bandwidth quota in GB.
+          type: integer
+        locations:
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+          type: array
+        type:
+          description: 'The plan type.
+
+
+            * SSD'
+          type: string
+        monthly_cost:
+          description: The monthly cost in US Dollars.
+          type: integer
+        disk_count:
+          description: The number of disks that this plan offers.
+          type: integer
+      title: plans-metal
+      type: object
+      x-tags:
+      - plans
+      x-examples:
+        baremetal:
+          id: vbm-4c-32gb
+          cpu_count: 4
+          cpu_threads: 8
+          cpu_model: E3-1270v6
+          ram: 32768
+          disk: 240
+          disk_count: 2
+          bandwidth: 5120
+          monthly_cost: 300
+          type: SSD
+          locations:
+          - ewr
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_metal_plans_200_response_2:
+      example:
+        plans:
+        - disk: disk
+          monthly_cost: 5
+          bandwidth: 5
+          cpu_model: cpu_model
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          cpu_threads: 6
+          type: type
+          cpu_count: 0
+          ram: 1
+        - disk: disk
+          monthly_cost: 5
+          bandwidth: 5
+          cpu_model: cpu_model
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          cpu_threads: 6
+          type: type
+          cpu_count: 0
+          ram: 1
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/plans-metal_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    list_plans_200_response_2:
+      example:
+        plans:
+        - disk: 1
+          vcpu_count: 0
+          monthly_cost: 5
+          bandwidth: 5
+          name: name
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          type: type
+          ram: 6
+        - disk: 1
+          vcpu_count: 0
+          monthly_cost: 5
+          bandwidth: 5
+          name: name
+          locations:
+          - locations
+          - locations
+          disk_count: 2
+          id: id
+          type: type
+          ram: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/plans_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    plans_3:
+      description: Plans for VPS instances.
+      example:
+        disk: 1
+        vcpu_count: 0
+        monthly_cost: 5
+        bandwidth: 5
+        name: name
+        locations:
+        - locations
+        - locations
+        disk_count: 2
+        id: id
+        type: type
+        ram: 6
+      properties:
+        id:
+          description: A unique ID for the Plan.
+          type: string
+        name:
+          description: The Plan name.
+          type: string
+        vcpu_count:
+          description: The number of vCPUs in this Plan.
+          type: integer
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The disk size in GB.
+          type: integer
+        bandwidth:
+          description: The monthly bandwidth quota in GB.
+          type: integer
+        monthly_cost:
+          description: The monthly cost in US Dollars.
+          type: integer
+        type:
+          description: 'The plan type.
+
+
+            |   | Type | Description |
+
+            | - | ------ | ------------- |
+
+            |   | vc2 | Cloud Compute |
+
+            |   | vhf | High Frequency Compute |
+
+            |   | vdc | Dedicated Cloud |'
+          type: string
+        locations:
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+          type: array
+        disk_count:
+          description: The number of disks that this plan offers.
+          type: integer
+      title: plans
+      type: object
+      x-tags:
+      - plans
+      x-examples:
+        plans:
+          id: vhf-8c-32gb
+          vcpu_count: 8
+          ram: 32768
+          disk: 512
+          disk_count: 1
+          bandwidth: 6144
+          monthly_cost: 192
+          type: vhf
+          locations:
+          - sea
+    plans-metal_3:
+      description: Plans for Bare Metal instances.
+      example:
+        disk: disk
+        monthly_cost: 5
+        bandwidth: 5
+        cpu_model: cpu_model
+        locations:
+        - locations
+        - locations
+        disk_count: 2
+        id: id
+        cpu_threads: 6
+        type: type
+        cpu_count: 0
+        ram: 1
+      properties:
+        id:
+          description: A unique ID for the Bare Metal Plan.
+          type: string
+        cpu_count:
+          description: The number of CPUs in this Plan.
+          type: integer
+        cpu_model:
+          description: The CPU model type for this instance.
+          type: string
+        cpu_threads:
+          description: The numner of supported threads for this instance.
+          type: integer
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The disk size in GB.
+          type: string
+        bandwidth:
+          description: The monthly bandwidth quota in GB.
+          type: integer
+        locations:
+          description: An array of Regions where this plan is valid for use.
+          items:
+            type: string
+          type: array
+        type:
+          description: 'The plan type.
+
+
+            * SSD'
+          type: string
+        monthly_cost:
+          description: The monthly cost in US Dollars.
+          type: integer
+        disk_count:
+          description: The number of disks that this plan offers.
+          type: integer
+      title: plans-metal
+      type: object
+      x-tags:
+      - plans
+      x-examples:
+        baremetal:
+          id: vbm-4c-32gb
+          cpu_count: 4
+          cpu_threads: 8
+          cpu_model: E3-1270v6
+          ram: 32768
+          disk: 240
+          disk_count: 2
+          bandwidth: 5120
+          monthly_cost: 300
+          type: SSD
+          locations:
+          - ewr
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

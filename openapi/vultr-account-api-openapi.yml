@@ -1,0 +1,363 @@
+openapi: 3.2.0
+info:
+  title: Vultr Account API
+  version: '2.0'
+  description: 'Operations tagged account across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Account
+  x-displayName: Account
+  description: Read-only information about your user account and billing information.
+paths:
+  /account:
+    get:
+      summary: Get Account Info
+      tags:
+      - Account
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/account\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: '#/components/schemas/account'
+              examples:
+                response:
+                  value:
+                    account:
+                      name: Example Account
+                      email: admin@example.com
+                      acls:
+                      - manage_users
+                      - subscriptions_view
+                      - subscriptions
+                      - billing
+                      - support
+                      - provisioning
+                      - dns
+                      - abuse
+                      - upgrade
+                      - firewall
+                      - alerts
+                      - objstore
+                      - loadbalancer
+                      balance: -100.55
+                      pending_charges: 60.25
+                      last_payment_date: '2020-10-10T01:56:20+00:00'
+                      last_payment_amount: -1.25
+      operationId: get-account
+      security:
+      - API Key: []
+      description: Get your Vultr account, permission, and billing information.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    account:
+      title: account
+      type: object
+      x-tags:
+      - account
+      description: Account information.
+      x-examples:
+        account:
+          account:
+            name: Example User
+            email: user@example.com
+            acls:
+            - manage_users
+            - subscriptions_view
+            - subscriptions
+            - billing
+            - support
+            - provisioning
+            - dns
+            - abuse
+            - upgrade
+            - firewall
+            - alerts
+            - objstore
+            - loadbalancer
+            balance: -100.55
+            pending_charges: 60.25
+            last_payment_date: '2020-10-10T01:56:20+00:00'
+            last_payment_amount: -1.25
+      properties:
+        name:
+          type: string
+          description: Your user name.
+        email:
+          type: string
+          description: Your email address.
+        acls:
+          type: array
+          description: 'An array of permission granted.
+
+            * manage\_users
+
+            * subscriptions_view
+
+            * subscriptions
+
+            * billing
+
+            * support
+
+            * provisioning
+
+            * dns
+
+            * abuse
+
+            * upgrade
+
+            * firewall
+
+            * alerts
+
+            * objstore
+
+            * loadbalancer'
+          items:
+            type: string
+        balance:
+          type: number
+          description: Your current account balance.
+        pending_charges:
+          type: number
+          description: Unbilled charges for this month.
+        last_payment_date:
+          description: Date of your last payment.
+          type: string
+        last_payment_amount:
+          type: number
+          description: The amount of your last payment.
+    account_2:
+      description: Account information.
+      example:
+        acls:
+        - acls
+        - acls
+        balance: 0.8008281904610115
+        pending_charges: 6.027456183070403
+        name: name
+        last_payment_date: last_payment_date
+        email: email
+        last_payment_amount: 1.4658129805029452
+      properties:
+        name:
+          description: Your user name.
+          type: string
+        email:
+          description: Your email address.
+          type: string
+        acls:
+          description: 'An array of permission granted.
+
+            * manage\_users
+
+            * subscriptions_view
+
+            * subscriptions
+
+            * billing
+
+            * support
+
+            * provisioning
+
+            * dns
+
+            * abuse
+
+            * upgrade
+
+            * firewall
+
+            * alerts
+
+            * objstore
+
+            * loadbalancer'
+          items:
+            type: string
+          type: array
+        balance:
+          description: Your current account balance.
+          type: number
+        pending_charges:
+          description: Unbilled charges for this month.
+          type: number
+        last_payment_date:
+          description: Date of your last payment.
+          type: string
+        last_payment_amount:
+          description: The amount of your last payment.
+          type: number
+      title: account
+      type: object
+      x-tags:
+      - account
+      x-examples:
+        account:
+          account:
+            name: Example User
+            email: user@example.com
+            acls:
+            - manage_users
+            - subscriptions_view
+            - subscriptions
+            - billing
+            - support
+            - provisioning
+            - dns
+            - abuse
+            - upgrade
+            - firewall
+            - alerts
+            - objstore
+            - loadbalancer
+            balance: -100.55
+            pending_charges: 60.25
+            last_payment_date: 2020-10-10 01:56:20+00:00
+            last_payment_amount: -1.25
+    get_account_200_response:
+      example:
+        account:
+          acls:
+          - acls
+          - acls
+          balance: 0.8008281904610115
+          pending_charges: 6.027456183070403
+          name: name
+          last_payment_date: last_payment_date
+          email: email
+          last_payment_amount: 1.4658129805029452
+      properties:
+        account:
+          $ref: '#/components/schemas/account_2'
+      type: object
+    account_3:
+      description: Account information.
+      example:
+        acls:
+        - acls
+        - acls
+        balance: 0.8008281904610115
+        pending_charges: 6.027456183070403
+        name: name
+        last_payment_date: last_payment_date
+        email: email
+        last_payment_amount: 1.4658129805029452
+      properties:
+        name:
+          description: Your user name.
+          type: string
+        email:
+          description: Your email address.
+          type: string
+        acls:
+          description: 'An array of permission granted.
+
+            * manage\_users
+
+            * subscriptions_view
+
+            * subscriptions
+
+            * billing
+
+            * support
+
+            * provisioning
+
+            * dns
+
+            * abuse
+
+            * upgrade
+
+            * firewall
+
+            * alerts
+
+            * objstore
+
+            * loadbalancer'
+          items:
+            type: string
+          type: array
+        balance:
+          description: Your current account balance.
+          type: number
+        pending_charges:
+          description: Unbilled charges for this month.
+          type: number
+        last_payment_date:
+          description: Date of your last payment.
+          type: string
+        last_payment_amount:
+          description: The amount of your last payment.
+          type: number
+      title: account
+      type: object
+      x-tags:
+      - account
+      x-examples:
+        account:
+          account:
+            name: Example User
+            email: user@example.com
+            acls:
+            - manage_users
+            - subscriptions_view
+            - subscriptions
+            - billing
+            - support
+            - provisioning
+            - dns
+            - abuse
+            - upgrade
+            - firewall
+            - alerts
+            - objstore
+            - loadbalancer
+            balance: -100.55
+            pending_charges: 60.25
+            last_payment_date: 2020-10-10 01:56:20+00:00
+            last_payment_amount: -1.25
+    get_account_200_response_2:
+      example:
+        account:
+          acls:
+          - acls
+          - acls
+          balance: 0.8008281904610115
+          pending_charges: 6.027456183070403
+          name: name
+          last_payment_date: last_payment_date
+          email: email
+          last_payment_amount: 1.4658129805029452
+      properties:
+        account:
+          $ref: '#/components/schemas/account_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

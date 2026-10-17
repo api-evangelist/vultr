@@ -1,0 +1,288 @@
+openapi: 3.2.0
+info:
+  title: Vultr Organization Invitations API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged Organization Invitations across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: Organization Invitations
+  description: Manage invitations for users to join organizations
+paths:
+  /v2/invitation:
+    post:
+      tags:
+      - Organization Invitations
+      summary: Create Invitation
+      operationId: createInvitation
+      description: Invite a user to join an organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email_invited
+              properties:
+                email_invited:
+                  type: string
+                  format: email
+                  description: Email of the user to invite
+                permissions:
+                  type: object
+                  description: JSON object with roles and API permissions
+                  properties:
+                    roles:
+                      type: object
+                      additionalProperties:
+                        type: string
+                        enum:
+                        - 'yes'
+                        - 'no'
+                    api_enabled:
+                      type: string
+                      enum:
+                      - 'yes'
+                      - 'no'
+      responses:
+        '201':
+          description: Invitation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags:
+      - Organization Invitations
+      summary: List Invitations
+      operationId: listOrganizationInvites
+      description: List all organization invitations across all organizations
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of organization invitations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationInvitation'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/invitation/{id}:
+    get:
+      tags:
+      - Organization Invitations
+      summary: Get Invitation
+      operationId: getInvitation
+      description: Retrieve details of a specific invitation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Invitation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/invitation/{id}/resend:
+    post:
+      tags:
+      - Organization Invitations
+      summary: Resend Invitation
+      operationId: resendInvitation
+      description: Resend an invitation email
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Invitation resent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInvitation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    OrganizationInvitation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        inviter_name:
+          type: string
+        inviter_email:
+          type: string
+          format: email
+        email_invited:
+          type: string
+          format: email
+        email_registered:
+          type: string
+          format: email
+        permissions:
+          type: object
+          properties:
+            roles:
+              type: object
+              additionalProperties:
+                type: string
+                enum:
+                - 'yes'
+                - 'no'
+            api_enabled:
+              type: string
+              enum:
+              - 'yes'
+              - 'no'
+        org_id:
+          type: string
+          format: uuid
+        org_name:
+          type: string
+        status:
+          type: string
+        status_full:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        date_responded:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        expiration_date:
+          type: string
+          format: date-time
+        invite_status:
+          type: string
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

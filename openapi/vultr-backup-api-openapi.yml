@@ -1,0 +1,408 @@
+openapi: 3.2.0
+info:
+  title: Vultr Backup API
+  version: '2.0'
+  description: 'Operations tagged backup across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Backup
+  x-displayName: Backups
+  description: A backup is a scheduled, automatic, point-in-time image of an instance. We do not stop the instance when taking a backup. Booting from a backup is similar to rebooting after a non-graceful restart. Snapshots are physically the same as backups, but snapshots are manual while backups run automatically on a schedule. Backups can be converted into snapshots. See our Automatic Backup FAQ for more information.
+paths:
+  /backups:
+    get:
+      summary: List Backups
+      tags:
+      - Backup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/backups\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  backups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/backup'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    backups:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Automatic Backup
+                      size: 10000000
+                      status: complete
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-backups
+      description: Get information about Backups in your account. You can filter the list by `instance_id`.
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: instance_id
+        description: Filter the backup list by [Instance id](#operation/list-instances).
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /backups/{backup-id}:
+    parameters:
+    - schema:
+        type: string
+      name: backup-id
+      in: path
+      required: true
+      description: The [Backup id](#operation/list-backups).
+    get:
+      summary: Get a Backup
+      tags:
+      - Backup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/backups/{backup-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  backup:
+                    $ref: '#/components/schemas/backup'
+              examples:
+                backup:
+                  value:
+                    backup:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Description
+                      size: 10000000
+                      status: complete
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-backup
+      security:
+      - API Key: []
+      description: Get the information for the Backup.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    backup:
+      title: backup
+      type: object
+      x-examples:
+        backup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          description: Example Automatic Backup
+          size: 10000000
+          status: complete
+      description: Backup information.
+      properties:
+        id:
+          type: string
+          description: A unique ID for the backup.
+        date_created:
+          type: string
+          description: The date the backup was created.
+        description:
+          type: string
+          description: The user-supplied description of this backup.
+        size:
+          type: integer
+          description: The size of the backup in Bytes.
+        status:
+          type: string
+          description: 'The Backup status.
+
+
+            * complete
+
+            * pending'
+      x-tags:
+      - backup
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    get_backup_200_response:
+      example:
+        backup:
+          size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+      properties:
+        backup:
+          $ref: '#/components/schemas/backup_2'
+      type: object
+    list_backups_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        backups:
+        - size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+        - size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+      properties:
+        backups:
+          items:
+            $ref: '#/components/schemas/backup_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    backup_2:
+      description: Backup information.
+      example:
+        size: 0
+        date_created: date_created
+        description: description
+        id: id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the backup.
+          type: string
+        date_created:
+          description: The date the backup was created.
+          type: string
+        description:
+          description: The user-supplied description of this backup.
+          type: string
+        size:
+          description: The size of the backup in Bytes.
+          type: integer
+        status:
+          description: 'The Backup status.
+
+
+            * complete
+
+            * pending'
+          type: string
+      title: backup
+      type: object
+      x-examples:
+        backup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          description: Example Automatic Backup
+          size: 10000000
+          status: complete
+      x-tags:
+      - backup
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    get_backup_200_response_2:
+      example:
+        backup:
+          size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+      properties:
+        backup:
+          $ref: '#/components/schemas/backup_3'
+      type: object
+    list_backups_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        backups:
+        - size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+        - size: 0
+          date_created: date_created
+          description: description
+          id: id
+          status: status
+      properties:
+        backups:
+          items:
+            $ref: '#/components/schemas/backup_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    backup_3:
+      description: Backup information.
+      example:
+        size: 0
+        date_created: date_created
+        description: description
+        id: id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the backup.
+          type: string
+        date_created:
+          description: The date the backup was created.
+          type: string
+        description:
+          description: The user-supplied description of this backup.
+          type: string
+        size:
+          description: The size of the backup in Bytes.
+          type: integer
+        status:
+          description: 'The Backup status.
+
+
+            * complete
+
+            * pending'
+          type: string
+      title: backup
+      type: object
+      x-examples:
+        backup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          description: Example Automatic Backup
+          size: 10000000
+          status: complete
+      x-tags:
+      - backup
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

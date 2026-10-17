@@ -1,0 +1,3824 @@
+openapi: 3.2.0
+info:
+  title: Vultr Managed Databases API
+  version: '2.0'
+  contact:
+    email: support@vultr.com
+    name: ''
+    url: https://www.vultr.com
+  description: 'Operations tagged managed-databases across 2 of this provider''s published API definitions: vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- description: Vultr Managed Databases is a managed database offering supporting MySQL, PostgreSQL, FerretDB + PostgreSQL, and Redis.
+  name: managed-databases
+  x-displayName: Managed Databases
+paths:
+  /databases/plans:
+    get:
+      description: List all Managed Databases plans.
+      operationId: list-database-plans
+      parameters:
+      - description: 'Filter by engine type
+
+
+          * `mysql`
+
+          * `pg`
+
+          * `redis`.'
+        explode: true
+        in: query
+        name: engine
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by number of nodes.
+        explode: true
+        in: query
+        name: nodes
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by [Region id](#operation/list-regions).
+        explode: true
+        in: query
+        name: region
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                plans:
+                  value:
+                    plans:
+                    - id: vultr-dbaas-hobbyist-cc-1-25-1
+                      number_of_nodes: 1
+                      type: vc2
+                      vcpu_count: 1
+                      ram: 1024
+                      disk: 25
+                      monthly_cost: 15
+                      supported_engines:
+                        mysql: true
+                        pg: true
+                        redis: false
+                      max_connections:
+                        mysql: 75
+                        pg: 22
+                      locations:
+                      - DEV
+                      - ICN
+                      - SEA
+              schema:
+                $ref: '#/components/schemas/list_database_plans_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Managed Database Plans
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/plans\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases:
+    get:
+      description: List all Managed Databases in your account.
+      operationId: list-databases
+      parameters:
+      - description: Filter by label.
+        explode: true
+        in: query
+        name: label
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by specific tag.
+        explode: true
+        in: query
+        name: tag
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by [Region id](#operation/list-regions).
+        explode: true
+        in: query
+        name: region
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    databases:
+                    - id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+                      read_replicas:
+                      - '...'
+                    meta:
+                      total: 1
+              schema:
+                $ref: '#/components/schemas/list_databases_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Managed Databases
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Create a new Managed Database in a `region` with the desired `plan`. Supply optional attributes as desired.
+      operationId: create-database
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  database_engine: mysql
+                  database_engine_version: '8'
+                  region: ewr
+                  plan: vultr-dbaas-hobbyist-cc-1-25-1
+                  label: Example Managed Database
+            schema:
+              $ref: '#/components/schemas/create_database_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+                      read_replicas:
+                      - '...'
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Create Managed Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"database_engine\" : \"mysql\",\n    \"database_engine_version\" : \"8\"\n    \"region\" : \"ewr\",\n    \"plan\" : \"vultr-dbaas-hobbyist-cc-1-25-1\",\n    \"label\" : \"Example Managed Database\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}:
+    delete:
+      description: Delete a Managed Database.
+      operationId: delete-database
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete Managed Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get information about a Managed Database.
+      operationId: get-database
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+                      read_replicas:
+                      - '...'
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Managed Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update information for a Managed Database. All attributes are optional. If not set, the attributes will retain their original values.
+      operationId: update-database
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  plan: vultr-dbaas-startup-cc-1-55-2
+                  label: Example Managed Database
+            schema:
+              $ref: '#/components/schemas/update_database_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+                      read_replicas:
+                      - '...'
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Update Managed Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"plan\" : \"vultr-dbaas-startup-cc-1-55-2\",\n    \"label\" : \"Example Managed Database\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/usage:
+    get:
+      description: Get disk, memory, and vCPU usage information for a Managed Database.
+      operationId: get-database-usage
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                usage:
+                  value:
+                    usage:
+                      disk:
+                        current_gb: 1.25
+                        max_gb: 55
+                        percentage: 2.27
+                      memory:
+                        current_mb: 768
+                        max_mb: 2048
+                        percentage: 37.5
+                      cpu:
+                        percentage: 4.65
+              schema:
+                $ref: '#/components/schemas/get_database_usage_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Database Usage Information
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/usage\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/users:
+    get:
+      description: List all database users within the Managed Database.
+      operationId: list-database-users
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                users:
+                  value:
+                    users:
+                    - username: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      encryption: Default (MySQL 8+)
+                    - username: ANOTHER_USER_HERE
+                      password: PASSWORD_GOES_HERE
+                      encryption: Legacy (MySQL 5.x)
+                    meta:
+                      total: 2
+              schema:
+                $ref: '#/components/schemas/list_database_users_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Database Users
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Create a new database user within the Managed Database. Supply optional attributes as desired.
+      operationId: create-database-user
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  username: some_new_user
+                  password: some_secure_password
+                  encryption: caching_sha2_password
+            schema:
+              $ref: '#/components/schemas/create_database_user_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                user:
+                  value:
+                    user:
+                      username: some_new_user
+                      password: some_secure_password
+                      encryption: Default (MySQL 8+)
+              schema:
+                $ref: '#/components/schemas/create_database_user_202_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Create Database User
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"username\" : \"some_new_user\",\n    \"password\" : \"some_secure_password\",\n    \"encryption\" : \"ewrcaching_sha2_password\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/users/{username}:
+    delete:
+      description: Delete a database user within a Managed Database.
+      operationId: delete-database-user
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [database user](#operation/list-database-users).
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete Database User
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users/{username}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get information about a Managed Database user.
+      operationId: get-database-user
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [database user](#operation/list-database-users).
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                user:
+                  value:
+                    user:
+                      username: some_username
+                      password: some_secure_password
+                      encryption: Default (MySQL 8+)
+              schema:
+                $ref: '#/components/schemas/create_database_user_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Database User
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users/{username}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update database user information within a Managed Database.
+      operationId: update-database-user
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [database user](#operation/list-database-users).
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  password: some_new_password_here
+            schema:
+              $ref: '#/components/schemas/update_database_user_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                user:
+                  value:
+                    user:
+                      username: some_username
+                      password: some_secure_password
+                      encryption: Default (MySQL 8+)
+              schema:
+                $ref: '#/components/schemas/create_database_user_202_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Update Database User
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users/{username}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"password\" : \"some_new_password_here\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/users/{username}/access-control:
+    put:
+      description: Configure access control settings for a Managed Database user (Redis engine type only).
+      operationId: set-database-user-acl
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [database user](#operation/list-database-users).
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  redis_acl_categories:
+                  - +@all
+                  redis_acl_channels:
+                  - '*'
+                  redis_acl_commands: []
+                  redis_acl_keys:
+                  - '*'
+            schema:
+              $ref: '#/components/schemas/set_database_user_acl_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                user:
+                  value:
+                    user:
+                      username: some_username
+                      password: some_secure_password
+                      access_control:
+                        redis_acl_categories:
+                        - +@all
+                        redis_acl_channels:
+                        - '*'
+                        redis_acl_commands: []
+                        redis_acl_keys:
+                        - '*'
+              schema:
+                $ref: '#/components/schemas/create_database_user_202_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Set Database User Access Control
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/users/{username}/access-control\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"redis_acl_categories\" : [\n      \"+@all\"\n    ],\n    \"redis_acl_channels\" : [\n      \"*\"\n    ],\n    \"redis_acl_commands\" : [],\n    \"redis_acl_keys\" : [\n      \"*\"\n    ]\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/dbs:
+    get:
+      description: List all logical databases within the Managed Database (MySQL and PostgreSQL only).
+      operationId: list-database-dbs
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                dbs:
+                  value:
+                    dbs:
+                    - name: defaultdb
+                    - name: another_db
+                    meta:
+                      total: 2
+              schema:
+                $ref: '#/components/schemas/list_database_dbs_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Logical Databases
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/dbs\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Create a new logical database within the Managed Database (MySQL and PostgreSQL only).
+      operationId: create-database-db
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  name: new_db_name
+            schema:
+              $ref: '#/components/schemas/create_database_db_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                db:
+                  value:
+                    db:
+                      name: new_db_name
+              schema:
+                $ref: '#/components/schemas/create_database_db_202_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Create Logical Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/dbs\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"new_db_name\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/dbs/{db-name}:
+    delete:
+      description: Delete a logical database within a Managed Database (MySQL and PostgreSQL only).
+      operationId: delete-database-db
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [logical database name](#operation/list-database-dbs).
+        explode: false
+        in: path
+        name: db-name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete Logical Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/dbs/{db-name}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get information about a logical database within a Managed Database (MySQL and PostgreSQL only).
+      operationId: get-database-db
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [logical database name](#operation/list-database-dbs).
+        explode: false
+        in: path
+        name: db-name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                db:
+                  value:
+                    db:
+                      name: some_db_name
+              schema:
+                $ref: '#/components/schemas/create_database_db_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Logical Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/dbs/{db-name}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/maintenance:
+    get:
+      description: List all available version upgrades within the Managed Database.
+      operationId: list-maintenance-updates
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                available_updates:
+                  value:
+                    available_updates:
+                    - update_description_here
+                    - another_description_here
+              schema:
+                $ref: '#/components/schemas/list_maintenance_updates_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Maintenance Updates
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/maintenance\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Start maintenance updates for the Managed Database.
+      operationId: start-maintenance-updates
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                message:
+                  value:
+                    message: Maintenance updates initialized. Please note the maintenance consists of switching to a new server that will host the service and all pending updates will be applied. This will cause a short service interruption.
+              schema:
+                $ref: '#/components/schemas/start_maintenance_updates_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Start Maintenance Updates
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/maintenance\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/alerts:
+    post:
+      description: List service alert messages for the Managed Database.
+      operationId: list-service-alerts
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  period: day
+            schema:
+              $ref: '#/components/schemas/list_service_alerts_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                alerts:
+                  value:
+                    alerts:
+                    - timestamp: 2023-02-10 12:40:19
+                      message_type: RESOURCE USAGE DISK
+                      description: Disk usage is critically high for a database service, service is not performing normally.
+                      recommendation: We recommend you review your application or upgrade to the next plan size.
+                      resource_type: disk
+                    - timestamp: 2023-02-09 15:41:20
+                      message_type: MAINTENANCE SCHEDULED
+                      description: Mandatory maintenance has been scheduled for a database service.
+                      maintenance_scheduled: 2023-02-12 01:00:00 (UTC)
+              schema:
+                $ref: '#/components/schemas/list_service_alerts_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: List Service Alerts
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/alerts \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"period\" : \"day\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/migration:
+    delete:
+      description: Detach a migration from the Managed Database.
+      operationId: database-detach-migration
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Detach Migration
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/migration\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: View the status of a migration attached to the Managed Database.
+      operationId: view-migration-status
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                migration:
+                  value:
+                    migration:
+                      status: complete
+                      method: replication
+                      credentials:
+                        host: some_host
+                        port: 3306
+                        username: some_username
+                        password: some_password
+                        database: some_database
+                        ignored_databases: ''
+                        ssl: true
+              schema:
+                $ref: '#/components/schemas/view_migration_status_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Migration Status
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/migration\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Start a migration to the Managed Database.
+      operationId: database-start-migration
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  host: some_host
+                  port: 3306
+                  username: some_username
+                  password: some_password
+                  database: some_database
+                  ignored_databases: ''
+                  ssl: true
+            schema:
+              $ref: '#/components/schemas/database_start_migration_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                migration:
+                  value:
+                    migration:
+                      status: pending
+                      credentials:
+                        host: some_host
+                        port: 3306
+                        username: some_username
+                        password: some_password
+                        database: some_database
+                        ignored_databases: ''
+                        ssl: true
+              schema:
+                $ref: '#/components/schemas/view_migration_status_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Start Migration
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/migration\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"host\" : \"some_host\",\n    \"port\" : 3306,\n    \"username\" : \"some_username\",\n    \"password\" : \"some_password\",\n    \"database\" : \"some_database\",\n    \"ssl\" : true\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/read-replica:
+    post:
+      description: Create a read-only replica node for the Managed Database.
+      operationId: database-add-read-replica
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  region: ewr
+                  label: new_read_replica_label
+            schema:
+              $ref: '#/components/schemas/database_add_read_replica_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Add Read-Only Replica
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/read-replica\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"label\" : \"new_read_replica_label\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/promote-read-replica:
+    post:
+      description: Promote a read-only replica node to its own primary Managed Database.
+      operationId: database-promote-read-replica
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Promote Read-Only Replica
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/promote-read-replica\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/backups:
+    get:
+      description: Get backup information for the Managed Database.
+      operationId: get-backup-information
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                backups:
+                  value:
+                    latest_backup:
+                      date: 2023-02-07
+                      time: 75065
+                    oldest_backup:
+                      date: 2023-02-05
+                      time: 75067
+              schema:
+                $ref: '#/components/schemas/get_backup_information_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Backup Information
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/backups \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/restore:
+    post:
+      description: Create a new Managed Database from a backup.
+      operationId: database-restore-from-backup
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  label: new_restore_label
+                  type: pitr
+                  date: 2023-02-06
+                  time: 08:00:00
+            schema:
+              $ref: '#/components/schemas/database_restore_from_backup_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-hobbyist-cc-1-25-1
+                      plan_disk: 25
+                      plan_ram: 1024
+                      plan_vcpus: 1
+                      plan_replicas: 0
+                      region: EWR
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: some label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Restore from Backup
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/restore\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"new_restore_label\",\n    \"type\" : \"pitr\",\n    \"date\" : \"2023-02-06\",\n    \"time\" : \"08:00:00\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/fork:
+    post:
+      description: Fork a Managed Database to a new subscription from a backup.
+      operationId: database-fork
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  label: new_fork_label
+                  region: sea
+                  plan: vultr-dbaas-startup-cc-2-80-4
+                  type: pitr
+                  date: 2023-02-06
+                  time: 08:00:00
+            schema:
+              $ref: '#/components/schemas/database_fork_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                database:
+                  value:
+                    database:
+                      id: 999c4ed0-f2e4-4f2a-a951-de358ceb9ab5
+                      date_created: 2022-05-09 10:13:31
+                      plan: vultr-dbaas-startup-cc-2-80-4
+                      plan_disk: 80
+                      plan_ram: 4096
+                      plan_vcpus: 2
+                      plan_replicas: 0
+                      region: SEA
+                      database_engine: mysql
+                      database_engine_version: 8
+                      vpc_id: d39bf0bf-e050-47d4-a291-5d6fc736f250
+                      status: Running
+                      label: new_fork_label
+                      tag: some tag
+                      dbname: defaultdb
+                      host: HOSTNAME_GOES_HERE
+                      public_host: PUBLIC_HOSTNAME_GOES_HERE
+                      user: vultradmin
+                      password: PASSWORD_GOES_HERE
+                      port: 16751
+                      maintenance_dow: sunday
+                      maintenance_time: 06:00:00
+                      latest_backup: 2022-11-02 12:58:18"
+                      trusted_ips:
+                      - '...'
+                      mysql_sql_modes:
+                      - ANSI
+                      - ERROR_FOR_DIVISION_BY_ZERO
+                      - NO_ENGINE_SUBSTITUTION
+                      - NO_ZERO_DATE
+                      - NO_ZERO_IN_DATE
+                      - STRICT_ALL_TABLES
+                      mysql_require_primary_key: true
+                      mysql_slow_query_log: false
+                      cluster_time_zone: America/New_York
+              schema:
+                $ref: '#/components/schemas/create_database_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Fork Managed Database
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/fork\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"new_fork_label\",\n    \"region\" : \"sea\",\n    \"plan\" : \"vultr-dbaas-startup-cc-2-80-4\",\n    \"type\" : \"pitr\",\n    \"date\" : \"2023-02-06\",\n    \"time\" : \"08:00:00\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/connection-pools:
+    get:
+      description: List all connection pools within the Managed Database (PostgreSQL engine types only).
+      operationId: list-connection-pools
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                connection_pools:
+                  value:
+                    connections:
+                      used: 12
+                      available: 10
+                      max: 22
+                    connection_pools:
+                    - name: first_pool_name
+                      database: some_db_name
+                      username: some_username
+                      mode: transaction
+                      size: 5
+                    - name: second_pool_name
+                      database: another_db_name
+                      username: another_username
+                      mode: session
+                      size: 7
+                    meta:
+                      total: 2
+              schema:
+                $ref: '#/components/schemas/list_connection_pools_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Connection Pools
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/connection-pools\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Create a new connection pool within the Managed Database (PostgreSQL engine types only).
+      operationId: create-connection-pool
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  name: new_connection_pool
+                  database: some_database
+                  username: some_user
+                  mode: transaction
+                  size: 5
+            schema:
+              $ref: '#/components/schemas/create_connection_pool_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                connection_pool:
+                  value:
+                    connection_pool:
+                      name: new_connection_pool
+                      database: some_database
+                      username: some_user
+                      mode: transaction
+                      size: 5
+              schema:
+                $ref: '#/components/schemas/create_connection_pool_202_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Create Connection Pool
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/connection-pools\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"new_connection_pool\",\n    \"database\" : \"some_database\",\n    \"username\" : \"some_user\",\n    \"mode\" : \"transaction\",\n    \"size\" : 5\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/connection-pools/{pool-name}:
+    delete:
+      description: Delete a connection pool within a Managed Database (PostgreSQL engine types only).
+      operationId: delete-connection-pool
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [connection pool name](#operation/list-connection-pools).
+        explode: false
+        in: path
+        name: pool-name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete Connection Pool
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/connection-pools/{pool-name}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get information about a Managed Database connection pool (PostgreSQL engine types only).
+      operationId: get-connection-pool
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [connection pool name](#operation/list-connection-pools).
+        explode: false
+        in: path
+        name: pool-name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                connection_pool:
+                  value:
+                    connection_pool:
+                      name: some_connection_pool
+                      database: some_database
+                      username: some_user
+                      mode: transaction
+                      size: 5
+              schema:
+                $ref: '#/components/schemas/create_connection_pool_202_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Connection Pool
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/connection-pools/{pool-name}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update connection-pool information within a Managed Database (PostgreSQL engine types only).
+      operationId: update-connection-pool
+      parameters:
+      - description: The [Managed Database ID](#operation/list-databases).
+        explode: false
+        in: path
+        name: database-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [connection pool name](#operation/list-connection-pools).
+        explode: false
+        in: path
+        name: pool-name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  mode: session
+            schema:
+              $ref: '#/components/schemas/update_connection_pool_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                connection_pool:
+                  value:
+                    connection_pool:
+                      name: some_connection_pool
+                      database: some_database
+                      username: some_user
+                      mode: transaction
+                      size: 5
+              schema:
+                $ref: '#/components/schemas/create_connection_pool_202_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Update Connection Pool
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/connection-pools/{pool-name}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"mode\" : \"session\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/advanced-options:
+    get:
+      description: List all configured and available advanced options for the Managed Database (PostgreSQL engine types only).
+      operationId: list-advanced-options
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                advanced_options:
+                  value:
+                    configured_options:
+                      jit: false
+                      temp_file_limit: 10000
+                      track_io_timing: 'off'
+                    available_options:
+                    - name: autovacuum_analyze_scale_factor
+                      type: float
+                      min_value: 0
+                      max_value: 1
+                    - name: autovacuum_analyze_threshold
+                      type: int
+                      min_value: 0
+                      max_value: 2147483647
+                    - '...'
+              schema:
+                $ref: '#/components/schemas/list_advanced_options_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Advanced Options
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/advanced-options\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Updates an advanced configuration option for the Managed Database (PostgreSQL engine types only).
+      operationId: update-advanced-options
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  jit: false
+                  temp_file_limit: 10000
+                  track_io_timing: 'off'
+            schema:
+              $ref: '#/components/schemas/update_advanced_options_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                advanced_options:
+                  value:
+                    configured_options:
+                      jit: false
+                      temp_file_limit: 10000
+                      track_io_timing: 'off'
+                    available_options:
+                    - name: autovacuum_analyze_scale_factor
+                      type: float
+                      min_value: 0
+                      max_value: 1
+                    - name: autovacuum_analyze_threshold
+                      type: int
+                      min_value: 0
+                      max_value: 2147483647
+                    - '...'
+              schema:
+                $ref: '#/components/schemas/list_advanced_options_200_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Update Advanced Options
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/advanced-options\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"jit\" : false,\n    \"temp_file_limit\" : 10000,\n    \"track_io_timing\" : \"off\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /databases/{database-id}/version-upgrade:
+    get:
+      description: List all available version upgrades within the Managed Database (PostgreSQL engine types only).
+      operationId: list-available-versions
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                available_versions:
+                  value:
+                    available_versions:
+                    - '12'
+                    - '13'
+                    - '14'
+                    - '15'
+              schema:
+                $ref: '#/components/schemas/list_available_versions_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List Available Versions
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/version-upgrade\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Start a version upgrade for the Managed Database (PostgreSQL engine types only).
+      operationId: start-version-upgrade
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  version: '15'
+            schema:
+              $ref: '#/components/schemas/start_version_upgrade_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                message:
+                  value:
+                    message: Version upgrade successfully initialized.
+              schema:
+                $ref: '#/components/schemas/start_version_upgrade_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Validation Error
+      security:
+      - API Key: []
+      summary: Start Version Upgrade
+      tags:
+      - managed-databases
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/databases/{database-id}/version-upgrade\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"version\" : \"15\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    list_service_alerts_request:
+      properties:
+        period:
+          description: The time range to list Managed Database service alerts from.
+          type: string
+      required:
+      - period
+      type: object
+    database_ferretdb_credentials:
+      description: Associated list of FerretDB connection credentials (FerretDB + PostgreSQL engine type only).
+      example:
+        password: password
+        public_ip: public_ip
+        port: ''
+        host: host
+        private_ip: private_ip
+        username: username
+      properties:
+        host:
+          description: The public hostname for FerretDB database connections.
+          type: string
+        port:
+          description: The assigned port for connecting to the FerretDB instance.
+          type: int
+        username:
+          description: The username for connecting to the FerretDB instance.
+          type: string
+        password:
+          description: The password for connecting to the FerretDB instance.
+          type: string
+        public_ip:
+          description: The public IP address of the FerretDB instance.
+          type: string
+        private_ip:
+          description: The private IP address of the FerretDB instance when attached to a VPC network.
+          type: string
+      type: object
+    database-latest-backup:
+      description: Managed Database latest backup information.
+      example:
+        date: date
+        time: time
+      properties:
+        date:
+          description: The date of the most recently available backup.
+          type: string
+        time:
+          description: The time of the most recently available backup.
+          type: string
+      title: backup
+      type: object
+      x-tags:
+      - database-latest-backup
+      x-examples: {}
+    update_database_user_request:
+      properties:
+        password:
+          description: The password for the database user. This can be empty to auto-generate a new secure password.
+          type: string
+      required:
+      - password
+      type: object
+    list_advanced_options_200_response:
+      example:
+        available_options:
+        - min_value: ''
+          enumerals:
+          - enumerals
+          - enumerals
+          name: name
+          alt_values:
+          - ''
+          - ''
+          units: units
+          type: type
+          max_value: ''
+        - min_value: ''
+          enumerals:
+          - enumerals
+          - enumerals
+          name: name
+          alt_values:
+          - ''
+          - ''
+          units: units
+          type: type
+          max_value: ''
+        configured_options: '{}'
+      properties:
+        configured_options:
+          type: object
+        available_options:
+          items:
+            $ref: '#/components/schemas/dbaas-available-options'
+          type: array
+      type: object
+    database-usage:
+      description: Managed Database usage information.
+      example:
+        disk:
+          current_gb: current_gb
+          percentage: percentage
+          max_gb: max_gb
+        memory:
+          percentage: percentage
+          current_mb: current_mb
+          max_mb: max_mb
+        cpu:
+          percentage: percentage
+      properties:
+        disk:
+          $ref: '#/components/schemas/database_usage_disk'
+        memory:
+          $ref: '#/components/schemas/database_usage_memory'
+        cpu:
+          $ref: '#/components/schemas/database_usage_cpu'
+      title: usage
+      type: object
+      x-tags:
+      - database-usage
+      x-examples: {}
+    database:
+      description: Managed Database information.
+      example:
+        database_engine_version: database_engine_version
+        vpc_id: vpc_id
+        read_replicas:
+        - '{}'
+        - '{}'
+        ferretdb_credentials:
+          password: password
+          public_ip: public_ip
+          port: ''
+          host: host
+          private_ip: private_ip
+          username: username
+        password: password
+        maintenance_dow: maintenance_dow
+        host: host
+        mysql_long_query_time: 5
+        pg_available_extensions:
+        - '{}'
+        - '{}'
+        id: id
+        tag: tag
+        redis_eviction_policy: redis_eviction_policy
+        plan: plan
+        latest_backup: latest_backup
+        mysql_require_primary_key: true
+        plan_vcpus: 1
+        public_host: public_host
+        date_created: date_created
+        label: label
+        plan_replicas: 5
+        database_engine: database_engine
+        plan_ram: 6
+        dbname: dbname
+        mysql_sql_modes:
+        - mysql_sql_modes
+        - mysql_sql_modes
+        port: port
+        maintenance_time: maintenance_time
+        mysql_slow_query_log: true
+        plan_disk: 0
+        trusted_ips:
+        - trusted_ips
+        - trusted_ips
+        cluster_time_zone: cluster_time_zone
+        region: region
+        user: user
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Managed Database.
+          type: string
+        date_created:
+          description: The date this database was created.
+          type: string
+        plan:
+          description: The name of the Managed Database plan.
+          type: string
+        plan_disk:
+          description: The size of the disk in GB (excluded for Redis engine types).
+          type: integer
+        plan_ram:
+          description: The amount of RAM in MB.
+          type: integer
+        plan_vcpus:
+          description: Number of vCPUs.
+          type: integer
+        plan_replicas:
+          description: Number of replica nodes.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the Managed Database is located.
+          type: string
+        database_engine:
+          description: The database engine type (MySQL, PostgreSQL, FerretDB + PostgreSQL, Redis).
+          type: string
+        database_engine_version:
+          description: The version number of the database engine in use.
+          type: string
+        vpc_id:
+          description: The ID of the [VPC Network](#operation/get-vpc) attached to the Managed Database.
+          type: string
+        status:
+          description: 'The current status.
+
+
+            * Rebuilding
+
+            * Rebalancing
+
+            * Running'
+          type: string
+        label:
+          description: The user-supplied label for this managed database.
+          type: string
+        tag:
+          description: The user-supplied tag for this managed database.
+          type: string
+        dbname:
+          description: The default database name.
+          type: string
+        ferretdb_credentials:
+          $ref: '#/components/schemas/database_ferretdb_credentials'
+        host:
+          description: The public hostname for database connections, or private hostname if this managed database is attached to a VPC network.
+          type: string
+        public_host:
+          description: The public hostname for database connections. Only visible when the managed database is attached to a VPC network.
+          type: string
+        user:
+          description: The default user configured on creation.
+          type: string
+        password:
+          description: The default user's secure password generated on creation.
+          type: string
+        port:
+          description: The assigned port for connecting to the Managed Database.
+          type: string
+        maintenance_dow:
+          description: The chosen date of week for routine maintenance updates.
+          type: string
+        maintenance_time:
+          description: The chosen hour for routine maintenance updates.
+          type: string
+        latest_backup:
+          description: The date for the latest backup stored on the Managed Database.
+          type: string
+        trusted_ips:
+          description: A list of trusted IP addresses for connecting to this Managed Database (in CIDR notation).
+          items:
+            type: string
+          type: array
+        mysql_sql_modes:
+          description: A list names of enabled SQL Modes for MySQL engine types only.
+          items:
+            type: string
+          type: array
+        mysql_require_primary_key:
+          description: Configuration value for requiring table primary keys for MySQL engine types only.
+          type: boolean
+        mysql_slow_query_log:
+          description: Configuration value for slow query logging on the Managed Database for MySQL engine types only.
+          type: boolean
+        mysql_long_query_time:
+          description: The number of seconds to denote a slow query when logging is enabled for MySQL engine types only.
+          type: integer
+        pg_available_extensions:
+          description: A list of objects containing names and versions (when applicable) of available extensions for PostgreSQL engine types only.
+          items:
+            type: object
+          type: array
+        redis_eviction_policy:
+          description: The current configured data eviction policy for Redis engine types only.
+          type: string
+        cluster_time_zone:
+          description: The configured time zone of the Managed Database in TZ database format.
+          type: string
+        read_replicas:
+          description: A list of database objects containing details for all attached read-only replica nodes.
+          items:
+            type: object
+          type: array
+      title: database
+      type: object
+      x-tags:
+      - databases
+      x-examples: {}
+    database_usage_disk:
+      description: Metrics for the disk storage of the Managed Database.
+      example:
+        current_gb: current_gb
+        percentage: percentage
+        max_gb: max_gb
+      properties:
+        current_gb:
+          description: The current amount of space used on the Managed Database (in GB).
+          type: string
+        max_gb:
+          description: The maximum available space on the Managed Database (in GB).
+          type: string
+        percentage:
+          description: The percentage of space used on the Managed Database relative to its capacity.
+          type: string
+      type: object
+    create_connection_pool_request:
+      properties:
+        name:
+          description: The name of the connection pool.
+          type: string
+        database:
+          description: The logical database associated with the connection pool.
+          type: string
+        username:
+          description: The database user associated with the connection pool.
+          type: string
+        mode:
+          description: 'The mode for the connection pool.
+
+            * `session`
+
+            * `transaction`
+
+            * `statement`'
+          type: string
+        size:
+          description: The size of the connection pool.
+          type: integer
+      required:
+      - database
+      - mode
+      - name
+      - size
+      - username
+      type: object
+    list_databases_200_response:
+      example:
+        databases:
+        - database_engine_version: database_engine_version
+          vpc_id: vpc_id
+          read_replicas:
+          - '{}'
+          - '{}'
+          ferretdb_credentials:
+            password: password
+            public_ip: public_ip
+            port: ''
+            host: host
+            private_ip: private_ip
+            username: username
+          password: password
+          maintenance_dow: maintenance_dow
+          host: host
+          mysql_long_query_time: 5
+          pg_available_extensions:
+          - '{}'
+          - '{}'
+          id: id
+          tag: tag
+          redis_eviction_policy: redis_eviction_policy
+          plan: plan
+          latest_backup: latest_backup
+          mysql_require_primary_key: true
+          plan_vcpus: 1
+          public_host: public_host
+          date_created: date_created
+          label: label
+          plan_replicas: 5
+          database_engine: database_engine
+          plan_ram: 6
+          dbname: dbname
+          mysql_sql_modes:
+          - mysql_sql_modes
+          - mysql_sql_modes
+          port: port
+          maintenance_time: maintenance_time
+          mysql_slow_query_log: true
+          plan_disk: 0
+          trusted_ips:
+          - trusted_ips
+          - trusted_ips
+          cluster_time_zone: cluster_time_zone
+          region: region
+          user: user
+          status: status
+        - database_engine_version: database_engine_version
+          vpc_id: vpc_id
+          read_replicas:
+          - '{}'
+          - '{}'
+          ferretdb_credentials:
+            password: password
+            public_ip: public_ip
+            port: ''
+            host: host
+            private_ip: private_ip
+            username: username
+          password: password
+          maintenance_dow: maintenance_dow
+          host: host
+          mysql_long_query_time: 5
+          pg_available_extensions:
+          - '{}'
+          - '{}'
+          id: id
+          tag: tag
+          redis_eviction_policy: redis_eviction_policy
+          plan: plan
+          latest_backup: latest_backup
+          mysql_require_primary_key: true
+          plan_vcpus: 1
+          public_host: public_host
+          date_created: date_created
+          label: label
+          plan_replicas: 5
+          database_engine: database_engine
+          plan_ram: 6
+          dbname: dbname
+          mysql_sql_modes:
+          - mysql_sql_modes
+          - mysql_sql_modes
+          port: port
+          maintenance_time: maintenance_time
+          mysql_slow_query_log: true
+          plan_disk: 0
+          trusted_ips:
+          - trusted_ips
+          - trusted_ips
+          cluster_time_zone: cluster_time_zone
+          region: region
+          user: user
+          status: status
+        meta:
+          total: 2
+      properties:
+        databases:
+          items:
+            $ref: '#/components/schemas/database'
+          type: array
+        meta:
+          $ref: '#/components/schemas/dbaas-meta'
+      type: object
+    create_database_user_202_response:
+      example:
+        user:
+          password: password
+          encryption: encryption
+          access_control:
+            redis_acl_keys:
+            - redis_acl_keys
+            - redis_acl_keys
+            redis_acl_channels:
+            - redis_acl_channels
+            - redis_acl_channels
+            redis_acl_categories:
+            - redis_acl_categories
+            - redis_acl_categories
+            redis_acl_commands:
+            - redis_acl_commands
+            - redis_acl_commands
+          username: username
+      properties:
+        user:
+          $ref: '#/components/schemas/database-user'
+      type: object
+    list_maintenance_updates_200_response:
+      example:
+        available_updates:
+        - available_updates
+        - available_updates
+      properties:
+        available_updates:
+          description: A list of available maintenance updates for the Managed Database.
+          items:
+            type: string
+          type: array
+      type: object
+    dbaas-migration:
+      description: Managed Database migration information.
+      example:
+        method: method
+        credentials:
+          password: password
+          database: database
+          port: ''
+          ignored_databases: ignored_databases
+          host: host
+          ssl: true
+          username: username
+        error: error
+        status: status
+      properties:
+        status:
+          description: 'The current status of the attached migration.
+
+            * `complete`
+
+            * `error`
+
+            * `pending`
+
+            * `running`'
+          type: string
+        method:
+          description: The type of migration performed (dump or replication). Only shows if status is `complete`.
+          type: string
+        error:
+          description: The verbose error message output for migrations with an `error` status.
+          type: string
+        credentials:
+          $ref: '#/components/schemas/dbaas_migration_credentials'
+      title: migration
+      type: object
+      x-tags:
+      - database-migration
+      x-examples: {}
+    start_version_upgrade_200_response:
+      example:
+        message: message
+      properties:
+        message:
+          description: A message indicating whether the version upgrade was successfully initialized.
+          type: string
+      type: object
+    database-db:
+      description: Managed Database logical database information.
+      example:
+        name: name
+      properties:
+        name:
+          description: The name of the logical database.
+          type: string
+      title: db
+      type: object
+      x-tags:
+      - database-dbs
+      x-examples: {}
+    update_database_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) where the Managed Database is located.
+          type: string
+        plan:
+          description: The [Plan id](#operation/list-database-plans) for this Managed Database.
+          type: string
+        label:
+          description: A user-supplied label for this Managed Database.
+          type: string
+        tag:
+          description: The user-supplied tag for this Managed Database.
+          type: string
+        vpc_id:
+          description: The [VPC id](#operation/list-vpcs) for this Managed Database.
+          type: string
+        maintenance_dow:
+          description: 'The day of week for routine maintenance updates.
+
+            * `monday`
+
+            * `tuesday`
+
+            * `wednesday`
+
+            * `thursday`
+
+            * `friday`
+
+            * `saturday`
+
+            * `sunday`'
+          type: string
+        maintenance_time:
+          description: The preferred time (UTC) for routine maintenance updates to occur in 24-hour HH:00 format (e.g. `01:00`, `13:00`, `23:00`, etc.).
+          type: string
+        cluster_time_zone:
+          description: The configured time zone for the Managed Database in TZ database format (e.g. `UTC`, `America/New_York`, `Europe/London`, etc.).
+          type: string
+        trusted_ips:
+          description: A list of IP addresses allowed to access the Managed Database in CIDR notation (defaults to /32 if excluded).
+          items:
+            type: string
+          type: array
+        mysql_sql_modes:
+          description: 'A list of SQL modes to enable on the Managed Database (MySQL engine type only).
+
+            * `ALLOW_INVALID_DATES`
+
+            * `ANSI` (Combination Mode)
+
+            * `ANSI_QUOTES`
+
+            * `ERROR_FOR_DIVISION_BY_ZERO`
+
+            * `HIGH_NOT_PRECEDENCE`
+
+            * `IGNORE_SPACE`
+
+            * `NO_AUTO_VALUE_ON_ZERO`
+
+            * `NO_DIR_IN_CREATE`
+
+            * `NO_ENGINE_SUBSTITUTION`
+
+            * `NO_UNSIGNED_SUBTRACTION`
+
+            * `NO_ZERO_DATE`
+
+            * `NO_ZERO_IN_DATE`
+
+            * `ONLY_FULL_GROUP_BY`
+
+            * `PIPES_AS_CONCAT`
+
+            * `REAL_AS_FLOAT`
+
+            * `STRICT_ALL_TABLES`
+
+            * `STRICT_TRANS_TABLES`
+
+            * `TIME_TRUNCATE_FRACTIONAL`
+
+            * `TRADITIONAL` (Combination Mode)'
+          items:
+            type: string
+          type: array
+        mysql_require_primary_key:
+          description: Require a primary key for all tables on the Managed Database (MySQL engine type only).
+          type: boolean
+        mysql_slow_query_log:
+          description: Enable or disable slow query logging on the Managed Database (MySQL engine type only).
+          type: boolean
+        mysql_long_query_time:
+          description: The number of seconds to denote a slow query when logging is enabled (MySQL engine type only).
+          type: integer
+        redis_eviction_policy:
+          description: Set the data eviction policy for the Managed Database (Redis engine type only)
+          type: string
+      type: object
+    view_migration_status_200_response:
+      example:
+        migration:
+          method: method
+          credentials:
+            password: password
+            database: database
+            port: ''
+            ignored_databases: ignored_databases
+            host: host
+            ssl: true
+            username: username
+          error: error
+          status: status
+      properties:
+        migration:
+          $ref: '#/components/schemas/dbaas-migration'
+      type: object
+    database_user_access_control:
+      description: Access control settings for the database user (Redis engine type only).
+      example:
+        redis_acl_keys:
+        - redis_acl_keys
+        - redis_acl_keys
+        redis_acl_channels:
+        - redis_acl_channels
+        - redis_acl_channels
+        redis_acl_categories:
+        - redis_acl_categories
+        - redis_acl_categories
+        redis_acl_commands:
+        - redis_acl_commands
+        - redis_acl_commands
+      properties:
+        redis_acl_categories:
+          description: List of configured rules for command categories.
+          items:
+            type: string
+          type: array
+        redis_acl_channels:
+          description: List of configured publish/subscribe channel patterns.
+          items:
+            type: string
+          type: array
+        redis_acl_commands:
+          description: List of configured rules for individual commands.
+          items:
+            type: string
+          type: array
+        redis_acl_keys:
+          description: List of configured key access rules.
+          items:
+            type: string
+          type: array
+      type: object
+    database_fork_request:
+      properties:
+        label:
+          description: A user-supplied label for this Managed Database.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Managed Database is located.
+          type: string
+        plan:
+          description: The [Plan id](#operation/list-database-plans) to use when deploying this Managed Database.
+          type: string
+        vpc_id:
+          description: The [VPC id](#operation/list-vpcs) to use when deploying this Managed Database. It can also be set to `new` to configure a new VPC network with this deployment.
+          type: string
+        type:
+          description: 'The type of backup restoration to use for this Managed Database.
+
+            * `pitr`: Point-in-time recovery
+
+            * `basebackup`: Latest backup (default if omitted)'
+          type: string
+        date:
+          description: The [backup date](#operation/get-backup-information) to use when restoring the Managed Database in YYYY-MM-DD date format. Required for `pitr` type requests.
+          type: string
+        time:
+          description: The [backup time](#operation/get-backup-information) to use when restoring the Managed Database in HH-MM-SS time format (24-hour UTC). Required for `pitr` type requests.
+          type: string
+      required:
+      - label
+      - plan
+      - region
+      type: object
+    dbaas-alerts:
+      description: Managed Database alerts information.
+      example:
+        maintenance_scheduled: maintenance_scheduled
+        table_count: 0
+        resource_type: resource_type
+        description: description
+        recommendation: recommendation
+        message_type: message_type
+        timestamp: timestamp
+      properties:
+        timestamp:
+          description: The date and time in which the alert was sent.
+          type: string
+        message_type:
+          description: 'The category of alert that was sent.
+
+            * `DB MASTER PROMOTION`
+
+            * `MAINTENANCE SCHEDULED`
+
+            * `MISSING MYSQL PRIMARY KEYS`
+
+            * `RESOURCE USAGE DISK`
+
+            * `RESOURCE USAGE OOM KILLED`
+
+            * `RESOURCE USAGE PG REPLICATION SLOTS`'
+          type: string
+        description:
+          description: A verbose description of the associated alert category.
+          type: string
+        recommendation:
+          description: A description of the recommended action the customer should take. Only included for certain alert types.
+          type: string
+        maintenance_scheduled:
+          description: The time in which mandatory maintenance has been scheduled with the associated alert. Only included for certain alert types.
+          type: string
+        resource_type:
+          description: The affected resource related to the associated alert. Only included for certain alert types.
+          type: string
+        table_count:
+          description: The number of affected tables related to the associated alert. Only included for certain alert types.
+          type: integer
+      title: alert
+      type: object
+      x-tags:
+      - database-alerts
+      x-examples: {}
+    get_backup_information_200_response:
+      example:
+        oldest_backup:
+          date: date
+          time: time
+        latest_backup:
+          date: date
+          time: time
+      properties:
+        latest_backup:
+          $ref: '#/components/schemas/database-latest-backup'
+        oldest_backup:
+          $ref: '#/components/schemas/database-oldest-backup'
+      type: object
+    create_database_user_request:
+      properties:
+        username:
+          description: The username of the database user.
+          type: string
+        password:
+          description: The password for the database user. This can be omitted to auto-generate a secure password.
+          type: string
+        encryption:
+          description: 'The password encryption type for the database user (MySQL engine type only).
+
+            * `caching_sha2_password` (default if omitted)
+
+            * `mysql_native_password`'
+          type: string
+      required:
+      - username
+      type: object
+    database-oldest-backup:
+      description: Managed Database oldest backup information.
+      example:
+        date: date
+        time: time
+      properties:
+        date:
+          description: The date of the oldest available backup.
+          type: string
+        time:
+          description: The time of the oldest available backup.
+          type: string
+      title: backup
+      type: object
+      x-tags:
+      - database-oldest-backup
+      x-examples: {}
+    dbaas-meta:
+      description: The meta information object.
+      example:
+        total: 2
+      properties:
+        total:
+          description: Total objects available in the list.
+          type: integer
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+    update_connection_pool_request:
+      properties:
+        database:
+          description: The logical database associated with the connection pool.
+          type: string
+        username:
+          description: The database user associated with the connection pool.
+          type: string
+        mode:
+          description: 'The mode for the connection pool.
+
+            * `session`
+
+            * `transaction`
+
+            * `statement`'
+          type: string
+        size:
+          description: The size of the connection pool.
+          type: integer
+      type: object
+    list_connection_pools_200_response:
+      example:
+        connection_pools:
+        - mode: mode
+          database: database
+          size: 5
+          name: name
+          username: username
+        - mode: mode
+          database: database
+          size: 5
+          name: name
+          username: username
+        meta:
+          total: 2
+        connections:
+          max: 1
+          available: 6
+          used: 0
+      properties:
+        connections:
+          $ref: '#/components/schemas/database-connections'
+        connection_pools:
+          items:
+            $ref: '#/components/schemas/connection-pool'
+          type: array
+        meta:
+          $ref: '#/components/schemas/dbaas-meta'
+      type: object
+    create_database_db_202_response:
+      example:
+        db:
+          name: name
+      properties:
+        db:
+          $ref: '#/components/schemas/database-db'
+      type: object
+    start_maintenance_updates_200_response:
+      example:
+        message: message
+      properties:
+        message:
+          description: A message indicating whether the maintenance updates were successfully initialized.
+          type: string
+      type: object
+    get_database_usage_200_response:
+      example:
+        usage:
+          disk:
+            current_gb: current_gb
+            percentage: percentage
+            max_gb: max_gb
+          memory:
+            percentage: percentage
+            current_mb: current_mb
+            max_mb: max_mb
+          cpu:
+            percentage: percentage
+      properties:
+        usage:
+          $ref: '#/components/schemas/database-usage'
+      type: object
+    connection-pool:
+      description: Managed Database connection pool information.
+      example:
+        mode: mode
+        database: database
+        size: 5
+        name: name
+        username: username
+      properties:
+        name:
+          description: The name of the connection pool.
+          type: string
+        database:
+          description: The logical database associated with the connection pool.
+          type: string
+        username:
+          description: The database user associated with the connection pool.
+          type: string
+        mode:
+          description: 'The mode for the connection pool.
+
+            * `session`
+
+            * `transaction`
+
+            * `statement`'
+          type: string
+        size:
+          description: The size of the connection pool.
+          type: integer
+      title: connection_pool
+      type: object
+      x-tags:
+      - database-connection-pool
+      x-examples: {}
+    dbaas_migration_credentials:
+      description: Associated list of connection details for the source database server.
+      example:
+        password: password
+        database: database
+        port: ''
+        ignored_databases: ignored_databases
+        host: host
+        ssl: true
+        username: username
+      properties:
+        host:
+          description: The host name of the source server.
+          type: string
+        port:
+          description: The connection port of the source server.
+          type: int
+        username:
+          description: The username of the source server.
+          type: string
+        password:
+          description: The password of the source server.
+          type: string
+        database:
+          description: The database of the source server. Excluded for Redis engine types.
+          type: string
+        ignored_databases:
+          description: Comma-separated list of ignored databases on the source server. Excluded for Redis engine types.
+          type: string
+        ssl:
+          description: The true/false value for whether SSL is needed to connect to the source server.
+          type: boolean
+      type: object
+    set_database_user_acl_request:
+      properties:
+        redis_acl_categories:
+          description: A list of rules for command categories.
+          items:
+            type: string
+          type: array
+        redis_acl_channels:
+          description: A list of publish/subscribe channel patterns.
+          items:
+            type: string
+          type: array
+        redis_acl_commands:
+          description: A list of rules for individual commands..
+          items:
+            type: string
+          type: array
+        redis_acl_keys:
+          description: A list of key access rules..
+          items:
+            type: string
+          type: array
+      type: object
+    list_available_versions_200_response:
+      example:
+        available_versions:
+        - available_versions
+        - available_versions
+      properties:
+        available_versions:
+          description: A list of available versions greater than the current version of the Managed Database.
+          items:
+            type: string
+          type: array
+      type: object
+    database-connections:
+      description: Managed Database connection information.
+      example:
+        max: 1
+        available: 6
+        used: 0
+      properties:
+        used:
+          description: The number of used database connections.
+          type: integer
+        available:
+          description: The number of available database connections.
+          type: integer
+        max:
+          description: The maximum number of database connections.
+          type: integer
+      title: connection
+      type: object
+      x-tags:
+      - database-connections
+      x-examples: {}
+    create_connection_pool_202_response:
+      example:
+        connection_pool:
+          mode: mode
+          database: database
+          size: 5
+          name: name
+          username: username
+      properties:
+        connection_pool:
+          $ref: '#/components/schemas/connection-pool'
+      type: object
+    list_service_alerts_200_response:
+      example:
+        alerts:
+          maintenance_scheduled: maintenance_scheduled
+          table_count: 0
+          resource_type: resource_type
+          description: description
+          recommendation: recommendation
+          message_type: message_type
+          timestamp: timestamp
+      properties:
+        alerts:
+          $ref: '#/components/schemas/dbaas-alerts'
+      type: object
+    database_usage_cpu:
+      description: Metrics for the vCPU(s) of the Managed Database.
+      example:
+        percentage: percentage
+      properties:
+        percentage:
+          description: The average percent of vCPU utilization for the Managed Database over the last hour.
+          type: string
+      type: object
+    list_database_plans_200_response:
+      example:
+        plans:
+        - disk: 5
+          max_connections: '{}'
+          vcpu_count: 6
+          monthly_cost: 5
+          supported_engines: '{}'
+          locations:
+          - locations
+          - locations
+          id: id
+          type: type
+          number_of_nodes: 0
+          ram: 1
+        - disk: 5
+          max_connections: '{}'
+          vcpu_count: 6
+          monthly_cost: 5
+          supported_engines: '{}'
+          locations:
+          - locations
+          - locations
+          id: id
+          type: type
+          number_of_nodes: 0
+          ram: 1
+      properties:
+        plans:
+          items:
+            $ref: '#/components/schemas/dbaas-plan'
+          type: array
+      type: object
+    database_add_read_replica_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) where the Managed Database is located.
+          type: string
+        label:
+          description: A user-supplied label for this Managed Database.
+          type: string
+      required:
+      - label
+      - region
+      type: object
+    database_start_migration_request:
+      properties:
+        host:
+          description: The host name of the source server.
+          type: string
+        port:
+          description: The connection port of the source server.
+          type: int
+        username:
+          description: The username of the source server. Uses `default` for Redis if left empty or unset.
+          type: string
+        password:
+          description: The password of the source server.
+          type: string
+        database:
+          description: The database of the source server. Required for MySQL/PostgreSQL engine types, but excluded for Redis.
+          type: string
+        ignored_databases:
+          description: Comma-separated list of ignored databases on the source server. Excluded for Redis engine types.
+          type: string
+        ssl:
+          description: The true/false value for whether SSL is needed to connect to the source server.
+          type: boolean
+      required:
+      - host
+      - password
+      - port
+      - ssl
+      - username
+      type: object
+    database_usage_memory:
+      description: Metrics for the memory of the Managed Database.
+      example:
+        percentage: percentage
+        current_mb: current_mb
+        max_mb: max_mb
+      properties:
+        current_mb:
+          description: The current amount of memory used on the Managed Database (in MB).
+          type: string
+        max_mb:
+          description: The maximum available memory on the Managed Database (in MB).
+          type: string
+        percentage:
+          description: The average percent of memory utilization for the Managed Database over the last hour.
+          type: string
+      type: object
+    create_database_202_response:
+      example:
+        database:
+          database_engine_version: database_engine_version
+          vpc_id: vpc_id
+          read_replicas:
+          - '{}'
+          - '{}'
+          ferretdb_credentials:
+            password: password
+            public_ip: public_ip
+            port: ''
+            host: host
+            private_ip: private_ip
+            username: username
+          password: password
+          maintenance_dow: maintenance_dow
+          host: host
+          mysql_long_query_time: 5
+          pg_available_extensions:
+          - '{}'
+          - '{}'
+          id: id
+          tag: tag
+          redis_eviction_policy: redis_eviction_policy
+          plan: plan
+          latest_backup: latest_backup
+          mysql_require_primary_key: true
+          plan_vcpus: 1
+          public_host: public_host
+          date_created: date_created
+          label: label
+          plan_replicas: 5
+          database_engine: database_engine
+          plan_ram: 6
+          dbname: dbname
+          mysql_sql_modes:
+          - mysql_sql_modes
+          - mysql_sql_modes
+          port: port
+          maintenance_time: maintenance_time
+          mysql_slow_query_log: true
+          plan_disk: 0
+          trusted_ips:
+          - trusted_ips
+          - trusted_ips
+          cluster_time_zone: cluster_time_zone
+          region: region
+          user: user
+          status: status
+      properties:
+        database:
+          $ref: '#/components/schemas/database'
+      type: object
+    database_restore_from_backup_request:
+      properties:
+        label:
+          description: A user-supplied label for this Managed Database.
+          type: string
+        type:
+          description: 'The type of backup restoration to use for this Managed Database.
+
+            * `pitr`: Point-in-time recovery
+
+            * `basebackup`: Latest backup (default if omitted)'
+          type: string
+        date:
+          description: The [backup date](#operation/get-backup-information) to use when restoring the Managed Database in YYYY-MM-DD date format. Required for `pitr` type requests.
+          type: string
+        time:
+          description: The [backup time](#operation/get-backup-information) to use when restoring the Managed Database in HH-MM-SS time format (24-hour UTC). Required for `pitr` type requests.
+          type: string
+      required:
+      - label
+      type: object
+    create_database_db_request:
+      properties:
+        name:
+          description: The name of the logical database.
+          type: string
+      required:
+      - name
+      type: object
+    dbaas-available-options:
+      description: Managed Database PostgreSQL advanced configuration options.
+      example:
+        min_value: ''
+        enumerals:
+        - enumerals
+        - enumerals
+        name: name
+        alt_values:
+        - ''
+        - ''
+        units: units
+        type: type
+        max_value: ''
+      properties:
+        name:
+          description: The name of the configuration option.
+          type: string
+        type:
+          description: 'The type of the configuration option.
+
+            * `int`
+
+            * `float`
+
+            * `bool`
+
+            * `enum`'
+          type: string
+        enumerals:
+          description: Valid enumerals for `enum` type configuration options only.
+          items:
+            type: string
+          type: array
+        min_value:
+          description: The smallest value accepted for the configuration option.
+          type: mixed
+        max_value:
+          description: The largest value accepted for the configuration option.
+          type: mixed
+        alt_values:
+          description: Any alternate value accepted for the configuration option.
+          items:
+            type: mixed
+          type: array
+        units:
+          description: The units associated with the configuration option.
+          type: string
+      title: available_option
+      type: object
+      x-tags:
+      - database-available-options
+      x-examples: {}
+    dbaas-plan:
+      description: Managed Database plan information.
+      example:
+        disk: 5
+        max_connections: '{}'
+        vcpu_count: 6
+        monthly_cost: 5
+        supported_engines: '{}'
+        locations:
+        - locations
+        - locations
+        id: id
+        type: type
+        number_of_nodes: 0
+        ram: 1
+      properties:
+        id:
+          description: A unique ID for the plan.
+          type: string
+        number_of_nodes:
+          description: The total number of nodes for this plan.
+          type: integer
+        type:
+          description: The type of plan this is.
+          type: string
+        vcpu_count:
+          description: Number of vCPUs.
+          type: integer
+        ram:
+          description: The amount of RAM in MB.
+          type: integer
+        disk:
+          description: The size of the disk in GB (excluded for Redis engine types).
+          type: integer
+        monthly_cost:
+          description: The monthly cost of this Managed Database plan.
+          type: integer
+        supported_engines:
+          description: A list of key/value pairs with database engine types and boolean values.
+          type: object
+        max_connections:
+          description: A list of key/value pairs with database engine types (excluding Redis) and integers of max connection values.
+          type: object
+        locations:
+          description: A list of available regions in which this plan is currently available.
+          items:
+            type: string
+          type: array
+      title: plan
+      type: object
+      x-tags:
+      - database-plans
+      x-examples: {}
+    list_database_dbs_200_response:
+      example:
+        dbs:
+        - name: name
+        - name: name
+        meta:
+          total: 2
+      properties:
+        dbs:
+          items:
+            $ref: '#/components/schemas/database-db'
+          type: array
+        meta:
+          $ref: '#/components/schemas/dbaas-meta'
+      type: object
+    list_database_users_200_response:
+      example:
+        meta:
+          total: 2
+        users:
+        - password: password
+          encryption: encryption
+          access_control:
+            redis_acl_keys:
+            - redis_acl_keys
+            - redis_acl_keys
+            redis_acl_channels:
+            - redis_acl_channels
+            - redis_acl_channels
+            redis_acl_categories:
+            - redis_acl_categories
+            - redis_acl_categories
+            redis_acl_commands:
+            - redis_acl_commands
+            - redis_acl_commands
+          username: username
+        - password: password
+          encryption: encryption
+          access_control:
+            redis_acl_keys:
+            - redis_acl_keys
+            - redis_acl_keys
+            redis_acl_channels:
+            - redis_acl_channels
+            - redis_acl_channels
+            redis_acl_categories:
+            - redis_acl_categories
+            - redis_acl_categories
+            redis_acl_commands:
+            - redis_acl_commands
+            - redis_acl_commands
+          username: username
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/database-user'
+          type: array
+        meta:
+          $ref: '#/components/schemas/dbaas-meta'
+      type: object
+    database-user:
+      description: Managed Database user information.
+      example:
+        password: password
+        encryption: encryption
+        access_control:
+          redis_acl_keys:
+          - redis_acl_keys
+          - redis_acl_keys
+          redis_acl_channels:
+          - redis_acl_channels
+          - redis_acl_channels
+          redis_acl_categories:
+          - redis_acl_categories
+          - redis_acl_categories
+          redis_acl_commands:
+          - redis_acl_commands
+          - redis_acl_commands
+        username: username
+      properties:
+        username:
+          description: The username for the database user.
+          type: string
+        password:
+          description: The password for the database user.
+          type: string
+        encryption:
+          description: 'The password encryption for the database user (MySQL engine type only).
+
+            * `Default (MySQL 8+)`
+
+            * `Legacy (MySQL 5.x)`'
+          type: string
+        access_control:
+          $ref: '#/components/schemas/database_user_access_control'
+      title: user
+      type: object
+      x-tags:
+      - database-users
+      x-examples: {}
+    start_version_upgrade_request:
+      properties:
+        version:
+          description: The version number to upgrade the Managed Database to.
+          type: string
+      required:
+      - version
+      type: object
+    create_database_request:
+      properties:
+        database_engine:
+          description: 'The database engine type for the Managed Database.
+
+            * `mysql`
+
+            * `pg`
+
+            * `ferretpg`
+
+            * `redis`'
+          type: string
+        database_engine_version:
+          description: 'The version of the chosen database engine type for the Managed Database.
+
+            * MySQL: `8`
+
+            * PostgreSQL: `12` - `15`
+
+            * FerretDB + PostgreSQL: `12` - `15`
+
+            * Redis: `7`'
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Managed Database is located.
+          type: string
+        plan:
+          description: The [Plan id](#operation/list-database-plans) to use when deploying this Managed Database.
+          type: string
+        label:
+          description: A user-supplied label for this Managed Database.
+          type: string
+        tag:
+          description: The user-supplied tag for this Managed Database.
+          type: string
+        vpc_id:
+          description: The [VPC id](#operation/list-vpcs) to use when deploying this Managed Database. It can also be set to `new` to configure a new VPC network with this deployment.
+          type: string
+        maintenance_dow:
+          description: 'The day of week for routine maintenance updates.
+
+            * `monday`
+
+            * `tuesday`
+
+            * `wednesday`
+
+            * `thursday`
+
+            * `friday`
+
+            * `saturday`
+
+            * `sunday`'
+          type: string
+        maintenance_time:
+          description: The preferred time (UTC) for routine maintenance updates to occur in 24-hour HH:00 format (e.g. `01:00`, `13:00`, `23:00`, etc.).
+          type: string
+        trusted_ips:
+          description: A list of IP addresses allowed to access the Managed Database in CIDR notation (defaults to /32 if excluded).
+          items:
+            type: string
+          type: array
+        mysql_sql_modes:
+          description: 'A list of SQL modes to enable on the Managed Database (MySQL engine type only).
+
+            * `ALLOW_INVALID_DATES`
+
+            * `ANSI` (Combination Mode)
+
+            * `ANSI_QUOTES`
+
+            * `ERROR_FOR_DIVISION_BY_ZERO`
+
+            * `HIGH_NOT_PRECEDENCE`
+
+            * `IGNORE_SPACE`
+
+            * `NO_AUTO_VALUE_ON_ZERO`
+
+            * `NO_DIR_IN_CREATE`
+
+            * `NO_ENGINE_SUBSTITUTION`
+
+            * `NO_UNSIGNED_SUBTRACTION`
+
+            * `NO_ZERO_DATE`
+
+            * `NO_ZERO_IN_DATE`
+
+            * `ONLY_FULL_GROUP_BY`
+
+            * `PIPES_AS_CONCAT`
+
+            * `REAL_AS_FLOAT`
+
+            * `STRICT_ALL_TABLES`
+
+            * `STRICT_TRANS_TABLES`
+
+            * `TIME_TRUNCATE_FRACTIONAL`
+
+            * `TRADITIONAL` (Combination Mode)'
+          items:
+            type: string
+          type: array
+        mysql_require_primary_key:
+          description: Require a primary key for all tables on the Managed Database (MySQL engine type only).
+          type: boolean
+        mysql_slow_query_log:
+          description: Enable or disable slow query logging on the Managed Database (MySQL engine type only).
+          type: boolean
+        mysql_long_query_time:
+          description: The number of seconds to denote a slow query when logging is enabled (MySQL engine type only).
+          type: integer
+        redis_eviction_policy:
+          description: Set the data eviction policy for the Managed Database (Redis engine type only)
+          type: string
+      required:
+      - database_engine
+      - database_engine_version
+      - label
+      - plan
+      - region
+      type: object
+    update_advanced_options_request:
+      properties:
+        autovacuum_analyze_scale_factor:
+          description: 'Accepted values: 0 - 1'
+          type: float
+        autovacuum_analyze_threshold:
+          description: 'Accepted values: 0 - 2147483647'
+          type: int
+        autovacuum_freeze_max_age:
+          description: 'Accepted values: 200000000 - 1500000000'
+          type: int
+        autovacuum_max_workers:
+          description: 'Accepted values: 1 - 20'
+          type: int
+        autovacuum_naptime:
+          description: 'Accepted values: 1 - 86400'
+          type: int
+        autovacuum_vacuum_cost_delay:
+          description: 'Accepted values: -1 - 100'
+          type: int
+        autovacuum_vacuum_cost_limit:
+          description: 'Accepted values: -1 - 10000'
+          type: int
+        autovacuum_vacuum_scale_factor:
+          description: 'Accepted values: 0 - 1'
+          type: float
+        autovacuum_vacuum_threshold:
+          description: 'Accepted values: 0 - 2147483647'
+          type: int
+        bgwriter_delay:
+          description: 'Accepted values: 10 - 10000'
+          type: int
+        bgwriter_flush_after:
+          description: 'Accepted values: 0 - 2048'
+          type: int
+        bgwriter_lru_maxpages:
+          description: 'Accepted values: 0 - 1073741823'
+          type: int
+        bgwriter_lru_multiplier:
+          description: 'Accepted values: 0 - 10'
+          type: float
+        deadlock_timeout:
+          description: 'Accepted values: 500 - 1800000'
+          type: int
+        default_toast_compression:
+          description: 'Accepted values:
+
+            * `lz4`
+
+            * `pglz`'
+          type: enum
+        idle_in_transaction_session_timeout:
+          description: 'Accepted values: 0 - 604800000'
+          type: int
+        jit:
+          description: 'Accepted values:
+
+            * `true`
+
+            * `false`'
+          type: boolean
+        log_autovacuum_min_duration:
+          description: 'Accepted values: -1 - 2147483647'
+          type: int
+        log_error_verbosity:
+          description: 'Accepted values:
+
+            * `TERSE`
+
+            * `DEFAULT`
+
+            * `VERBOSE`'
+          type: enum
+        log_line_prefix:
+          description: 'Accepted values:
+
+            * `''pid=%p,user=%u,db=%d,app=%a,client=%h ''`
+
+            * `''%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h ''`
+
+            * `''%m [%p] %q[user=%u,db=%d,app=%a] ''`'
+          type: enum
+        log_min_duration_statement:
+          description: 'Accepted values: -1 - 86400000'
+          type: int
+        max_files_per_process:
+          description: 'Accepted values: 1000 - 4096'
+          type: int
+        max_locks_per_transaction:
+          description: 'Accepted values: 64 - 6400'
+          type: int
+        max_logical_replication_workers:
+          description: 'Accepted values: 4 - 64'
+          type: int
+        max_parallel_workers:
+          description: 'Accepted values: 0 - 96'
+          type: int
+        max_parallel_workers_per_gather:
+          description: 'Accepted values: 0 - 96'
+          type: int
+        max_pred_locks_per_transaction:
+          description: 'Accepted values: 64 - 5120'
+          type: int
+        max_prepared_transactions:
+          description: 'Accepted values: 0 - 10000'
+          type: int
+        max_replication_slots:
+          description: 'Accepted values: 8 - 64'
+          type: int
+        max_stack_depth:
+          description: 'Accepted values: 2097152 - 6291456'
+          type: int
+        max_standby_archive_delay:
+          description: 'Accepted values: 1 - 43200000'
+          type: int
+        max_standby_streaming_delay:
+          description: 'Accepted values: 1 - 43200000'
+          type: int
+        max_wal_senders:
+          description: 'Accepted values: 20 - 64'
+          type: int
+        max_worker_processes:
+          description: 'Accepted values: 8 - 96'
+          type: int
+        pg_partman_bgw.interval:
+          description: 'Accepted values: 3600 - 604800'
+          type: int
+        pg_partman_bgw.role:
+          description: 'Maximum length: 64 characters'
+          type: string
+        pg_stat_statements.track:
+          description: 'Accepted values:
+
+            * `all`
+
+            * `top`
+
+            * `none`'
+          type: enum
+        temp_file_limit:
+          description: 'Accepted values: -1 - 2147483647'
+          type: int
+        track_activity_query_size:
+          description: 'Accepted values: 1024 - 10240'
+          type: int
+        track_commit_timestamp:
+          description: 'Accepted values:
+
+            * `off`
+
+            * `on`'
+          type: enum
+        track_functions:
+          description: 'Accepted values:
+
+            * `all`
+
+            * `pl`
+
+            * `none`'
+          type: enum
+        track_io_timing:
+          description: 'Accepted values:
+
+            * `off`
+
+            * `on`'
+          type: enum
+        wal_sender_timeout:
+          description: 'Accepted values: 0, 5000 - 10800000'
+          type: int
+        wal_writer_delay:
+          description: 'Accepted values: 10 - 200'
+          type: int
+      type: object
+  securitySchemes:
+    API_Key:
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+      in: header
+      scheme: bearer
+      type: http
+x-refined-from:
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

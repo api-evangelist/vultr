@@ -1,0 +1,301 @@
+openapi: 3.2.0
+info:
+  title: Vultr Organizations API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged Organizations across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: Organizations
+  description: Manage organizations
+paths:
+  /v2/organizations:
+    post:
+      tags:
+      - Organizations
+      summary: Create Organization
+      operationId: createOrganization
+      description: Create a new organization and initialize SCIM settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: Name of the organization
+                  example: My Organization
+                type:
+                  type: string
+                  description: Type of organization
+                  example: Personal/Team
+      responses:
+        '201':
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags:
+      - Organizations
+      summary: List Organizations
+      operationId: listOrganizations
+      description: List all organizations that belong to the authenticated user
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orgs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/organizations/{id}:
+    get:
+      tags:
+      - Organizations
+      summary: Get Organization
+      operationId: getOrganization
+      description: Retrieve a single organization by its UUID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - Organizations
+      summary: Update Organization
+      operationId: updateOrganization
+      description: Update an organization's name (Root role required)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: New name for the organization
+                  example: Updated Organization Name
+      responses:
+        '200':
+          description: Organization updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Organizations
+      summary: Soft Delete Organization
+      operationId: softDeleteOrganization
+      description: Disable SCIM, expire invites, suspend users, and soft delete the organization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Organization deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/organizations/{id}/restore:
+    patch:
+      tags:
+      - Organizations
+      summary: Restore Organization
+      operationId: restoreOrganization
+      description: Restore a previously soft-deleted organization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Organization restored
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Organization UUID
+        name:
+          type: string
+          description: Organization name
+        type:
+          type: string
+          description: Organization type
+          enum:
+          - Personal/Team
+          - Business/Enterprise
+          default: Personal/Team
+        date_created:
+          type: string
+          format: date-time
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

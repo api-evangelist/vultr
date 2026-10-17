@@ -73,21 +73,18 @@ common:
 - type: MCPServer
   url: mcp/vultr-mcp.yml
 apis:
-- aid: vultr:vultr-api
-  name: Vultr API v2
-  description: RESTful Vultr API v2 covering instances, bare metal, object storage, block storage, Kubernetes, managed databases, networking, DNS, billing and account resources. Bearer API key authentication, cursor-based pagination, 30 requests/second per IP rate limit.
+- aid: vultr:vultr-account-api
+  name: Vultr Account API
+  description: >-
+    Read-only information about your [user account](https://my.vultr.com/settings/#settingsprofile) and
+    [billing](https://my.vultr.com/billing/#billinghistory) information.
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
-  - Cloud
-  - Compute
-  - Object Storage
+  - account
   properties:
   - type: OpenAPI
-    url: openapi/vultr-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://raw.githubusercontent.com/vultr/vultr-java/HEAD/api/openapi.yaml
+    url: openapi/vultr-account-api-openapi.yml
   - type: JSONSchema
     url: json-schema/vultr-create-instance-request-schema.json
   - type: JSONSchema
@@ -100,20 +97,1619 @@ apis:
     url: json-schema/vultr-create-database-request-schema.json
   - type: JSONSchema
     url: json-schema/vultr-update-database-request-schema.json
-- aid: vultr:vultr-iam-management-api
-  name: Vultr IAM & SCIM Management API
-  description: Vultr IAM and SCIM management API for users, groups, roles, policies and SCIM provisioning on Vultr organizations, published in the vultr/iam-management-api repository.
-  humanURL: https://github.com/vultr/iam-management-api
-  baseURL: https://api.vultr.com
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-application-api
+  name: Vultr Application API
+  description: >-
+    [One-Click](https://www.vultr.com/features/one-click-apps/) and [Marketplace](https://www.vultr.com/marketplace/)
+    Applications are ready-to-run with minimal configuration. We have an extensive [documentation library](https://www.vultr.com/docs/category/apps)
+    for our Applications.
+
+    <br><br>There are two types of Applications: `marketplace` and `one-click`. This is denoted by the
+    `type` field in the Application object. Applications with `type` of `marketplace` can be deployed
+    by using the `image_id` while Applications with `type` of `one-click` should use the `id`.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
   tags:
-  - IAM
-  - SCIM
+  - application
   properties:
   - type: OpenAPI
-    url: openapi/vultr-iam-openapi.yml
+    url: openapi/vultr-application-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-backup-api
+  name: Vultr Backup API
+  description: >-
+    A backup is a scheduled, automatic, point-in-time image of an instance. We do not stop the instance
+    when taking a backup. Booting from a backup is similar to rebooting after a non-graceful restart.
+    [Snapshots](#tag/snapshot) are physically the same as backups, but snapshots are manual while backups
+    run automatically on a schedule. Backups can be converted into snapshots. See our [Automatic Backup
+    FAQ](https://www.vultr.com/docs/vps-automatic-backups) for more information.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - backup
+  properties:
   - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://raw.githubusercontent.com/vultr/iam-management-api/main/iam-management-api.yml
+    url: openapi/vultr-backup-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-baremetal-api
+  name: Vultr Baremetal API
+  description: >-
+    [Bare Metal](https://www.vultr.com/products/bare-metal/) servers give you access to the underlying
+    physical hardware in a single-tenant environment without a virtualization layer.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - baremetal
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-baremetal-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-billing-api
+  name: Vultr Billing API
+  description: >-
+    Read-only [billing](https://my.vultr.com/billing/#billinghistory) information for your [user account](https://my.vultr.com/settings/#settingsprofile).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - billing
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-billing-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-block-api
+  name: Vultr Block API
+  description: >-
+    [Block Storage](https://www.vultr.com/products/block-storage/) volumes are highly-available, redundant,
+    SSD backed, and expandable from 10 GB to 10,000 GB. Block storage volumes can be formatted with your
+    choice of filesystems and moved between server instances as needed. [See our FAQ](https://www.vultr.com/docs/block-storage/)
+    for details.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - block
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-block-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-container-registry-api
+  name: Vultr Container Registry API
+  description: >-
+    Store and manage public and private container images for rapid deployment to Vultr Managed Kubernetes.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Container Registry
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-container-registry-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-dns-api
+  name: Vultr Dns API
+  description: >-
+    Vultr offers [free DNS hosting](https://www.vultr.com/docs/introduction-to-vultr-dns) for customers'
+    domains. The nameservers are on an AnyCAST network and ensure fast DNS resolution. When you manage
+    your DNS through the API, you can view the results [in your customer portal](https://my.vultr.com/dns/).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - dns
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-dns-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-firewall-api
+  name: Vultr Firewall API
+  description: >-
+    Vultr offers a [web-based firewall](https://www.vultr.com/docs/vultr-firewall) solution to protect
+    one or more compute instances. [Firewall groups](https://my.vultr.com/firewall/) can manage multiple
+    servers with a standard ruleset. You can control multiple groups with the API.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - firewall
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-firewall-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-assumed-roles-api
+  name: Vultr IAM Assumed Roles API
+  description: Manage temporary role assumptions
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Assumed Roles
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-assumed-roles-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-endpoint-actions-api
+  name: Vultr IAM Endpoint Actions API
+  description: View available IAM endpoint-to-action mappings
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Endpoint Actions
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-endpoint-actions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-groups-api
+  name: Vultr IAM Groups API
+  description: Non-SCIM group management endpoints
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-groups-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-policies-api
+  name: Vultr IAM Policies API
+  description: Endpoints for managing IAM policies within an organization
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Policies
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-policies-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-policy-group-mappings-api
+  name: Vultr IAM Policy-Group Mappings API
+  description: Manage direct policy attachments to groups
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Policy-Group Mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-policy-group-mappings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-policy-user-mappings-api
+  name: Vultr IAM Policy-User Mappings API
+  description: Manage direct policy attachments to users
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Policy-User Mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-policy-user-mappings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-role-group-mappings-api
+  name: Vultr IAM Role-Group Mappings API
+  description: Manage role assignments to groups
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Role-Group Mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-role-group-mappings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-role-policy-mappings-api
+  name: Vultr IAM Role-Policy Mappings API
+  description: Manage the attachment and detachment of IAM policies to roles
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Role-Policy Mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-role-policy-mappings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-role-trusts-api
+  name: Vultr IAM Role Trusts API
+  description: Manage trust relationships between roles
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Role Trusts
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-role-trusts-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-role-user-mappings-api
+  name: Vultr IAM Role-User Mappings API
+  description: Manage role assignments to users
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Role-User Mappings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-role-user-mappings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iam-roles-api
+  name: Vultr IAM Roles API
+  description: Endpoints for managing IAM roles within an organization
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - IAM Roles
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iam-roles-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-instances-api
+  name: Vultr Instances API
+  description: >-
+    Vultr [Cloud instances](https://www.vultr.com/products/cloud-compute/) can be [deployed](https://my.vultr.com/)
+    with your preferred operating system or pre-installed application in seconds. [High Frequency Compute](https://www.vultr.com/products/high-frequency-compute/)
+    instances are powered by high clock speed CPU's and NVMe local storage to power your most demanding
+    applications. [Dedicated Cloud](https://www.vultr.com/products/dedicated-cloud/) instances have dedicated
+    CPU, SSD drives, and RAM.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - instances
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-instances-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-iso-api
+  name: Vultr Iso API
+  description: >-
+    [Upload](https://www.vultr.com/features/upload-iso/) and boot instances from your ISO, or choose one
+    from our [public ISO library](https://my.vultr.com/iso/public/). See our [ISO documentation](https://www.vultr.com/docs/requirements-for-uploading-an-os-iso-to-vultr).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - iso
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-iso-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-kubernetes-api
+  name: Vultr Kubernetes API
+  description: Vultr Kubernetes Engine is a managed Kubernetes offering.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - kubernetes
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-kubernetes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-load-balancer-api
+  name: Vultr Load Balancer API
+  description: >-
+    [Load Balancers](https://www.vultr.com/docs/vultr-load-balancers) sit in front of your application
+    and distribute incoming traffic across multiple Instances. When you control the load balancer via
+    the API, you can inspect the results in the [customer portal](https://my.vultr.com/loadbalancers/).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - load-balancer
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-load-balancer-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-logs-api
+  name: Vultr Logs API
+  description: Endpoints for viewing logs and for managing an audit logs subscription
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Logs
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-logs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-managed-databases-api
+  name: Vultr Managed Databases API
+  description: >-
+    [Vultr Managed Databases](https://www.vultr.com/docs/vultr-managed-databases/) is a managed database
+    offering supporting MySQL, PostgreSQL, FerretDB + PostgreSQL, and Redis.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - managed-databases
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-managed-databases-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-organization-invitations-api
+  name: Vultr Organization Invitations API
+  description: Manage invitations for users to join organizations
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Organization Invitations
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-organization-invitations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-organization-membership-management-api
+  name: Vultr Organization Membership Management API
+  description: Manage users inside organizations (membership, roles, suspensions)
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Organization Membership Management
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-organization-membership-management-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-organizations-api
+  name: Vultr Organizations API
+  description: Manage organizations
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-organizations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-os-api
+  name: Vultr Os API
+  description: >-
+    We have a wide range of [operating systems](https://www.vultr.com/features/operating-systems/) available
+    to deploy server instances. You can also [upload an ISO](#tag/iso) or choose from our public ISO library.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - os
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-os-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-plans-api
+  name: Vultr Plans API
+  description: >-
+    A Plan is a particular configuration of vCPU, RAM, SSD, and bandwidth to deploy an [Instance](#tag/instances).
+    Not all Plans are available in all [Regions](#tag/region). You can browse plans in the [Customer Portal](https://my.vultr.com/deploy/)
+    or get a list of Plans from the API.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - plans
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-plans-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-private-networks-api
+  name: Vultr private Networks API
+  description: >-
+    [Private Networks](https://www.vultr.com/docs/configuring-private-network) are fully isolated networks
+    accessible only by instances on your account. Each private network is only available in one Region
+    and cannot span across regions. An [instance](#tag/instances) can connect to [multiple private networks](https://www.vultr.com/docs/multiple-private-networks)
+    and you may have up to 5 private networks per [region](#tag/region).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - private Networks
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-private-networks-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-region-api
+  name: Vultr Region API
+  description: >-
+    Instances can be deployed in many [Regions](https://www.vultr.com/features/datacenter-locations/)
+    on multiple continents. Choose any of our worldwide locations to deploy servers near your office or
+    customers for low-latency.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - region
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-region-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-reserved-ip-api
+  name: Vultr Reserved Ip API
+  description: >-
+    IP addresses can be [reserved](https://my.vultr.com/network/) and moved between [instances](#tag/instances).
+    Reserved IPs can also be used as [floating addresses](https://www.vultr.com/docs/high-availability-on-vultr-with-floating-ip-and-bgp)
+    for high-availability.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - reserved-ip
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-reserved-ip-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-s3-api
+  name: Vultr S3 API
+  description: >-
+    [Object Storage](https://www.vultr.com/docs/vultr-object-storage) is S3 API compatible. Objects uploaded
+    to object storage can be accessed privately or publicly on the web. Object storage supports a virtually
+    unlimited number of objects. Control your Object Storage via the API or browse in the [Customer Portal](https://my.vultr.com/objectstorage/).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - s3
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-s3-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-scim-groups-api
+  name: Vultr SCIM Groups API
+  description: SCIM 2.0 compliant endpoints for managing groups
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - SCIM Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-scim-groups-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-scim-settings-api
+  name: Vultr SCIM Settings API
+  description: Manage SCIM enablement and tokens for organizations
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - SCIM Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-scim-settings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-scim-users-api
+  name: Vultr SCIM Users API
+  description: SCIM 2.0 compliant endpoints for managing users
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - SCIM Users
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-scim-users-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-snapshot-api
+  name: Vultr Snapshot API
+  description: >-
+    A snapshot is a point-in-time image of an instance. We do not stop the instance when taking a snapshot.
+    Booting from a snapshot is similar to rebooting after a non-graceful restart. Snapshots are physically
+    the same as [backups](#tag/backup), but snapshots are manual while backups run automatically on a
+    schedule. See our [Snapshot Quickstart Guide](https://www.vultr.com/docs/vultr-vps-snapshots) for
+    more information.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - snapshot
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-snapshot-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-ssh-api
+  name: Vultr Ssh API
+  description: >-
+    You can add [SSH keys](https://www.vultr.com/docs/how-do-i-generate-ssh-keys/) to your [account](https://my.vultr.com/settings/#settingssshkeys),
+    which can be copied to new instances when first deployed. Updating a key does not update any running
+    instances. If you [reinstall](#operation/reinstall-instance) an instance (erasing all its data), it
+    will inherit the updated key.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - ssh
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-ssh-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-startup-api
+  name: Vultr Startup API
+  description: >-
+    Vultr allows you to assign [two types of scripts to a server](https://www.vultr.com/docs/vultr-startup-scripts-quickstart-guide).
+    Boot scripts configure new deployments, and PXE scripts automatically install operating systems. Assign
+    startup scripts to your servers through the API or on your [Startup Scripts page](https://my.vultr.com/startup/)
+    in the customer portal.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - startup
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-startup-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-user-resources-api
+  name: Vultr User Resources API
+  description: Endpoints for viewing user-specific IAM resources (groups, roles, policies)
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - User Resources
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-user-resources-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-users-api
+  name: Vultr Users API
+  description: >-
+    Vultr supports [multiple users](https://my.vultr.com/settings/#settingsusers) in each account, and
+    each user has [individual access permissions](https://my.vultr.com/users/manage/?USERID=new). Users
+    have unique API keys, which respect the permission for that user.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - users
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-users-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-vpc2-api
+  name: Vultr VPC2 API
+  description: >-
+    [VPCs](https://www.vultr.com/docs/how-to-create-a-vultr-virtual-private-cloud-vpc/) are fully isolated
+    networks accessible only by instances on your account. Each VPC is only available in one region and
+    cannot span across regions. An [instance](#tag/instances) can connect to multiple VPCs and you may
+    have up to 5 VPCs per [region](#tag/region).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - VPC2
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-vpc2-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-vpcs-api
+  name: Vultr VPCs API
+  description: >-
+    [VPCs](https://www.vultr.com/docs/how-to-create-a-vultr-virtual-private-cloud-vpc/) are fully isolated
+    networks accessible only by instances on your account. Each VPC is only available in one region and
+    cannot span across regions. An [instance](#tag/instances) can connect to multiple VPCs and you may
+    have up to 5 VPCs per [region](#tag/region).
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - VPCs
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-vpcs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-extended-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-log-meta-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-scimuser-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-role-trust-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-assumed-role-session-schema.json
+- aid: vultr:vultr-sub-account-api
+  name: Vultr Sub Account API
+  description: >-
+    Sub-accounts are separate Vultr accounts that are directly linked to your account. These accounts
+    function similarly to normal Vultr accounts with some additional billing and administrative features
+    available to your account.
+  humanURL: https://docs.vultr.com
+  baseURL: https://api.vultr.com/v2
+  tags:
+  - Sub Account
+  properties:
+  - type: OpenAPI
+    url: openapi/vultr-sub-account-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/vultr-create-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-instance-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-advanced-options-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-baremetal-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-create-database-request-schema.json
+  - type: JSONSchema
+    url: json-schema/vultr-update-database-request-schema.json
   - type: JSONSchema
     url: json-schema/vultr-extended-log-schema.json
   - type: JSONSchema

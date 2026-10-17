@@ -1,0 +1,260 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Policy-Group Mappings API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Policy-Group Mappings across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Policy-Group Mappings
+  description: Manage direct policy attachments to groups
+paths:
+  /v2/policies/{id}/groups:
+    get:
+      tags:
+      - IAM Policy-Group Mappings
+      summary: List Groups with Policy
+      operationId: listGroupsWithPolicy
+      description: List all groups that have this policy attached
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of groups with this policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  groups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        assigned_date:
+                          type: string
+                          format: date-time
+                        member_count:
+                          type: string
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/policies/{id}/groups/{group-id}:
+    post:
+      tags:
+      - IAM Policy-Group Mappings
+      summary: Attach Policy to Group
+      operationId: attachPolicyToGroup
+      description: Attach this policy to a group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: group-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Policy attached to group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupPolicyAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+      - IAM Policy-Group Mappings
+      summary: Detach Policy from Group
+      operationId: detachPolicyFromGroup
+      description: Remove this policy from a group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: group-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Policy detached from group
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    GroupPolicyAssignment:
+      type: object
+      required:
+      - group_id
+      - group_name
+      - policy_id
+      - policy_name
+      - date_assigned
+      properties:
+        group_id:
+          type: string
+          format: uuid
+          description: UUID of the group with the policy
+        group_name:
+          type: string
+          description: Name of the group
+        policy_id:
+          type: string
+          format: uuid
+          description: UUID of the attached policy
+        policy_name:
+          type: string
+          description: Name of the attached policy
+        policy_description:
+          type: string
+          description: Description of the attached policy
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the policy was attached to the group
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

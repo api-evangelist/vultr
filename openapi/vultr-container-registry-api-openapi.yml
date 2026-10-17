@@ -1,0 +1,1185 @@
+openapi: 3.2.0
+info:
+  title: Vultr Container Registry API
+  version: '2.0'
+  contact:
+    email: support@vultr.com
+    name: ''
+    url: https://www.vultr.com
+  description: 'Operations tagged Container Registry across 2 of this provider''s published API definitions: vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- description: Store and manage public and private container images for rapid deployment to Vultr Managed Kubernetes.
+  name: Container Registry
+  x-displayName: Container Registry
+paths:
+  /registries:
+    get:
+      description: List All Container Registry Subscriptions for this account
+      operationId: list-registries
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_registries_200_response'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: List Container Registries
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registries\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry:
+    post:
+      description: Create a new Container Registry Subscription
+      operationId: create-registry
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  name: charizard
+                  public: false
+                  region: sjc
+                  plan: business
+            schema:
+              $ref: '#/components/schemas/create_registry_request'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry'
+          description: OK
+        '401':
+          description: Unauthorized
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Create Container Registry
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registries\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n    --data '{\n      \"region\" : \"sjc\",\n      \"name\" : \"charizard\",\n      \"plan\" : \"business\",\n      \"public\" : false\n    }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/{registry-id}:
+    delete:
+      description: Deletes a Container Registry Subscription
+      operationId: delete-registry
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content - Successfully Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Delete Container Registry
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get a single Container Registry Subscription
+      operationId: read-registry
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Read Container Registry
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update a Container Registry Subscription
+      operationId: update-registry
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  public: true
+                  plan: business
+            schema:
+              $ref: '#/components/schemas/update_registry_request'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Update Container Registry
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n    --data '{\n      \"region\" : \"sjc\",\n      \"name\" : \"charizard\",\n      \"plan\" : \"business\",\n      \"public\" : false\n    }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/{registry-id}/repositories:
+    get:
+      description: List All Repositories in a Container Registry Subscription
+      operationId: list-registry-repositories
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_registry_repositories_200_response'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: List Repositories
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/repositories\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/{registry-id}/repository/{repository-image}:
+    delete:
+      description: Deletes a Repository from a Container Registry Subscription
+      operationId: delete-repository
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [Repository Image](#components/schemas/registry-repository/properties/image). Which can be found by [List Repositories](#operation/list-registry-repositories).
+        explode: false
+        in: path
+        name: repository-image
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content - Successfully Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Delete Repository
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/repository/{repository-image}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get a single Repository in a Container Registry Subscription
+      operationId: read-registry-repository
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [Repository Image](#components/schemas/registry-repository/properties/image). Which can be found by [List Repositories](#operation/list-registry-repositories).
+        explode: false
+        in: path
+        name: repository-image
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry-repository'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Read Repository
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/repository/{repository-image}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update a Repository in a Container Registry Subscription
+      operationId: update-repository
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The [Repository Image](#components/schemas/registry-repository/properties/image). Which can be found by [List Repositories](#operation/list-registry-repositories).
+        explode: false
+        in: path
+        name: repository-image
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  description: This is my super cool hello-world project
+            schema:
+              $ref: '#/components/schemas/update_repository_request'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry-repository'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Update Repository
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/repository/{repository-image}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n    --data '{\n      \"description\" : \"his is my super cool hello-world project\"\n    }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/{registry-id}/docker-credentials?expiry_seconds=0&read_write=false:
+    options:
+      description: Create a fresh set of Docker Credentials for this Container Registry Subscription
+      operationId: create-registry-docker-credentials
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The seconds until these credentials expire. When set to 0, credentials do not expire. The default value is 0
+        explode: true
+        in: query
+        name: expiry_seconds
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Whether these credentials will have only PULL access or PUSH access as well. If true these credentials can PUSH to repos in this registry. If false, these credentials can only PULL. Default is false.
+        explode: true
+        in: query
+        name: read_write
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registry-docker-credentials'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Create Docker Credentials
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/docker-credentials\" \\\n  -X OPTIONS \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/{registry-id}/docker-credentials/kubernetes?expiry_seconds=0&read_write=false&base64_encode=false:
+    options:
+      description: Create a fresh set of Docker Credentials for this Container Registry Subscription and return them in a Kubernetes friendly YAML format
+      operationId: create-registry-kubernetes-docker-credentials
+      parameters:
+      - description: The [Registry ID](#components/schemas/registry/properties/id). Which can be found by [List Registries](#operation/list-registries).
+        explode: false
+        in: path
+        name: registry-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The seconds until these credentials expire. When set to 0, credentials do not expire. The default value is 0
+        explode: true
+        in: query
+        name: expiry_seconds
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Whether these credentials will have only PULL access or PUSH access as well. If true these credentials can PUSH to repos in this registry. If false, these credentials can only PULL. Default is false.
+        explode: true
+        in: query
+        name: read_write
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Whether this YAML will be returned in a base64 encoded string for ease of downloading. If true, the response will be a base64 encoded string. Default is false.
+        explode: true
+        in: query
+        name: base64_encode
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        '200':
+          content:
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/registry-kubernetes-docker-credentials'
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: Create Docker Credentials for Kubernetes
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/{registry-id}/docker-credentials/kubernetes\" \\\n  -X OPTIONS \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/yaml
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/region/list:
+    get:
+      description: List All Regions where a Container Registry can be deployed
+      operationId: list-registry-regions
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_registry_regions_200_response'
+          description: OK
+        '401':
+          description: Unauthorized
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: List Registry Regions
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/region/list\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /registry/plan/list:
+    get:
+      description: List All Plans to help choose which one is the best fit for your Container Registry
+      operationId: list-registry-plans
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_registry_plans_200_response'
+          description: OK
+        '401':
+          description: Unauthorized
+        '422':
+          description: Bad Request
+      security:
+      - API Key: []
+      summary: List Registry Plans
+      tags:
+      - Container Registry
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/registry/plan/list\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    registry_docker_credentials_auths__registry_region_name__vultrcr_com:
+      description: This object represents the auth for this region
+      example:
+        auth: auth
+      properties:
+        auth:
+          description: The base64 encoded credentials of the Robot Account {registry-user-username}:{registry-user-password}
+          type: string
+      type: object
+    registry:
+      description: Container Registry Entity
+      example:
+        urn: urn
+        metadata:
+          subscription:
+            billing:
+              monthly_price: ''
+              pending_charges: ''
+          region:
+            urn: urn
+            added_at: added_at
+            public: true
+            updated_at: updated_at
+            name: name
+            base_url: base_url
+            data_center: '{}'
+            id: 6
+        public: true
+        date_created: date_created
+        name: name
+        id: id
+        storage:
+          allowed:
+            updated_at: updated_at
+            mb: ''
+            bytes: ''
+            gb: ''
+            tb: ''
+          used:
+            updated_at: updated_at
+            mb: ''
+            bytes: ''
+            gb: ''
+            tb: ''
+        root_user:
+          added_at: added_at
+          password: password
+          updated_at: updated_at
+          root: true
+          id: 0
+          username: username
+      properties:
+        id:
+          description: The UUID to reference this registry
+          type: string
+        name:
+          description: The globally unique name to reference this registry
+          type: string
+        urn:
+          description: The base URN (the URL without the scheme [i.e. http:// or https://]) of this registry
+          type: string
+        storage:
+          $ref: '#/components/schemas/registry_storage'
+        date_created:
+          description: The date this Registry Subscription was created
+          type: string
+        public:
+          description: If true, this is a publically accessible registry allowing anyone to pull from it. If false, this registry is completely private
+          type: boolean
+        root_user:
+          $ref: '#/components/schemas/registry-user'
+        metadata:
+          $ref: '#/components/schemas/registry_metadata'
+      title: registry
+      type: object
+      x-tags:
+      - registry
+      - registries
+      x-examples: {}
+    registry-repository:
+      description: Container Registry Repository Entity
+      example:
+        image: image
+        added_at: added_at
+        updated_at: updated_at
+        name: name
+        artifact_count: 6
+        description: description
+        pull_count: 0
+      properties:
+        name:
+          description: The name of this repository (the name of the container image prepended with the registry name)
+          type: string
+        image:
+          description: The name of the conatiner image
+          type: string
+        description:
+          description: User defined description of this repository
+          type: string
+        added_at:
+          description: The date this Repo was added
+          type: string
+        updated_at:
+          description: The date this Repo was last updated
+          type: string
+        pull_count:
+          description: The amount of pulls for this Repo
+          type: integer
+        artifact_count:
+          description: The amount of artifacts of this Repo
+          type: integer
+      title: registry-repository
+      type: object
+      x-tags:
+      - registry-repository
+      - registry-repositories
+      x-examples: {}
+    list_registry_repositories_200_response:
+      example:
+        repositories:
+        - image: image
+          added_at: added_at
+          updated_at: updated_at
+          name: name
+          artifact_count: 6
+          description: description
+          pull_count: 0
+        - image: image
+          added_at: added_at
+          updated_at: updated_at
+          name: name
+          artifact_count: 6
+          description: description
+          pull_count: 0
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        repositories:
+          items:
+            $ref: '#/components/schemas/registry-repository'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    registry_metadata_subscription:
+      description: Subscription information
+      example:
+        billing:
+          monthly_price: ''
+          pending_charges: ''
+      properties:
+        billing:
+          $ref: '#/components/schemas/registry_metadata_subscription_billing'
+      type: object
+    registry_metadata:
+      description: The metadata containing subscription information such as the region where this registry lives and monthly price and pending charges
+      example:
+        subscription:
+          billing:
+            monthly_price: ''
+            pending_charges: ''
+        region:
+          urn: urn
+          added_at: added_at
+          public: true
+          updated_at: updated_at
+          name: name
+          base_url: base_url
+          data_center: '{}'
+          id: 6
+      properties:
+        region:
+          $ref: '#/components/schemas/registry-region'
+        subscription:
+          $ref: '#/components/schemas/registry_metadata_subscription'
+      type: object
+    registry-kubernetes-docker-credentials:
+      description: Container Registry Kubernetes Docker Credentials Entity
+      properties:
+        apiVersion:
+          description: Specifies that this is api v1
+          type: string
+        kind:
+          description: Specifies that this is a Kubernetes Secret
+          type: string
+        metadata:
+          $ref: '#/components/schemas/registry_kubernetes_docker_credentials_metadata'
+        data:
+          $ref: '#/components/schemas/registry_kubernetes_docker_credentials_data'
+        type:
+          description: Specifies that this type is a kubernetes.io/dockerconfigjson
+          type: string
+      title: registry-kubernetes-docker-credentials
+      type: object
+      x-tags:
+      - registry-kubernetes-docker-credentials
+      x-examples: {}
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    create_registry_request:
+      properties:
+        name:
+          $ref: '#/components/schemas/registry/properties/name'
+        public:
+          $ref: '#/components/schemas/registry/properties/public'
+        region:
+          description: The name of the region you'd like to deploy this Registry in. Can get list of regions from /registry/region/list endpoint i.e. sjc
+          type: string
+        plan:
+          description: The key of the plan you'd like to select which dictates how much storage you're allocated and the monthly cost. Can get list of plans from /plan/list endpoint i.e. start_up
+          type: string
+      required:
+      - name
+      - plan
+      - public
+      - region
+      type: object
+    registry-user:
+      description: Container Registry User Entity
+      example:
+        added_at: added_at
+        password: password
+        updated_at: updated_at
+        root: true
+        id: 0
+        username: username
+      properties:
+        id:
+          description: The Numeric ID of this user.
+          type: integer
+        username:
+          description: The globally unique name of this user.
+          type: string
+        password:
+          description: The password this user will use to authenticate.
+          type: string
+        root:
+          description: If true, this is a root user/registry owner meaning it cannot be deleted or renamed. If false, this is an additional user added to this registry that can be modified
+          type: boolean
+        added_at:
+          description: The date this User was added
+          type: string
+        updated_at:
+          description: The date this User was last updated
+          type: string
+      title: registry-user
+      type: object
+      x-tags:
+      - registry-user
+      x-examples: {}
+    list_registry_plans_200_response_plans:
+      example:
+        premium:
+          monthly_price: 6
+          vanity_name: vanity_name
+          max_storage_mb: 0
+        start_up:
+          monthly_price: 6
+          vanity_name: vanity_name
+          max_storage_mb: 0
+        business:
+          monthly_price: 6
+          vanity_name: vanity_name
+          max_storage_mb: 0
+        enterprise:
+          monthly_price: 6
+          vanity_name: vanity_name
+          max_storage_mb: 0
+      properties:
+        start_up:
+          $ref: '#/components/schemas/registry-plan'
+        business:
+          $ref: '#/components/schemas/registry-plan'
+        premium:
+          $ref: '#/components/schemas/registry-plan'
+        enterprise:
+          $ref: '#/components/schemas/registry-plan'
+      type: object
+    registry-plan:
+      description: Container Registry Plan Entity. The KEY of this entity is the Plan ID you will use to create/upgrade your Container Registry
+      example:
+        monthly_price: 6
+        vanity_name: vanity_name
+        max_storage_mb: 0
+      properties:
+        vanity_name:
+          description: The Nice Name of the plan
+          type: string
+        max_storage_mb:
+          description: The total allocated storage this plan allows
+          type: integer
+        monthly_price:
+          description: The monthly price for this plan
+          type: integer
+      title: registry-plan
+      type: object
+      x-tags:
+      - registry-plan
+      x-examples: {}
+    registry_kubernetes_docker_credentials_data:
+      description: ''
+      properties:
+        .dockerconfigjson:
+          description: Contains the base64 encoded Docker Credentials Config JSON
+          type: string
+      type: object
+    list_registry_plans_200_response:
+      example:
+        plans:
+          premium:
+            monthly_price: 6
+            vanity_name: vanity_name
+            max_storage_mb: 0
+          start_up:
+            monthly_price: 6
+            vanity_name: vanity_name
+            max_storage_mb: 0
+          business:
+            monthly_price: 6
+            vanity_name: vanity_name
+            max_storage_mb: 0
+          enterprise:
+            monthly_price: 6
+            vanity_name: vanity_name
+            max_storage_mb: 0
+      properties:
+        plans:
+          $ref: '#/components/schemas/list_registry_plans_200_response_plans'
+      type: object
+    list_registry_regions_200_response:
+      example:
+        regions:
+        - urn: urn
+          added_at: added_at
+          public: true
+          updated_at: updated_at
+          name: name
+          base_url: base_url
+          data_center: '{}'
+          id: 6
+        - urn: urn
+          added_at: added_at
+          public: true
+          updated_at: updated_at
+          name: name
+          base_url: base_url
+          data_center: '{}'
+          id: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        regions:
+          items:
+            $ref: '#/components/schemas/registry-region'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    registry_metadata_subscription_billing:
+      description: Billing information
+      example:
+        monthly_price: ''
+        pending_charges: ''
+      properties:
+        monthly_price:
+          description: Monthly Price
+          type: float
+        pending_charges:
+          description: The current charges for this subscription
+          type: float
+      type: object
+    update_registry_request:
+      properties:
+        public:
+          $ref: '#/components/schemas/registry/properties/public'
+        plan:
+          description: The key of the plan you'd like to upgrade to which dictates how much storage you're allocated and the monthly cost. Can get list of plans from /plan/list endpoint i.e. business
+          type: string
+      type: object
+    registry-storage:
+      description: Container Registry Storage Information
+      example:
+        updated_at: updated_at
+        mb: ''
+        bytes: ''
+        gb: ''
+        tb: ''
+      properties:
+        bytes:
+          description: Storage in Bytes
+          type: float
+        mb:
+          description: Storage in Megabytes
+          type: float
+        gb:
+          description: Storage in Gigabytes
+          type: float
+        tb:
+          description: Storage in Terabytes
+          type: float
+        updated_at:
+          description: The date at which the storage information was last updated
+          type: string
+      title: registry-storage
+      type: object
+      x-tags:
+      - registry-storage
+      - registries-storage
+      x-examples: {}
+    list_registries_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        registries:
+        - urn: urn
+          metadata:
+            subscription:
+              billing:
+                monthly_price: ''
+                pending_charges: ''
+            region:
+              urn: urn
+              added_at: added_at
+              public: true
+              updated_at: updated_at
+              name: name
+              base_url: base_url
+              data_center: '{}'
+              id: 6
+          public: true
+          date_created: date_created
+          name: name
+          id: id
+          storage:
+            allowed:
+              updated_at: updated_at
+              mb: ''
+              bytes: ''
+              gb: ''
+              tb: ''
+            used:
+              updated_at: updated_at
+              mb: ''
+              bytes: ''
+              gb: ''
+              tb: ''
+          root_user:
+            added_at: added_at
+            password: password
+            updated_at: updated_at
+            root: true
+            id: 0
+            username: username
+        - urn: urn
+          metadata:
+            subscription:
+              billing:
+                monthly_price: ''
+                pending_charges: ''
+            region:
+              urn: urn
+              added_at: added_at
+              public: true
+              updated_at: updated_at
+              name: name
+              base_url: base_url
+              data_center: '{}'
+              id: 6
+          public: true
+          date_created: date_created
+          name: name
+          id: id
+          storage:
+            allowed:
+              updated_at: updated_at
+              mb: ''
+              bytes: ''
+              gb: ''
+              tb: ''
+            used:
+              updated_at: updated_at
+              mb: ''
+              bytes: ''
+              gb: ''
+              tb: ''
+          root_user:
+            added_at: added_at
+            password: password
+            updated_at: updated_at
+            root: true
+            id: 0
+            username: username
+      properties:
+        registries:
+          items:
+            $ref: '#/components/schemas/registry'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    meta:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    update_repository_request:
+      properties:
+        description:
+          $ref: '#/components/schemas/registry-repository/properties/description'
+      type: object
+    registry_kubernetes_docker_credentials_metadata:
+      description: ''
+      properties:
+        name:
+          description: Specifies that these are Vultr Container Registry Credentials
+          type: string
+      type: object
+    registry-region:
+      description: Container Registry Region Entity
+      example:
+        urn: urn
+        added_at: added_at
+        public: true
+        updated_at: updated_at
+        name: name
+        base_url: base_url
+        data_center: '{}'
+        id: 6
+      properties:
+        id:
+          description: The Numeric ID of this region.
+          type: integer
+        name:
+          description: The unique name of this region, this is what you will use to specify a region when creating your subscription
+          type: string
+        urn:
+          description: The base URN (the URL without the scheme [i.e. http:// or https://]) of this region
+          type: string
+        base_url:
+          description: The base URL of this region
+          type: string
+        public:
+          description: If true, this is a publically accessible region allowing any customer to create new subscriptions on this region. If false, this region is not generally available yet
+          type: boolean
+        added_at:
+          description: The date this Region was added
+          type: string
+        updated_at:
+          description: The date this Region was last updated
+          type: string
+        data_center:
+          description: Information on the datacenter this region resides in
+          type: object
+      title: registry-region
+      type: object
+      x-tags:
+      - registry-region
+      x-examples: {}
+    registry-docker-credentials:
+      description: Container Registry Docker Credentials Entity
+      example:
+        auths:
+          '{registry-region-name}.vultrcr.com':
+            auth: auth
+      properties:
+        auths:
+          $ref: '#/components/schemas/registry_docker_credentials_auths'
+      title: registry-docker-credentials
+      type: object
+      x-tags:
+      - registry-docker-credentials
+      x-examples: {}
+    registry_docker_credentials_auths:
+      description: Contains a single object with the key being the URN of the region
+      example:
+        '{registry-region-name}.vultrcr.com':
+          auth: auth
+      properties:
+        '{registry-region-name}.vultrcr.com':
+          $ref: '#/components/schemas/registry_docker_credentials_auths__registry_region_name__vultrcr_com'
+      type: object
+    registry_storage:
+      description: The allowed and used storage for this registry subscription.
+      example:
+        allowed:
+          updated_at: updated_at
+          mb: ''
+          bytes: ''
+          gb: ''
+          tb: ''
+        used:
+          updated_at: updated_at
+          mb: ''
+          bytes: ''
+          gb: ''
+          tb: ''
+      properties:
+        used:
+          $ref: '#/components/schemas/registry-storage'
+        allowed:
+          $ref: '#/components/schemas/registry-storage'
+      type: object
+  securitySchemes:
+    API_Key:
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+      in: header
+      scheme: bearer
+      type: http
+x-refined-from:
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

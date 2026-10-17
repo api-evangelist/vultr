@@ -1,0 +1,240 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Role-User Mappings API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Role-User Mappings across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Role-User Mappings
+  description: Manage role assignments to users
+paths:
+  /v2/roles/{id}/users:
+    get:
+      tags:
+      - IAM Role-User Mappings
+      summary: List Users with Role
+      operationId: listUsersWithRole
+      description: List all users that have this role assigned
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of users with this role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleAssignment'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/roles/{id}/users/{user-id}:
+    post:
+      tags:
+      - IAM Role-User Mappings
+      summary: Attach Role to User
+      operationId: attachRoleToUser
+      description: Assign this role to a user
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: user-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Role attached to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+      - IAM Role-User Mappings
+      summary: Detach Role from User
+      operationId: detachRoleFromUser
+      description: Remove this role from a user
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: user-id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Role detached from user
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    RoleAssignment:
+      type: object
+      required:
+      - user_id
+      - role_id
+      - role_name
+      - role_type
+      - date_assigned
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user assigned to the role
+        role_id:
+          type: string
+          format: uuid
+          description: UUID of the assigned role
+        role_name:
+          type: string
+          description: Name of the assigned role
+        role_description:
+          type: string
+          description: Description of the assigned role
+        role_type:
+          type: string
+          enum:
+          - assignable
+          - assumed
+          description: Type of role assignment
+        date_assigned:
+          type: string
+          format: date-time
+          description: When the role was assigned
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

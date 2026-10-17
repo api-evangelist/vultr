@@ -1,0 +1,700 @@
+openapi: 3.2.0
+info:
+  title: Vultr Iso API
+  version: '2.0'
+  description: 'Operations tagged iso across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: iso
+  x-displayName: ISO
+  description: Upload and boot instances from your ISO, or choose one from our public ISO library. See our ISO documentation.
+paths:
+  /iso:
+    get:
+      summary: List ISOs
+      tags:
+      - iso
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/iso\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/iso'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    isos:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      filename: my-iso.iso
+                      size: 120586240
+                      md5sum: 77ba289bdc966ec996278a5a740d96d8
+                      sha512sum: 2b31b6fcab34d6ea9a6b293601c39b90cb044e5679fcc5
+                      status: complete
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-isos
+      description: Get the ISOs in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create ISO
+      tags:
+      - iso
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/iso\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"url\" : \"https://example.com/my-iso.iso\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iso:
+                    $ref: '#/components/schemas/iso'
+              examples:
+                response:
+                  value:
+                    iso:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      filename: my-iso.iso
+                      status: pending
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-iso
+      description: Create a new ISO in your account from `url`.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: 'Public URL location of the ISO image to download. Example: https://example.com/my-iso.iso'
+              required:
+              - url
+            examples:
+              request:
+                value:
+                  url: http://example.com/my-iso.iso
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /iso/{iso-id}:
+    parameters:
+    - schema:
+        type: string
+      name: iso-id
+      in: path
+      required: true
+      description: The [ISO id](#operation/list-isos).
+    get:
+      summary: Get ISO
+      tags:
+      - iso
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/iso/{iso-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iso:
+                    $ref: '#/components/schemas/iso'
+              examples:
+                response:
+                  value:
+                    iso:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      filename: my-iso.iso
+                      size: 120586240
+                      md5sum: 77ba289bdc966ec996278a5a740d96d8
+                      sha512sum: 2b31b6fcab34d6ea9a6b293601c39b90cb044e5679fcc5
+                      status: complete
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: iso-get
+      description: Get information for an ISO.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete ISO
+      tags:
+      - iso
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/iso/{iso-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-iso
+      description: Delete an ISO.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /iso-public:
+    get:
+      summary: List Public ISOs
+      tags:
+      - iso
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/iso-public\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  public_isos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/iso-public'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    public_isos:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b604
+                      name: CentOS 7
+                      description: 7 x86_64 Minimal
+                      md5sum: 7f4df50f42ee1b52b193e79855a3aa19
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: list-public-isos
+      description: List all Vultr Public ISOs.
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    iso-public:
+      title: iso-public
+      type: object
+      x-tags:
+      - iso
+      description: Public ISO  information.
+      x-examples:
+        public iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b604
+          name: CentOS 7
+          description: 7 x86_64 Minimal
+          md5sum: 7f4df50f42ee1b52b193e79855a3aa19
+      properties:
+        id:
+          description: A unique ID for the Vultr Public ISO.
+          type: string
+        name:
+          type: string
+          description: The short name of the Public ISO.
+        description:
+          type: string
+          description: The long description of the Public ISO.
+        md5sum:
+          type: string
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    iso:
+      title: iso
+      type: object
+      x-tags:
+      - iso
+      description: ISO information.
+      x-examples:
+        iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          filename: my-iso.iso
+          size: 9342976
+          md5sum: ec0669895a250f803e1709d0402fc411
+          sha512sum: 1741f890bce04613f60b4f2b16fb8070c31640c53d4dbb4271b22610150928743eda1207f031b0b5bdd240ef1a6ed21fd5e6a2d192b9c87eff60b6d9698b8260
+          status: complete
+      properties:
+        id:
+          type: string
+          description: A unique ID for the ISO.
+        date_created:
+          type: string
+          description: Date the ISO was created.
+        filename:
+          type: string
+          description: The ISO filename.
+        size:
+          type: integer
+          description: The ISO size in KB.
+        md5sum:
+          type: string
+          description: The calculated md5sum of the ISO.
+        sha512sum:
+          type: string
+          description: The calculated sha512sum of the ISO.
+        status:
+          type: string
+          description: 'The current status of the ISO.
+
+
+            * complete
+
+            * pending'
+    create_iso_201_response:
+      example:
+        iso:
+          sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+      properties:
+        iso:
+          $ref: '#/components/schemas/iso_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    iso_2:
+      description: ISO information.
+      example:
+        sha512sum: sha512sum
+        filename: filename
+        size: 0
+        date_created: date_created
+        md5sum: md5sum
+        id: id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the ISO.
+          type: string
+        date_created:
+          description: Date the ISO was created.
+          type: string
+        filename:
+          description: The ISO filename.
+          type: string
+        size:
+          description: The ISO size in KB.
+          type: integer
+        md5sum:
+          description: The calculated md5sum of the ISO.
+          type: string
+        sha512sum:
+          description: The calculated sha512sum of the ISO.
+          type: string
+        status:
+          description: 'The current status of the ISO.
+
+
+            * complete
+
+            * pending'
+          type: string
+      title: iso
+      type: object
+      x-tags:
+      - iso
+      x-examples:
+        iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          filename: my-iso.iso
+          size: 9342976
+          md5sum: ec0669895a250f803e1709d0402fc411
+          sha512sum: 1741f890bce04613f60b4f2b16fb8070c31640c53d4dbb4271b22610150928743eda1207f031b0b5bdd240ef1a6ed21fd5e6a2d192b9c87eff60b6d9698b8260
+          status: complete
+    list_isos_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        isos:
+        - sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+        - sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+      properties:
+        isos:
+          items:
+            $ref: '#/components/schemas/iso_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    iso-public_2:
+      description: Public ISO  information.
+      example:
+        md5sum: md5sum
+        name: name
+        description: description
+        id: id
+      properties:
+        id:
+          description: A unique ID for the Vultr Public ISO.
+          type: string
+        name:
+          description: The short name of the Public ISO.
+          type: string
+        description:
+          description: The long description of the Public ISO.
+          type: string
+        md5sum:
+          type: string
+      title: iso-public
+      type: object
+      x-tags:
+      - iso
+      x-examples:
+        public iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b604
+          name: CentOS 7
+          description: 7 x86_64 Minimal
+          md5sum: 7f4df50f42ee1b52b193e79855a3aa19
+    create_iso_request:
+      properties:
+        url:
+          description: 'Public URL location of the ISO image to download. Example: https://example.com/my-iso.iso'
+          type: string
+      required:
+      - url
+      type: object
+    list_public_isos_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        public_isos:
+        - md5sum: md5sum
+          name: name
+          description: description
+          id: id
+        - md5sum: md5sum
+          name: name
+          description: description
+          id: id
+      properties:
+        public_isos:
+          items:
+            $ref: '#/components/schemas/iso-public_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    create_iso_201_response_2:
+      example:
+        iso:
+          sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+      properties:
+        iso:
+          $ref: '#/components/schemas/iso_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    iso_3:
+      description: ISO information.
+      example:
+        sha512sum: sha512sum
+        filename: filename
+        size: 0
+        date_created: date_created
+        md5sum: md5sum
+        id: id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the ISO.
+          type: string
+        date_created:
+          description: Date the ISO was created.
+          type: string
+        filename:
+          description: The ISO filename.
+          type: string
+        size:
+          description: The ISO size in KB.
+          type: integer
+        md5sum:
+          description: The calculated md5sum of the ISO.
+          type: string
+        sha512sum:
+          description: The calculated sha512sum of the ISO.
+          type: string
+        status:
+          description: 'The current status of the ISO.
+
+
+            * complete
+
+            * pending'
+          type: string
+      title: iso
+      type: object
+      x-tags:
+      - iso
+      x-examples:
+        iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          filename: my-iso.iso
+          size: 9342976
+          md5sum: ec0669895a250f803e1709d0402fc411
+          sha512sum: 1741f890bce04613f60b4f2b16fb8070c31640c53d4dbb4271b22610150928743eda1207f031b0b5bdd240ef1a6ed21fd5e6a2d192b9c87eff60b6d9698b8260
+          status: complete
+    list_isos_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        isos:
+        - sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+        - sha512sum: sha512sum
+          filename: filename
+          size: 0
+          date_created: date_created
+          md5sum: md5sum
+          id: id
+          status: status
+      properties:
+        isos:
+          items:
+            $ref: '#/components/schemas/iso_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    iso-public_3:
+      description: Public ISO  information.
+      example:
+        md5sum: md5sum
+        name: name
+        description: description
+        id: id
+      properties:
+        id:
+          description: A unique ID for the Vultr Public ISO.
+          type: string
+        name:
+          description: The short name of the Public ISO.
+          type: string
+        description:
+          description: The long description of the Public ISO.
+          type: string
+        md5sum:
+          type: string
+      title: iso-public
+      type: object
+      x-tags:
+      - iso
+      x-examples:
+        public iso:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b604
+          name: CentOS 7
+          description: 7 x86_64 Minimal
+          md5sum: 7f4df50f42ee1b52b193e79855a3aa19
+    list_public_isos_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        public_isos:
+        - md5sum: md5sum
+          name: name
+          description: description
+          id: id
+        - md5sum: md5sum
+          name: name
+          description: description
+          id: id
+      properties:
+        public_isos:
+          items:
+            $ref: '#/components/schemas/iso-public_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

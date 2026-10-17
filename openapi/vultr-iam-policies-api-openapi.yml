@@ -1,0 +1,338 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Policies API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Policies across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Policies
+  description: Endpoints for managing IAM policies within an organization
+paths:
+  /v2/policies:
+    post:
+      tags:
+      - IAM Policies
+      summary: Create Policy
+      operationId: createPolicy
+      description: Create a new IAM policy within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - policy_document
+              properties:
+                name:
+                  type: string
+                  description: Name of the policy
+                  example: ReadOnlyPolicy
+                description:
+                  type: string
+                  description: Description of the policy
+                  example: Policy that allows read-only access to resources
+                policy_document:
+                  type: object
+                  description: IAM policy document in JSON format
+                  example:
+                    Version: '2012-10-17'
+                    Statement:
+                    - Effect: Allow
+                      Action:
+                      - compute.instance.Create
+                      - compute.instance.Read
+                      - compute.instance.Update
+                      - compute.instance.Delete
+                      - compute.backup.List
+                      - compute.backup.Read
+                      Resource: '*'
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags:
+      - IAM Policies
+      summary: List Policies
+      operationId: listPolicies
+      description: List all IAM policies within the organization
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Policy'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/policies/{id}:
+    get:
+      tags:
+      - IAM Policies
+      summary: Get Policy
+      operationId: getPolicy
+      description: Retrieve a specific IAM policy by ID
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    $ref: '#/components/schemas/Policy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - IAM Policies
+      summary: Update Policy
+      operationId: updatePolicy
+      description: Update an IAM policy
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the policy
+                description:
+                  type: string
+                  description: Description of the policy
+                policy_document:
+                  type: object
+                  description: IAM policy document in JSON format
+                  example:
+                    Version: '2012-10-17'
+                    Statement:
+                    - Effect: Allow
+                      Action:
+                      - kubernetes.cluster.Create
+                      - kubernetes.cluster.Read
+                      - kubernetes.cluster.Update
+                      - kubernetes.cluster.Delete
+                      Resource: '*'
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - IAM Policies
+      summary: Delete Policy
+      operationId: deletePolicy
+      description: Soft delete an IAM policy
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Policy deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/policies/{id}/restore:
+    patch:
+      tags:
+      - IAM Policies
+      summary: Restore Policy
+      operationId: restorePolicy
+      description: Restore a previously soft-deleted IAM policy
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Policy restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        version:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        is_system_policy:
+          type: boolean
+          description: Whether this is a system-managed policy
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

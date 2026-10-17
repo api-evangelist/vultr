@@ -1,0 +1,764 @@
+openapi: 3.2.0
+info:
+  title: Vultr Reserved Ip API
+  version: '2.0'
+  description: 'Operations tagged reserved-ip across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: reserved-ip
+  x-displayName: Reserved IPs
+  description: IP addresses can be reserved and moved between instances. Reserved IPs can also be used as floating addresses for high-availability.
+paths:
+  /reserved-ips/{reserved-ip}:
+    parameters:
+    - schema:
+        type: string
+      name: reserved-ip
+      in: path
+      required: true
+      description: The [Reserved IP id](#operation/list-reserved-ips).
+    get:
+      summary: Get Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/{reserved-ip}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reserved_ip:
+                    $ref: '#/components/schemas/reserved-ip'
+              examples:
+                example-1:
+                  value:
+                    reserved_ip:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      ip_type: v4
+                      subnet: 192.0.2.123
+                      subnet_size: 32
+                      label: Example Reserved IPv4
+                      instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-reserved-ip
+      description: Get information about a Reserved IP.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Reserved IP
+      operationId: delete-reserved-ip
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: Delete a Reserved IP.
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/{reserved-ip}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      security:
+      - API Key: []
+    patch:
+      description: Update information on a Reserved IP.
+      operationId: patch-reserved-ips-reserved-ip
+      parameters:
+      - description: The [Reserved IP id](#operation/list-reserved-ips).
+        explode: false
+        in: path
+        name: reserved-ip
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  label: Example Label
+            schema:
+              $ref: '#/components/schemas/patch_reserved_ips_reserved_ip_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get_reserved_ip_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Update Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/{reserved-ip}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"Example Label\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /reserved-ips:
+    parameters: []
+    get:
+      summary: List Reserved IPs
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reserved_ips:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/reserved-ip'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    reserved_ips:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      ip_type: v4
+                      subnet: 192.0.2.123
+                      subnet_size: 32
+                      label: Example Reserved IPv4
+                      instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      ip_type: v6
+                      subnet: '2001:0db8:5:5157::'
+                      subnet_size: 64
+                      label: Example Reserved IPv6
+                      instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                    meta:
+                      total: 2
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-reserved-ips
+      description: List all Reserved IPs in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"ip_type\" : \"v4\",\n    \"label\" : \"Example Reserved IPv4\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reserved_ip:
+                    $ref: '#/components/schemas/reserved-ip'
+              examples:
+                response:
+                  value:
+                    reserved_ip:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      ip_type: v4
+                      subnet: 192.0.2.123
+                      subnet_size: 32
+                      label: Example Reserved IPv4
+                      instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-reserved-ip
+      description: Create a new Reserved IP. The `region` and `ip_type` attributes are required.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                  description: The [Region id](#operation/list-regions) where the Reserved IP will be created.
+                ip_type:
+                  type: string
+                  description: 'The type of IP address.
+
+
+                    * v4
+
+                    * v6'
+                label:
+                  type: string
+                  description: The user-supplied label.
+              required:
+              - region
+              - ip_type
+            examples:
+              request:
+                value:
+                  region: ewr
+                  ip_type: v4
+                  label: Example Reserved IPv4
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /reserved-ips/{reserved-ip}/attach:
+    parameters:
+    - schema:
+        type: string
+      name: reserved-ip
+      in: path
+      required: true
+      description: The [Reserved IP id](#operation/list-reserved-ips)
+    post:
+      summary: Attach Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/{reserved-ip}/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_id\" : \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: attach-reserved-ip
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_id:
+                  type: string
+                  description: Attach the Reserved IP to a [Compute Instance id](#operation/list-instances) or a [Bare Metal Instance id](#operation/list-baremetals).
+              required:
+              - instance_id
+            examples:
+              request:
+                value:
+                  instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+      description: Attach a Reserved IP to an compute instance or a baremetal instance - `instance_id`.
+    servers:
+    - url: https://api.vultr.com/v2
+  /reserved-ips/{reserved-ip}/detach:
+    parameters:
+    - schema:
+        type: string
+      name: reserved-ip
+      in: path
+      required: true
+      description: The [Reserved IP id](#operation/list-reserved-ips)
+    post:
+      summary: Detach Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/{reserved-ip}/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: detach-reserved-ip
+      description: Detach a Reserved IP.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /reserved-ips/convert:
+    parameters: []
+    post:
+      summary: Convert Instance IP to Reserved IP
+      tags:
+      - reserved-ip
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/reserved-ips/convert\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ip_address\": \"192.0.2.123\",\n    \"label\": \"Example Reserved IPv4\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reserved_ip:
+                    $ref: '#/components/schemas/reserved-ip'
+              examples:
+                response:
+                  value:
+                    reserved_ip:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      ip_type: v4
+                      subnet: 192.0.2.123
+                      subnet_size: 64
+                      label: Example Reserved IPv4
+                      instance_id: 3f26dfe9-6a18-4f3d-a543-0cbca7a3e496
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: convert-reserved-ip
+      description: Convert the `ip_address` of an existing instance into a Reserved IP.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip_address:
+                  type: string
+                  description: The IP address to convert.
+                label:
+                  type: string
+                  description: A user-supplied label for this IP address.
+              required:
+              - ip_address
+            examples:
+              request:
+                value:
+                  ip_address: 192.0.2.123
+                  label: Example Reserved IPv4
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    reserved-ip:
+      title: reserved-ip
+      type: object
+      x-examples:
+        reserved ip:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          region: ewr
+          ip_type: v6
+          subnet: '2001:db8:9999::'
+          subnet_size: 64
+          label: Example Reserved IPv6
+          instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+      description: Reserved IP information.
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Reserved IP.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the Reserved IP is located.
+        ip_type:
+          type: string
+          description: 'The type of IP address.
+
+
+            * v4
+
+            * v6'
+        subnet:
+          type: string
+          description: The IP subnet.
+        subnet_size:
+          type: integer
+          description: The IP network size in bits.
+        label:
+          type: string
+          description: The user-supplied label.
+        instance_id:
+          type: string
+          description: The [Instance id](#operation/list-instances) attached to this Reserved IP.
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    list_reserved_ips_200_response:
+      example:
+        reserved_ips:
+        - subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+        - subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        reserved_ips:
+          items:
+            $ref: '#/components/schemas/reserved-ip_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    patch_reserved_ips_reserved_ip_request:
+      properties:
+        label:
+          type: string
+      required:
+      - label
+      type: object
+    convert_reserved_ip_request:
+      properties:
+        ip_address:
+          description: The IP address to convert.
+          type: string
+        label:
+          description: A user-supplied label for this IP address.
+          type: string
+      required:
+      - ip_address
+      type: object
+    create_reserved_ip_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) where the Reserved IP will be created.
+          type: string
+        ip_type:
+          description: 'The type of IP address.
+
+
+            * v4
+
+            * v6'
+          type: string
+        label:
+          description: The user-supplied label.
+          type: string
+      required:
+      - ip_type
+      - region
+      type: object
+    attach_reserved_ip_request:
+      properties:
+        instance_id:
+          description: Attach the Reserved IP to a [Compute Instance id](#operation/list-instances) or a [Bare Metal Instance id](#operation/list-baremetals).
+          type: string
+      required:
+      - instance_id
+      type: object
+    reserved-ip_2:
+      description: Reserved IP information.
+      example:
+        subnet: subnet
+        instance_id: instance_id
+        id: id
+        subnet_size: 0
+        label: label
+        region: region
+        ip_type: ip_type
+      properties:
+        id:
+          description: A unique ID for the Reserved IP.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Reserved IP is located.
+          type: string
+        ip_type:
+          description: 'The type of IP address.
+
+
+            * v4
+
+            * v6'
+          type: string
+        subnet:
+          description: The IP subnet.
+          type: string
+        subnet_size:
+          description: The IP network size in bits.
+          type: integer
+        label:
+          description: The user-supplied label.
+          type: string
+        instance_id:
+          description: The [Instance id](#operation/list-instances) attached to this Reserved IP.
+          type: string
+      title: reserved-ip
+      type: object
+      x-examples:
+        reserved ip:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          region: ewr
+          ip_type: v6
+          subnet: '2001:db8:9999::'
+          subnet_size: 64
+          label: Example Reserved IPv6
+          instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    get_reserved_ip_200_response:
+      example:
+        reserved_ip:
+          subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+      properties:
+        reserved_ip:
+          $ref: '#/components/schemas/reserved-ip_2'
+      type: object
+    list_reserved_ips_200_response_2:
+      example:
+        reserved_ips:
+        - subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+        - subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        reserved_ips:
+          items:
+            $ref: '#/components/schemas/reserved-ip_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    reserved-ip_3:
+      description: Reserved IP information.
+      example:
+        subnet: subnet
+        instance_id: instance_id
+        id: id
+        subnet_size: 0
+        label: label
+        region: region
+        ip_type: ip_type
+      properties:
+        id:
+          description: A unique ID for the Reserved IP.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Reserved IP is located.
+          type: string
+        ip_type:
+          description: 'The type of IP address.
+
+
+            * v4
+
+            * v6'
+          type: string
+        subnet:
+          description: The IP subnet.
+          type: string
+        subnet_size:
+          description: The IP network size in bits.
+          type: integer
+        label:
+          description: The user-supplied label.
+          type: string
+        instance_id:
+          description: The [Instance id](#operation/list-instances) attached to this Reserved IP.
+          type: string
+      title: reserved-ip
+      type: object
+      x-examples:
+        reserved ip:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          region: ewr
+          ip_type: v6
+          subnet: '2001:db8:9999::'
+          subnet_size: 64
+          label: Example Reserved IPv6
+          instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+    get_reserved_ip_200_response_2:
+      example:
+        reserved_ip:
+          subnet: subnet
+          instance_id: instance_id
+          id: id
+          subnet_size: 0
+          label: label
+          region: region
+          ip_type: ip_type
+      properties:
+        reserved_ip:
+          $ref: '#/components/schemas/reserved-ip_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

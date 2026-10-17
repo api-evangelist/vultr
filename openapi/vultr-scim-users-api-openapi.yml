@@ -1,0 +1,257 @@
+openapi: 3.2.0
+info:
+  title: Vultr SCIM Users API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged SCIM Users across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: (Scim) Users
+  description: SCIM 2.0 compliant endpoints for managing users
+paths:
+  /scim/v2/Users:
+    post:
+      tags:
+      - (Scim) Users
+      summary: Create SCIM User
+      operationId: createSCIMUser
+      description: Create a new user via SCIM 2.0 protocol
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/SCIMUser'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMUser'
+        '400':
+          $ref: '#/components/responses/SCIMError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/SCIMError'
+    get:
+      tags:
+      - (Scim) Users
+      summary: List SCIM Users
+      operationId: listSCIMUsers
+      description: List users via SCIM 2.0 protocol with filtering
+      parameters:
+      - name: filter
+        in: query
+        description: SCIM filter expression
+        schema:
+          type: string
+          example: userName eq "john.doe@example.com"
+      - name: startIndex
+        in: query
+        description: Starting index for pagination (1-indexed)
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: count
+        in: query
+        description: Number of results per page
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /scim/v2/Users/{id}:
+    get:
+      tags:
+      - (Scim) Users
+      summary: Get SCIM User
+      operationId: getSCIMUser
+      description: Retrieve a specific user via SCIM 2.0 protocol
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/SCIMUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/SCIMError'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    SCIMError:
+      description: SCIM Error Response
+      content:
+        application/scim+json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                items:
+                  type: string
+                example:
+                - urn:ietf:params:scim:api:messages:2.0:Error
+              status:
+                type: string
+                example: '400'
+              scimType:
+                type: string
+                example: invalidValue
+              detail:
+                type: string
+                example: Invalid filter syntax
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    SCIMListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            type: object
+    SCIMUser:
+      type: object
+      required:
+      - schemas
+      - userName
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:schemas:core:2.0:User
+        id:
+          type: string
+        externalId:
+          type: string
+        userName:
+          type: string
+        name:
+          type: object
+          properties:
+            formatted:
+              type: string
+            familyName:
+              type: string
+            givenName:
+              type: string
+        displayName:
+          type: string
+        emails:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              type:
+                type: string
+              primary:
+                type: boolean
+        phoneNumbers:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              type:
+                type: string
+        active:
+          type: boolean
+        groups:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              $ref:
+                type: string
+              display:
+                type: string
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            created:
+              type: string
+            lastModified:
+              type: string
+            location:
+              type: string
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

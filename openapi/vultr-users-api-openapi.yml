@@ -1,0 +1,865 @@
+openapi: 3.2.0
+info:
+  title: Vultr Users API
+  version: '2.0'
+  description: 'Operations tagged users across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Users
+  x-displayName: Users
+  description: Vultr supports multiple users in each account, and each user has individual access permissions. Users have unique API keys, which respect the permission for that user.
+paths:
+  /users/{user-id}:
+    parameters:
+    - schema:
+        type: string
+      name: user-id
+      in: path
+      required: true
+      description: The [User id](#operation/list-users).
+    get:
+      summary: Get User
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/users/{user-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+              examples:
+                user:
+                  value:
+                    user:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      email: user@example.com
+                      api_enabled: true
+                      acls:
+                      - manage_users
+                      - subscriptions_view
+                      - subscriptions
+                      - provisioning
+                      - billing
+                      - support
+                      - abuse
+                      - dns
+                      - upgrade
+                      - objstore
+                      - loadbalancer
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-user
+      description: Get information about a User.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete User
+      operationId: delete-user
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/users/{user-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Delete a User.
+      security:
+      - API Key: []
+      tags:
+      - Users
+    patch:
+      summary: Update User
+      operationId: update-user
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/users/{user-id}\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"email\" : \"user@example.com\",\n    \"name\" : \"Example User\",\n    \"password\" : \"example-password\",\n    \"api_enabled\" : true,\n    \"acls\" : [\n      \"manage_users\",\n      \"subscriptions_view\",\n      \"subscriptions\",\n      \"provisioning\",\n      \"billing\",\n      \"support\",\n      \"abuse\",\n      \"dns\",\n      \"upgrade\",\n      \"objstore\",\n      \"loadbalancer\"\n    ]\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: The User's email address.
+                name:
+                  type: string
+                  description: The User's name.
+                password:
+                  type: string
+                  description: The User's password.
+                api_enabled:
+                  type: boolean
+                  description: 'API access is permitted for this User.
+
+
+                    * true (default)
+
+                    * false'
+                acls:
+                  type: array
+                  description: 'An array of permission granted. Valid values:
+
+
+                    * abuse
+
+                    * alerts
+
+                    * billing
+
+                    * dns
+
+                    * firewall
+
+                    * loadbalancer
+
+                    * manage\_users
+
+                    * objstore
+
+                    * provisioning
+
+                    * subscriptions
+
+                    * subscriptions\_view
+
+                    * support
+
+                    * upgrade'
+                  items:
+                    type: string
+            examples:
+              request:
+                value:
+                  email: user@example.com
+                  name: Example User
+                  password: example-password
+                  api_enabled: true
+                  acls:
+                  - manage_users
+                  - subscriptions_view
+                  - subscriptions
+                  - provisioning
+                  - billing
+                  - support
+                  - abuse
+                  - dns
+                  - upgrade
+                  - objstore
+                  - loadbalancer
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      description: Update information for a User. All attributes are optional. If not set, the attributes will retain their original values.
+      security:
+      - API Key: []
+      tags:
+      - Users
+    servers:
+    - url: https://api.vultr.com/v2
+  /users:
+    get:
+      summary: Get Users
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/users\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                users:
+                  value:
+                    users:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      email: user@example.com
+                      api_enabled: true
+                      acls:
+                      - manage_users
+                      - subscriptions_view
+                      - subscriptions
+                      - provisioning
+                      - billing
+                      - support
+                      - abuse
+                      - dns
+                      - upgrade
+                      - objstore
+                      - loadbalancer
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-users
+      description: Get a list of all Users in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: number
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create User
+      operationId: create-user
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/users\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"email\" : \"user@example.com\",\n    \"name\" : \"Example User\",\n    \"password\" : \"example-password\",\n    \"api_enabled\" : true,\n    \"acls\" : [\n      \"manage_users\",\n      \"subscriptions_view\",\n      \"subscriptions\",\n      \"provisioning\",\n      \"billing\",\n      \"support\",\n      \"abuse\",\n      \"dns\",\n      \"upgrade\",\n      \"objstore\",\n      \"loadbalancer\"\n    ]\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+              examples:
+                user:
+                  value:
+                    user:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      name: Example User
+                      email: user@example.com
+                      api_enabled: true
+                      acls:
+                      - manage_users
+                      - subscriptions_view
+                      - subscriptions
+                      - provisioning
+                      - billing
+                      - support
+                      - abuse
+                      - dns
+                      - upgrade
+                      - objstore
+                      - loadbalancer
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      description: Create a new User. The `email`, `name`, and `password` attributes are required.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: The User's email address.
+                name:
+                  type: string
+                  description: The User's name.
+                password:
+                  type: string
+                  description: The User's password.
+                api_enabled:
+                  type: boolean
+                  description: 'API access is permitted for this User.
+
+
+                    * true (default)
+
+                    * false'
+                acls:
+                  type: array
+                  description: 'An array of permissions granted.
+
+
+                    * abuse
+
+                    * alerts
+
+                    * billing
+
+                    * dns
+
+                    * firewall
+
+                    * loadbalancer
+
+                    * manage\_users
+
+                    * objstore
+
+                    * provisioning
+
+                    * subscriptions
+
+                    * subscriptions\_view
+
+                    * support
+
+                    * upgrade'
+                  items:
+                    type: string
+              required:
+              - email
+              - name
+              - password
+            examples:
+              request example:
+                value:
+                  name: Example User
+                  email: user@example.com
+                  password: sh#sedHA_FTdz6w+
+                  api_enabled: true
+                  acls:
+                  - manage_users
+                  - subscriptions_view
+                  - subscriptions
+                  - provisioning
+                  - billing
+                  - support
+                  - abuse
+                  - dns
+                  - upgrade
+                  - objstore
+                  - loadbalancer
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+      tags:
+      - Users
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    user:
+      title: user
+      type: object
+      x-tags:
+      - users
+      description: User information.
+      x-examples:
+        user:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          email: user@example.com
+          api_enabled: true
+          acls:
+          - manage_users
+          - subscriptions_view
+          - subscriptions
+          - provisioning
+          - billing
+          - support
+          - abuse
+          - dns
+          - upgrade
+          - objstore
+          - loadbalancer
+      properties:
+        user:
+          type: object
+          description: An array of Users.
+          properties:
+            id:
+              type: string
+              description: The User's id.
+            name:
+              type: string
+              description: The User's name.
+            api_enabled:
+              type: boolean
+              description: 'Permit API access for this User.
+
+
+                * true
+
+                * false'
+            email:
+              type: string
+              description: The User's email address.
+            password:
+              type: string
+              description: The User's password.
+            acls:
+              type: array
+              description: 'An array of permission granted.
+
+
+                * abuse
+
+                * alerts
+
+                * billing
+
+                * dns
+
+                * firewall
+
+                * loadbalancer
+
+                * manage\_users
+
+                * objstore
+
+                * provisioning
+
+                * subscriptions
+
+                * subscriptions\_view
+
+                * support
+
+                * upgrade'
+              items:
+                type: string
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_users_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        users:
+        - user:
+            password: password
+            acls:
+            - acls
+            - acls
+            api_enabled: true
+            name: name
+            id: id
+            email: email
+        - user:
+            password: password
+            acls:
+            - acls
+            - acls
+            api_enabled: true
+            name: name
+            id: id
+            email: email
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/user_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    user_user:
+      description: An array of Users.
+      example:
+        password: password
+        acls:
+        - acls
+        - acls
+        api_enabled: true
+        name: name
+        id: id
+        email: email
+      properties:
+        id:
+          description: The User's id.
+          type: string
+        name:
+          description: The User's name.
+          type: string
+        api_enabled:
+          description: 'Permit API access for this User.
+
+
+            * true
+
+            * false'
+          type: boolean
+        email:
+          description: The User's email address.
+          type: string
+        password:
+          description: The User's password.
+          type: string
+        acls:
+          description: 'An array of permission granted.
+
+
+            * abuse
+
+            * alerts
+
+            * billing
+
+            * dns
+
+            * firewall
+
+            * loadbalancer
+
+            * manage\_users
+
+            * objstore
+
+            * provisioning
+
+            * subscriptions
+
+            * subscriptions\_view
+
+            * support
+
+            * upgrade'
+          items:
+            type: string
+          type: array
+      type: object
+    update_user_request:
+      properties:
+        email:
+          description: The User's email address.
+          type: string
+        name:
+          description: The User's name.
+          type: string
+        password:
+          description: The User's password.
+          type: string
+        api_enabled:
+          description: 'API access is permitted for this User.
+
+
+            * true (default)
+
+            * false'
+          type: boolean
+        acls:
+          description: 'An array of permission granted. Valid values:
+
+
+            * abuse
+
+            * alerts
+
+            * billing
+
+            * dns
+
+            * firewall
+
+            * loadbalancer
+
+            * manage\_users
+
+            * objstore
+
+            * provisioning
+
+            * subscriptions
+
+            * subscriptions\_view
+
+            * support
+
+            * upgrade'
+          items:
+            type: string
+          type: array
+      type: object
+    create_user_request:
+      properties:
+        email:
+          description: The User's email address.
+          type: string
+        name:
+          description: The User's name.
+          type: string
+        password:
+          description: The User's password.
+          type: string
+        api_enabled:
+          description: 'API access is permitted for this User.
+
+
+            * true (default)
+
+            * false'
+          type: boolean
+        acls:
+          description: 'An array of permissions granted.
+
+
+            * abuse
+
+            * alerts
+
+            * billing
+
+            * dns
+
+            * firewall
+
+            * loadbalancer
+
+            * manage\_users
+
+            * objstore
+
+            * provisioning
+
+            * subscriptions
+
+            * subscriptions\_view
+
+            * support
+
+            * upgrade'
+          items:
+            type: string
+          type: array
+      required:
+      - email
+      - name
+      - password
+      type: object
+    user_2:
+      description: User information.
+      example:
+        user:
+          password: password
+          acls:
+          - acls
+          - acls
+          api_enabled: true
+          name: name
+          id: id
+          email: email
+      properties:
+        user:
+          $ref: '#/components/schemas/user_user'
+      title: user
+      type: object
+      x-tags:
+      - users
+      x-examples:
+        user:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          email: user@example.com
+          api_enabled: true
+          acls:
+          - manage_users
+          - subscriptions_view
+          - subscriptions
+          - provisioning
+          - billing
+          - support
+          - abuse
+          - dns
+          - upgrade
+          - objstore
+          - loadbalancer
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_users_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        users:
+        - user:
+            password: password
+            acls:
+            - acls
+            - acls
+            api_enabled: true
+            name: name
+            id: id
+            email: email
+        - user:
+            password: password
+            acls:
+            - acls
+            - acls
+            api_enabled: true
+            name: name
+            id: id
+            email: email
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/user_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    user_3:
+      description: User information.
+      example:
+        user:
+          password: password
+          acls:
+          - acls
+          - acls
+          api_enabled: true
+          name: name
+          id: id
+          email: email
+      properties:
+        user:
+          $ref: '#/components/schemas/user_user'
+      title: user
+      type: object
+      x-tags:
+      - users
+      x-examples:
+        user:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          email: user@example.com
+          api_enabled: true
+          acls:
+          - manage_users
+          - subscriptions_view
+          - subscriptions
+          - provisioning
+          - billing
+          - support
+          - abuse
+          - dns
+          - upgrade
+          - objstore
+          - loadbalancer
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

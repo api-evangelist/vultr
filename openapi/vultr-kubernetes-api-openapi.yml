@@ -1,0 +1,2399 @@
+openapi: 3.2.0
+info:
+  title: Vultr Kubernetes API
+  version: '2.0'
+  description: 'Operations tagged kubernetes across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Kubernetes
+  x-displayName: Kubernetes
+  description: Vultr Kubernetes Engine is a managed Kubernetes offering.
+paths:
+  /kubernetes/clusters:
+    post:
+      summary: Create Kubernetes Cluster
+      tags:
+      - Kubernetes
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vke_cluster:
+                    $ref: '#/components/schemas/vke-cluster'
+              examples:
+                example create response:
+                  value:
+                    vke_cluster:
+                      id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+                      label: vke
+                      date_created: '2021-07-07T22:57:01+00:00'
+                      cluster_subnet: 10.244.0.0/16
+                      service_subnet: 10.96.0.0/12
+                      ip: 0.0.0.0
+                      endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+                      version: v1.20.0+1
+                      region: lax
+                      status: pending
+                      node_pools:
+                      - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+                        date_created: '2021-07-07T22:57:01+00:00'
+                        date_updated: '2021-07-07T22:58:44+00:00'
+                        label: my-label
+                        tag: my-tag
+                        plan: vc2-1c-2gb
+                        status: pending
+                        node_quantity: 2
+                        nodes:
+                        - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+                          label: my-label-6ac60e6313dd1
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: pending
+                        - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+                          label: my-label-6ac60e6313ddc
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: pending
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-kubernetes-cluster
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: The label for your Kubernetes cluster.
+                region:
+                  type: string
+                  description: Region you want to deploy VKE in. EWR or LAX
+                version:
+                  type: string
+                  description: Version of Kubernetes you want to deploy.
+                node_pools:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      node_quantity:
+                        type: integer
+                        description: Number of instances to deploy in this nodepool. Minimum of 1 node required, but at least 3 is recommended.
+                      label:
+                        type: string
+                        description: Label for this nodepool. You cannot change the label after a nodepool is created. You cannot have duplicate node pool labels in the same cluster.
+                      plan:
+                        type: string
+                        description: 'Plan you want this nodepool to use. Note: minimum plan must be $10'
+                      tag:
+                        type: string
+                        description: Tag for node pool
+                    required:
+                    - node_quantity
+                    - label
+                    - plan
+              required:
+              - region
+              - version
+            examples:
+              example request:
+                value:
+                  label: vke
+                  region: lax
+                  version: v1.20.0+1
+                  node_pools:
+                  - node_quantity: 2
+                    label: my-label
+                    plan: vc2-1c-2gb
+                    tag: my-tag
+        description: Request Body
+      security:
+      - API Key: []
+    get:
+      summary: List all Kubernetes Clusters
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vke_clusters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/vke-cluster'
+              examples:
+                example response:
+                  value:
+                    vke_clusters:
+                    - id: c907e832-3080-48a6-a54d-7379e645c0b7
+                      label: my-vke
+                      date_created: '2021-07-02T12:12:43+00:00'
+                      cluster_subnet: 10.244.0.0/16
+                      service_subnet: 10.96.0.0/12
+                      ip: 8.9.30.155
+                      endpoint: c907e832-3080-48a6-a54d-7379e645c0b7.vultr-k8s.com
+                      version: v1.20.0+1
+                      region: ewr
+                      status: active
+                      node_pools:
+                      - id: 74de1914-63ea-4a78-9da5-b7220063c701
+                        date_created: '2021-07-02T12:12:44+00:00'
+                        date_updated: '2021-07-03T12:12:44+00:00'
+                        label: nodepool
+                        tag: my-tag
+                        plan: vc2-1c-2gb
+                        status: active
+                        node_quantity: 2
+                        nodes:
+                        - id: cafd4673-2a62-49c4-a045-44d05ecc0a7b
+                          label: nodepool-6a960df02bc1b
+                          date_created: '2021-07-02T12:12:44+00:00'
+                          status: active
+                        - id: 5fc5ae88-f73e-46b5-9fa1-ac5ed8dcd33c
+                          label: nodepool-6a960df02bc25
+                          date_created: '2021-07-02T12:12:44+00:00'
+                          status: active
+                    - id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+                      label: vke
+                      date_created: '2021-07-07T22:57:01+00:00'
+                      cluster_subnet: 10.244.0.0/16
+                      service_subnet: 10.96.0.0/12
+                      ip: 207.246.109.187
+                      endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+                      version: v1.20.0+1
+                      region: lax
+                      status: active
+                      node_pools:
+                      - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+                        date_created: '2021-07-07T22:57:01+00:00'
+                        date_updated: '2021-07-08T12:12:44+00:00'
+                        label: my-label
+                        tag: my-tag
+                        plan: vc2-1c-2gb
+                        status: active
+                        node_quantity: 2
+                        nodes:
+                        - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+                          label: my-label-6ac60e6313dd1
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: active
+                        - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+                          label: my-label-6ac60e6313ddc
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: active
+                    meta:
+                      total: 2
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-kubernetes-clusters
+      description: List all Kubernetes clusters currently deployed
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    get:
+      summary: Get Kubernetes Cluster
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vke_cluster:
+                    $ref: '#/components/schemas/vke-cluster'
+              examples:
+                example response:
+                  value:
+                    vke_cluster:
+                      id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+                      label: vke
+                      date_created: '2021-07-07T22:57:01+00:00'
+                      cluster_subnet: 10.244.0.0/16
+                      service_subnet: 10.96.0.0/12
+                      ip: 207.246.109.187
+                      endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+                      version: v1.20.0+1
+                      region: lax
+                      status: active
+                      node_pools:
+                      - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+                        date_created: '2021-07-07T22:57:01+00:00'
+                        date_updated: '2021-07-08T12:12:44+00:00'
+                        label: my-label
+                        tag: my-tag
+                        plan: vc2-1c-2gb
+                        status: active
+                        node_quantity: 2
+                        nodes:
+                        - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+                          label: my-label-6ac60e6313dd1
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: active
+                        - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+                          label: my-label-6ac60e6313ddc
+                          date_created: '2021-07-07T22:57:01+00:00'
+                          status: active
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-kubernetes-clusters
+      security:
+      - API Key: []
+    put:
+      summary: Update Kubernetes Cluster
+      tags:
+      - Kubernetes
+      responses:
+        '204':
+          description: No Content
+          headers: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-kubernetes-cluster
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: Label for the Kubernetes cluster
+              required:
+              - label
+            examples:
+              example-1:
+                value:
+                  label: my new label
+        description: Request Body
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Kubernetes Cluster
+      tags:
+      - Kubernetes
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-kubernetes-cluster
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/delete-with-linked-resources:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+    delete:
+      summary: Delete VKE Cluster and All Related Resources
+      tags:
+      - Kubernetes
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-kubernetes-cluster-vke-id-delete-with-linked-resources
+      description: Delete Kubernetes Cluster and all related resources.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/resources:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    get:
+      summary: Get Kubernetes Resources
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    resources:
+                      block_storage:
+                      - id: 7eb35f6c-c4fa-4835-9548-d4730912cbd4
+                        label: track-again3
+                        date_created: '2021-07-29T16:41:07+00:00'
+                        status: pending
+                      - id: 6d1526c9-2d55-4f6b-a775-0024ec5048f0
+                        label: tracking
+                        date_created: '2021-08-04T15:34:50+00:00'
+                        status: pending
+                      load_balancer:
+                      - id: 04a27709-8d3d-42c2-ae69-c7d8ae6155d8
+                        label: tracking8
+                        date_created: '2021-07-29T16:46:12+00:00'
+                        status: active
+                properties:
+                  resources:
+                    type: object
+                    properties:
+                      block_storage:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              minLength: 1
+                              description: Unique identifier for the block storage volume
+                            label:
+                              type: string
+                              minLength: 1
+                              description: Label given to the block storage volume
+                            date_created:
+                              type: string
+                              minLength: 1
+                              description: Date the block storage volume was created
+                            status:
+                              type: string
+                              minLength: 1
+                              description: Status of the block storage volume
+                      load_balancer:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              minLength: 1
+                              description: Unique identifier for the load balancer
+                            label:
+                              type: string
+                              minLength: 1
+                              description: Label given to the load balancer
+                            date_created:
+                              type: string
+                              minLength: 1
+                              description: Date the load balancer was created
+                            status:
+                              type: string
+                              minLength: 1
+                              description: Status of the load balancer
+              examples:
+                example:
+                  value:
+                    resources:
+                      block_storage:
+                      - id: 29479a12-6edd-48cf-a883-24eccafab094
+                        label: 29479a12-6edd-48cf-a883-24eccafab094
+                        date_created: '2021-07-29T16:41:07+00:00'
+                        status: active
+                      - id: 0fa3097e-aef9-475e-958a-56f697ed3998
+                        label: 0fa3097e-aef9-475e-958a-56f697ed3998
+                        date_created: '2021-08-04T15:34:50+00:00'
+                        status: pending
+                      load_balancer:
+                      - id: 369ed902-2ec4-4a22-b959-cb1709394c3a
+                        label: 369ed902-2ec4-4a22-b959-cb1709394c3a
+                        date_created: '2021-07-29T16:46:12+00:00'
+                        status: active
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-kubernetes-resources
+      description: Get the block storage volumes and load balancers deployed by the specified Kubernetes cluster.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/node-pools:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    post:
+      summary: Create NodePool
+      tags:
+      - Kubernetes
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  node_pool:
+                    $ref: '#/components/schemas/nodepools'
+              examples:
+                example response:
+                  value:
+                    node_pool:
+                      id: 4130764b-5276-4552-546f-32513239732b
+                      date_created: '2021-07-07T23:29:18+00:00'
+                      date_updated: '2021-07-08T23:29:18+00:00'
+                      label: nodepool
+                      tag: my-tag
+                      plan: vc2-1c-2gb
+                      status: pending
+                      node_quantity: 2
+                      nodes:
+                      - id: 2f863151-d784-4184-804e-31e4e60945bd
+                        label: nodepool-6c360e638ce61
+                        date_created: '2021-07-07T23:29:18+00:00'
+                        status: pending
+                      - id: 73a459dc-293f-4c2b-92f7-61be459a033b
+                        label: nodepool-6c360e638ce6c
+                        date_created: '2021-07-07T23:29:18+00:00'
+                        status: pending
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-nodepools
+      description: Create NodePool for a Existing Kubernetes Cluster
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_quantity:
+                  type: integer
+                  description: Number of instances in this nodepool
+                label:
+                  type: string
+                  description: Label for the nodepool. You cannot change the label after a nodepool is created. You cannot have duplicate node pool labels in the same cluster.
+                plan:
+                  type: string
+                  description: Plan that this nodepool will use
+                tag:
+                  type: string
+                  description: Tag for node pool
+              required:
+              - node_quantity
+              - label
+              - plan
+            examples:
+              request body example:
+                value:
+                  node_quantity: 2
+                  label: nodepool
+                  plan: vc2-1c-2gb
+                  tag: my-tag
+        description: Request Body
+      security:
+      - API Key: []
+    get:
+      summary: List NodePools
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  node_pools:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/nodepools'
+              examples:
+                example response:
+                  value:
+                    node_pools:
+                    - id: e97bdee9-2781-4f31-be03-60fc75f399ae
+                      date_created: '2021-07-07T23:27:08+00:00'
+                      date_updated: '2021-07-08T12:12:44+00:00'
+                      label: my-label
+                      tag: my-tag
+                      plan: vc2-1c-2gb
+                      status: active
+                      node_quantity: 2
+                      nodes:
+                      - id: f2e11430-76e5-4dc6-a1c9-ef5682c21ddf
+                        label: my-label-44060e6384c45
+                        date_created: '2021-07-07T23:27:08+00:00'
+                        status: active
+                      - id: c0a160eb-a7bc-4377-a6fb-52a9531167ca
+                        label: my-label-44060e6384c50
+                        date_created: '2021-07-07T23:27:08+00:00'
+                        status: active
+                    - id: 4130764b-5276-4552-546f-32513239732b
+                      date_created: '2021-07-07T23:29:18+00:00'
+                      label: nodepool
+                      tag: my-tag
+                      plan: vc2-1c-2gb
+                      status: active
+                      node_quantity: 2
+                      nodes:
+                      - id: 2f863151-d784-4184-804e-31e4e60945bd
+                        label: nodepool-6c360e638ce61
+                        date_created: '2021-07-07T23:29:18+00:00'
+                        status: active
+                      - id: 73a459dc-293f-4c2b-92f7-61be459a033b
+                        label: nodepool-6c360e638ce6c
+                        date_created: '2021-07-07T23:29:18+00:00'
+                        status: active
+                    meta:
+                      total: 2
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-nodepools
+      description: List all available NodePools on a Kubernetes Cluster
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/node-pools/{nodepool-id}:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    - schema:
+        type: string
+      name: nodepool-id
+      in: path
+      required: true
+      description: The [NodePool ID](#operation/get-nodepools).
+    get:
+      summary: Get NodePool
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  node_pool:
+                    $ref: '#/components/schemas/nodepools'
+              examples:
+                example response:
+                  value:
+                    node_pool:
+                      id: e97bdee9-2781-4f31-be03-60fc75f399ae
+                      date_created: '2021-07-07T23:27:08+00:00'
+                      date_updated: '2021-07-08T12:12:44+00:00'
+                      label: my-label
+                      tag: my-tag
+                      plan: vc2-1c-2gb
+                      status: active
+                      node_quantity: 2
+                      nodes:
+                      - id: f2e11430-76e5-4dc6-a1c9-ef5682c21ddf
+                        label: my-label-44060e6384c45
+                        date_created: '2021-07-07T23:27:08+00:00'
+                        status: active
+                      - id: c0a160eb-a7bc-4377-a6fb-52a9531167ca
+                        label: my-label-44060e6384c50
+                        date_created: '2021-07-07T23:27:08+00:00'
+                        status: active
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-nodepool
+      description: Get Nodepool from a Kubernetes Cluster
+      security:
+      - API Key: []
+    patch:
+      summary: Update Nodepool
+      tags:
+      - Kubernetes
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ? ''
+                  : $ref: '#/components/schemas/nodepools'
+              examples:
+                example-1:
+                  value:
+                    node_pool:
+                      id: e97bdee9-2781-4f31-be03-60fc75f399ae
+                      date_created: '2021-07-07T23:27:08+00:00'
+                      date_updated: '2021-07-08T12:12:44+00:00'
+                      label: my-label
+                      tag: my-tag
+                      plan: vc2-1c-2gb
+                      status: active
+                      node_quantity: 1
+                      nodes:
+                      - id: f2e11430-76e5-4dc6-a1c9-ef5682c21ddf
+                        label: my-label-44060e6384c45
+                        date_created: '2021-07-07T23:27:08+00:00'
+                        status: active
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-nodepool
+      description: Update a Nodepool on a Kubernetes Cluster
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_quantity:
+                  type: integer
+                  description: Number of instances in the NodePool. Minimum of 1 is required, but at least 3 is recommended.
+                tag:
+                  type: string
+                  description: Tag for your node pool
+            examples:
+              example-1:
+                value:
+                  node_quantity: 1
+                  tag: my-tag
+          application/xml:
+            schema:
+              type: object
+              properties:
+                node_quantity:
+                  type: integer
+                  description: Number of instances in the nodepool. Minimum of 1 is required, but at least 3 is recommended.
+              required:
+              - node_quantity
+        description: Request Body
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Nodepool
+      tags:
+      - Kubernetes
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-nodepool
+      description: Delete a NodePool from a Kubernetes Cluster
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/node-pools/{nodepool-id}/nodes/{node-id}:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    - schema:
+        type: string
+      name: nodepool-id
+      in: path
+      required: true
+      description: The [NodePool ID](#operation/get-nodepools).
+    - schema:
+        type: string
+      name: node-id
+      in: path
+      required: true
+      description: The [Instance ID](#operation/list-instances).
+    delete:
+      summary: Delete NodePool Instance
+      tags:
+      - Kubernetes
+      operationId: delete-nodepool-instance
+      security:
+      - API Key: []
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Delete a single nodepool instance from a given Nodepool
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/node-pools/{nodepool-id}/nodes/{node-id}/recycle:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    - schema:
+        type: string
+      name: nodepool-id
+      in: path
+      required: true
+      description: The [NodePool ID](#operation/get-nodepools).
+    - schema:
+        type: string
+      name: node-id
+      in: path
+      required: true
+      description: Node ID
+    post:
+      summary: Recycle a NodePool Instance
+      tags:
+      - Kubernetes
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: recycle-nodepool-instance
+      description: Recycle a specific NodePool Instance
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/config:
+    parameters:
+    - schema:
+        type: string
+      name: vke-id
+      in: path
+      required: true
+      description: The [VKE ID](#operation/list-kubernetes-clusters).
+    get:
+      summary: Get Kubernetes Cluster Kubeconfig
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kube_config:
+                    type: string
+                    description: Base64 encoded KubeConfig
+              examples:
+                example response:
+                  value:
+                    kube_config: YXBpdmVyc2lvbjogdjEKY2x1c3RlcnM6Ci0gY2x1c3RlcjoKICAgIGNlcnRpZmljYXRlLWF1dGhvcml0eS1kYXRhOiBMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VSblZFTkRRVzF0WjBGM1NVSkJaMGxKU2psdFN6bEViRk5pY0RSM1JGRlpTa3R2V2tsb2RtTk9RVkZGVEVKUlFYZFVla1ZNVFVGclIwRXhWVVVLUW1oTlExWldUWGhHYWtGVlFtZE9Wa0pCWTFSRVZrNW9ZbWxDUjJOdFJuVlpNbXg2V1RJNGVFVjZRVkpDWjA1V1FrRnZWRU5yZERGWmJWWjVZbTFXTUFwYVdFMTRSWHBCVWtKblRsWkNRVTFVUTJ0ME1WbHRWbmxpYlZZd1dsaE5kMGhvWTA1TmFrVjNUbnBCZVUxVVNYaE5la0Y1VjJoalRrMXFTWGRPZWtGNUNrMVVTWGhOZWtGNVYycENVRTFSYzNkRFVWbEVWbEZSUjBWM1NsWlZla1ZYVFVKUlIwRXhWVVZDZUUxT1ZUSkdkVWxGV25sWlZ6VnFZVmhPYW1KNlJWUUtUVUpGUjBFeFZVVkRhRTFMVXpOV2FWcFlTblZhV0ZKc1kzcEZWRTFDUlVkQk1WVkZRWGhOUzFNelZtbGFXRXAxV2xoU2JHTjZRME5CVTBsM1JGRlpTZ3BMYjFwSmFIWmpUa0ZSUlVKQ1VVRkVaMmRGVUVGRVEwTkJVVzlEWjJkRlFrRk1laTlITXpOaVlWZG5TMU5GVmpKQ2RsQlhZbWd6WkhZclYybEhOVlJqQ2s1bllVTlZNMlJWVm5KdGNtaHVXbVJPYWtkTVl5OUJTR3RIWm1OaVIxQlRXbkJ2UVZCbWFuaGtWRTA0WlVOTFlXdGxkR0Z6YkRsdFNDOVhlVTlETXpnS1pGcEZVWGRSZWpseFIzWnpaa3BTT0RKQ01WWTBWM3AxUVdRMEwxSmtaVGxqU3psaVdIWktkRUZMU2xrNVF6aG9VM2RtTDNNM1drRlNabGxYYTIxb1R3cHZkSHBFUnpaR2JtaFljSFJtUkRZdmRXNXNXRWhyYTNveFVHSjZhR1Z2ZG5adU9GUkNUamR2UWpkTVdUaG9kRE5tVTBJeFEwSlRTMGxxV1hsaGJEaHJDbU5XZVU1R1MyUndVRVoxV0ZvelkyYzRaMHN2ZUROS1VXZHBLMGxqVTA0Mk9GZDJaa3gxYXpjM2JXOXNWWE5IY25neWNWRkZTa2RwU2k5SGEzUm5kMndLWlVnNU1FbHpMMkZDZERjd1dsaG9aM2cyTnpkSmVuTnVWMnN3UWpWSFlVeGpaRk5oYUN0WlNraGthbkpMU0N0R01qVTNWekpvTUVOQmQwVkJRV0ZPYUFwTlJqaDNSR2RaUkZaU01GQkJVVWd2UWtGUlJFRm5TMFZOUWpCSFFURlZaRXBSVVZkTlFsRkhRME56UjBGUlZVWkNkMDFEUW1kbmNrSm5SVVpDVVdORUNrRlVRVkJDWjA1V1NGSk5Ra0ZtT0VWQ1ZFRkVRVkZJTDAxQ01FZEJNVlZrUkdkUlYwSkNVME5EVWtoSmFERm1XbnBzU210MFMwVmtOalpITVZWWGRqQUtNRVJCVGtKbmEzRm9hMmxIT1hjd1FrRlJjMFpCUVU5RFFWRkZRV0V3VG1SUVlYa3dPREp0YVcxWllUa3ZOVVpMY1hWa1YwSmpabVpHVkVScFdrTmljUXA1YVUxNFZXeEVTQzl6Tm1Od1YzbEJORXRuY0ZGRWMySXdiM0pzYTNwTk1ERjNieTlsTUc1clUxTTFVVkIyWVZvNU9FaFNObFlyTUV4a0swZzViM1JCQ2xZM2VUbEdlQzlJVUhCdldGWTJhVWswYWpCaVpFdFBNMHQ0VUZKVWRsaDFRMUZETTNRd2FHc3pjVnBRSzFSalNEaHhWRTV6VkVwb1JGTnlSMWRLUjNvS1dqZ3liMGwwY0c5RVRsaEJZVUpqYmxSRmNUUkNXRzFoTTJVNVJHSkpVMU5SZW5aaGFIYzBWMkZwVTFWNGVYUllVakJ5Um1oaFpFUnpkbFJuVVhZNGF3cEdlbkV5TjNkS2RUaHZUV2hIWTJWb2VGUlRXVUpyWjNGWVUzYzNPR2xsTVZadk1XVlBMMGxTYlhsM1ZtMWlhM2M1TWswcldtZFdOV0Z3VERCNlNYRnNDbFEzWmtkekszWTViREkwYkM4eGFIbExVekZCU1ZKTmVrRkljMGw1YVdWdE1GUkZUM0Z6WVVVNVFYWjBlWEZZZEZKblBUMEtMUzB0TFMxRlRrUWdRMFZTVkVsR1NVTkJWRVV0TFMwdExRbz0KICAgIHNlcnZlcjogaHR0cHM6Ly9jOTA3ZTgzMi0zMDgwLTQ4YTYtYTU0ZC03Mzc5ZTY0NWMwYjcudnVsdHItazhzLmNvbTo2NDQzCiAgbmFtZTogdmtlCmNvbnRleHRzOgotIGNvbnRleHQ6CiAgICBjbHVzdGVyOiB2a2UKICAgIHVzZXI6IGFkbWluCiAgbmFtZTogdmtlCmN1cnJlbnQtY29udGV4dDogdmtlCmtpbmQ6IENvbmZpZwpwcmVmZXJlbmNlczoge30KdXNlcnM6Ci0gbmFtZTogYWRtaW4KICB1c2VyOgogICAgY2xpZW50LWNlcnRpZmljYXRlLWRhdGE6IExTMHRMUzFDUlVkSlRpQkRSVkpVU1VaSlEwRlVSUzB0TFMwdENrMUpTVVJWUkVORFFXcHBaMEYzU1VKQlowbEpUVmg0VTFOSGRFRnliR2QzUkZGWlNrdHZXa2xvZG1OT1FWRkZURUpSUVhkVWVrVk1UVUZyUjBFeFZVVUtRbWhOUTFaV1RYaEdha0ZWUW1kT1ZrSkJZMVJFVms1b1ltbENSMk50Um5WWk1teDZXVEk0ZUVWNlFWSkNaMDVXUWtGdlZFTnJkREZaYlZaNVltMVdNQXBhV0UxNFJYcEJVa0puVGxaQ1FVMVVRMnQwTVZsdFZubGliVll3V2xoTmQwaG9ZMDVOYWtWM1RucEJlVTFVU1hoTmVrRjVWMmhqVGsxcVNYZE9la0Y1Q2sxVVNYaE5la0Y1VjJwQ1QwMVJjM2REVVZsRVZsRlJSMFYzU2xaVmVrVlhUVUpSUjBFeFZVVkNlRTFPVlRKR2RVbEZXbmxaVnpWcVlWaE9hbUo2UlZnS1RVSlZSMEV4VlVWRGFFMVBZek5zZW1SSFZuUlBiVEZvWXpOU2JHTnVUWGhFYWtGTlFtZE9Wa0pCVFZSQ1YwWnJZbGRzZFUxSlNVSkpha0ZPUW1kcmNRcG9hMmxIT1hjd1FrRlJSVVpCUVU5RFFWRTRRVTFKU1VKRFowdERRVkZGUVhselRIVndNSHBvYXpsUFVHODVWa05TTUZSbmJ6UTFORThyV0hOTVEyUXhDbE5CWVdKNmFtMVJaM1pEVVZKeFdEaEZUa0Z0VW5kbVdFUjNaRkJMWTFkbmFtcHpRaTlQU2pSR2F6TmpWWFZIVVdkNmFrRkRXVVJYVjNBM1RWaG1TM1VLVm5GeVNGTmtZMnhQWVV0dEwwbGpNMEkxWVd0a1pYcGxRVFJ4UzFGRlRrbFVSbXR1VkdSWVJ6RTFVV3MxU2tNMGNIWXpaa3M1ZUhVMldqZHhjVmRXVlFwdmVFMXdjR2huV1hGWFVsUkNSMnByT0hSRk5sbDZOazVZZGs5NkwxVXpNWEprV0ZOVFluYzRWakpxTUdnNU1FTlRMMkZLVkN0U01sRmxNRWh3YkZNeUNsSjBWek0yYlRjMFVGaHpXRGQ2Ym1aTVZWZEpaMGQxYjBvNVdYTkJNRFphUTFSVllrdFNTekV2V0haRmFGZHVPSGRtWTFCblRHTXlRWEJRTnpsMVlYa0taV0phZVV4SmFXOWFXRXRNVERWQ05tcEZaVkZWV2pGWlRFTjNSV0pCTXpWYVdYSm1lRTVCUmsxcFUwcDFTMnhhUlRWSGNYRlJTVVJCVVVGQ2IzcEZkd3BNZWtGUFFtZE9Wa2hST0VKQlpqaEZRa0ZOUTBGdlVYZElVVmxFVmxJd2JFSkNXWGRHUVZsSlMzZFpRa0pSVlVoQmQwbEhRME56UjBGUlZVWkNkMDFDQ2sxQk1FZERVM0ZIVTBsaU0wUlJSVUpEZDFWQlFUUkpRa0ZSUWpWbUwwdHJVVGxRV1d4WE1uQllUek13V1dSYVZHMUlhbWRhTm10RlFUUmhVelJvVWs4S2NqSldSbHBwUjBoUVluZGFZMjVuZFc1UVRXTnJaRmh2UWs5a1dsVkhkelpoYkUxaVFVOUZhRlpIUVVOSU5IcEhkM2RUUlZrMk5HRTJVV0ZsVFVaSWF3cHZkalU1UW1GclJIZFJkVlprTVdoMk1rcFZkMXB3WTFsTVZUZE5PWGRLWTI5a09FODBNM0EyVGxwTmNrVjBObHB2YmtsSWJGbEpkMGhFTWxWaGVYcHZDamhUVkhWeWNXVm5jakJvYzAwd1ltWlFRbkZzY25CdE9VTXZOV2hVVjJVemJ6STJiRFpNUTBabWFFdzBaamN5VURSaWFYWnNkVTVoYVc5UFp6QXZXVVlLZFVwd09WUjZkMnRuUWtSVE9DOU5hVTFUVDFwSFpVdHlia2hWYlhKa2FGbHpSbTFCVVRCRVRYWlJiMnh1TWtwVlRYSXlkWE4yU0VGcFJGWm9PVkZMWlFwM1lrSlRMMlJ3UW04M09UbEZRWHBpWkdaclpIcG5iVWhDU2k5WU4wVjNNR3B4Tm5Nek5YTkRNMUpqY0dNNFJrd0tMUzB0TFMxRlRrUWdRMFZTVkVsR1NVTkJWRVV0TFMwdExRbz0KICAgIGNsaWVudC1rZXktZGF0YTogTFMwdExTMUNSVWRKVGlCU1UwRWdVRkpKVmtGVVJTQkxSVmt0TFMwdExRcE5TVWxGYjJkSlFrRkJTME5CVVVWQmVYTk1kWEF3ZW1ock9VOVFiemxXUTFJd1ZHZHZORFUwVHl0WWMweERaREZUUVdGaWVtcHRVV2QyUTFGU2NWZzRDa1ZPUVcxU2QyWllSSGRrVUV0alYyZHFhbk5DTDA5S05FWnJNMk5WZFVkUlozcHFRVU5aUkZkWGNEZE5XR1pMZFZaeGNraFRaR05zVDJGTGJTOUpZek1LUWpWaGEyUmxlbVZCTkhGTFVVVk9TVlJHYTI1VVpGaEhNVFZSYXpWS1F6Undkak5tU3psNGRUWmFOM0Z4VjFaVmIzaE5jSEJvWjFseFYxSlVRa2RxYXdvNGRFVTJXWG8yVGxoMlQzb3ZWVE14Y21SWVUxTmlkemhXTW1vd2FEa3dRMU12WVVwVUsxSXlVV1V3U0hCc1V6SlNkRmN6Tm0wM05GQlljMWczZW01bUNreFZWMGxuUjNWdlNqbFpjMEV3TmxwRFZGVmlTMUpMTVM5WWRrVm9WMjQ0ZDJaalVHZE1ZekpCY0ZBM09YVmhlV1ZpV25sTVNXbHZXbGhMVEV3MVFqWUtha1ZsVVZWYU1WbE1RM2RGWWtFek5WcFpjbVo0VGtGR1RXbFRTblZMYkZwRk5VZHhjVkZKUkVGUlFVSkJiMGxDUVVKaWN6VXpUQzlJUm5CTmFESmpjd3A1Tm5WdVVFRmpRMHQwU1VzNGVVMXBObll6VkRCWVdVWjVSRTFzTlVGdk5EVnJSVFJhTjNWTlVsZExjbTUxV0VsT1NtdG5WSFE0Tmpndk1FSnVURWMyQ2xVd05tazRaMDlvUkRWME4ySlFkMHRZYlM5eFN6RktUVUY1WkRkSWIzQmhPVE4yYVV0dlNYa3pMemxwWjB4Tk0yRkZkRXB2Vlc5S2NUaDJaMDFxVDNRS2MxWk5aMVJWVmpKVVVYZGFUR056ZEdFNU5YTlphamh1V214S2QyczNhSHBFTmtFemNUSTBhRVJ0YUU1a2FUZ3dSSEJEVDJjMk1IbFpTaXQ2Y0dab1dBcHZORkJPTlhsTVZGaFhkSG80SzJ0UllqaDZaR3B0Wms5a1pHVnJaeTlOTTA1T1pUY3JPRVZHV2tJMWExWkRkbEV3UmxoSVIxRlZPREUzV1dNdlNEZHZDamhpVFZsM2QySlZRbEppTkdobmVWWnZkemxVV2s5YVkwMXVMM2xoYVd3M1JtVmljblpGU2s5dVJtdG9Wa3BoUlRKdVlWSlJjbEJ1TmtORWRVdEdXRGdLUTJNM2JHZGhSVU5uV1VWQmVuZEVURlpFY1UxWlYxcHNiWFJUYzJGdWVGaEJhMnBwUW5GVWFreFhTbGRIZVZSTk0xZEtUM2RzZG1GWk9FTlRiSHB5TkFwelMyOTNOMXByT0doQ1ZXSm1WRFJCV1ZWTlpVRlBSV0p2UkhCTVpYQTBURmxYU0hSUmJuQkpWakY1ZURSMVdWZHlSM28yZVhSemVGbE1MMnRvYTBSMENtUnVRVTFDVTBOdlZXOW1VVWczSzBWa2NHdFpZbGxrYW05bFZuWXdlalpPVG1SQ1ZYSk9VbFpQWlc1NFR6WkllR1JIZDNwSFUxVkRaMWxGUVN0elJXVUtVMk5wU0RSbWIybDVkRlZNWW5VMVJVVmtaM0YwTDFseUszTmtVMjl6TURGTWVtOXpSVU4wZGpFMGJrNHZWVlpIYTI5WE5UUTRVVEpOYmtkeUswSTFLd3BvUkRCME1XTXpXQ3RPT1dOc2FYRXdWVzVGZVhad09DOXhWblJUZGxSYWFscEdOVTFKTXpadWJqWXhVVkkxV0hOcFNEVmhWbWQyUlRoYWNFNTBSbHBsQ21sWlRVNHpRM2R6VjNCb1drMUJTV2hVZDI1S1RVOVZlVXhHVlhWT05rTjNhelJFUlhacVZVTm5XVUZ2UWs5R1MxVldPV1ZZVTNRM1pWYzBlakJCU1VzS1VWRnFhR1V2VFc1cVVVWlZhMmhNUWtsbldsUTRUMjlTY1hWTmMwNVplSEZ4ZUhneVkzTXJUMUZZTld4QmFESlZjME5OVjNwSE5Va3hZbmhPTkd0M1ZRbzRXbVZ4TmtoVlpqTndNMDVZWlc4MFVEUkdhM2R0WlZSaGMxaEdXbkozUW5vM2RXcExhVTFuWjFnd2RFSm9kVmg1YUZVNE5UVllUbU5OZG1weVVUUnFDblo2YWk5cFRGWktWWFkzSzBwc2NrWjRWREZFZFZGTFFtZEhZbkJrVmxoUk1FUjJiRmhtZDJrellrNXJXa1pzZVdZeU0wdDNXbWRHTUVKMGVUTjJORWtLUVU5bFRpOUVVRmx2WTNKMFkwbzFXRGxqWms0d2JsSXphRW95Y2xocU9VWnZTbU5qUTFOU2FDOHllU3RGUVRJMU1scHhNRmgyZEZKMVN6Vm9UVkFyVkFwV0szQkdXU3RSTjNwRVVHeERlRTlzZWpoME5uWjRVblJSVEVSbWRHRk1ORkF5Y2paVmFWaEpWM1Z3UTBwWmREZDBOaXQ1YTFKdWVYZzJiMkUzTHpGS0NtNTJWakZCYjBkQlRtRkZSV1VyZERoNGFXUlFaeXRIUm5FemN6VkhUa1pPU0VKQmMzcG1NV3BxVFdwdmF6ZEtiMmxyWWxaVU1FNUJWVmhLZEdWclNra0taekZPVUd0UVQxSjRWakZWY0dKUGVsUXJhMWhyTjBwVmExTTNiVE0zV0VneWRuUm1abVIxTlhFNVEzWkhObkZaYW1OcVpVOHZSRWhzYUZWRmNrMUpXUXBsVHpSQk9FOUNWRWgwUVRkM01XTjVVa2hIVUZWUE1VRlFiRXRTTWtWVU9XMXVOeXROV0hSRU1GQmxjRWh2TVV0UU9VRTlDaTB0TFMwdFJVNUVJRkpUUVNCUVVrbFdRVlJGSUV0RldTMHRMUzB0Q2c9PQo=
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-kubernetes-clusters-config
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/versions:
+    get:
+      summary: Get Kubernetes Versions
+      tags:
+      - Kubernetes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                example:
+                  value:
+                    versions:
+                    - v1.20.0+1
+        '404':
+          description: Not Found
+      operationId: get-kubernetes-versions
+      description: Get a list of supported Kubernetes versions
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/available-upgrades:
+    get:
+      description: Get the available upgrades for the specified Kubernetes cluster.
+      operationId: get-kubernetes-available-upgrades
+      parameters:
+      - description: The [VKE ID](#operation/list-kubernetes-clusters).
+        explode: false
+        in: path
+        name: vke-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                example:
+                  value:
+                    available_upgrades:
+                    - v1.22.8+3
+                    - v1.21.11+3
+              schema:
+                $ref: '#/components/schemas/get_kubernetes_available_upgrades_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get Kubernetes Available Upgrades
+      tags:
+      - Kubernetes
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/kubernetes/clusters/{vke-id}/available-upgrades\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /kubernetes/clusters/{vke-id}/upgrades:
+    post:
+      description: Start a Kubernetes cluster upgrade.
+      operationId: start-kubernetes-cluster-upgrade
+      parameters:
+      - description: The [VKE ID](#operation/list-kubernetes-clusters).
+        explode: false
+        in: path
+        name: vke-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example request:
+                value:
+                  upgrade_version: v1.22.8+3
+            schema:
+              $ref: '#/components/schemas/start_kubernetes_cluster_upgrade_request'
+        description: Request Body
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Start Kubernetes Cluster Upgrade
+      tags:
+      - Kubernetes
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/kubernetes/clusters/{vke-id}/upgrades\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"upgrade_version\" : \"v1.22.8+3\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    nodepools:
+      title: nodepools
+      type: object
+      x-examples:
+        example nodepool:
+          id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+          date_created: '2021-07-07T22:57:01+00:00'
+          label: my-label
+          tag: my-tag
+          plan: vc2-1c-2gb
+          status: pending
+          node_quantity: 2
+          nodes:
+          - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+            label: my-label-48770259-6ac60e6313dd1
+            date_created: '2021-07-07T22:57:01+00:00'
+            status: pending
+          - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+            label: my-label-48770259-6ac60e6313ddc
+            date_created: '2021-07-07T22:57:01+00:00'
+            status: pending
+      description: NodePool
+      x-tags:
+      - kubernetes
+      properties:
+        id:
+          type: string
+          description: The [NodePool ID](#operation/get-nodepools).
+        date_created:
+          type: string
+          description: Date of creation
+        label:
+          type: string
+          description: Label for nodepool
+        tag:
+          type: string
+          description: Tag for node pool
+        plan:
+          type: string
+          description: Plan used for nodepool
+        status:
+          type: string
+          description: Status for nodepool
+        node_quantity:
+          type: integer
+          description: Number of nodes in nodepool
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/nodepool-instances'
+        date_updated:
+          type: string
+          description: Date the nodepool was updated.
+    nodepool-instances:
+      title: nodepool-instances
+      type: object
+      description: Instance that belongs to a nodepool
+      x-examples:
+        example nodepool:
+          id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+          label: my-label-48770259-6ac60e6313dd1
+          date_created: '2021-07-07T22:57:01+00:00'
+          status: pending
+      properties:
+        id:
+          type: string
+          description: ID of the nodepool instance
+        label:
+          type: string
+          description: Label of the nodepool instance
+        date_created:
+          type: string
+          description: Date of creation
+    vke-cluster:
+      title: vke-cluster
+      type: object
+      x-examples:
+        example vke cluster:
+          id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+          label: vke
+          date_created: '2021-07-07T22:57:01+00:00'
+          cluster_subnet: 10.244.0.0/16
+          service_subnet: 10.96.0.0/12
+          ip: 0.0.0.0
+          endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+          version: v1.20.0+1
+          region: lax
+          status: pending
+          node_pools:
+          - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+            date_created: '2021-07-07T22:57:01+00:00'
+            label: my-label
+            tag: my-tag
+            plan: vc2-1c-2gb
+            status: pending
+            node_quantity: 2
+            nodes:
+            - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+              label: my-label-6ac60e6313dd1
+              date_created: '2021-07-07T22:57:01+00:00'
+              status: pending
+            - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+              label: my-label-6ac60e6313ddc
+              date_created: '2021-07-07T22:57:01+00:00'
+              status: pending
+      x-tags:
+      - kubernetes
+      description: VKE Cluster
+      properties:
+        id:
+          type: string
+          description: ID for the VKE cluster
+        label:
+          type: string
+          description: Label for your cluster
+        date_created:
+          type: string
+          description: Date of creation
+        cluster_subnet:
+          type: string
+          description: IP range that your pods will run on in this cluster
+        service_subnet:
+          type: string
+          description: IP range that services will run on this cluster
+        ip:
+          type: string
+          description: IP for your Kubernetes Clusters Control Plane
+        endpoint:
+          type: string
+          description: Domain for your Kubernetes Clusters Control Plane
+        version:
+          type: string
+          description: Version of Kubernetes this cluster is running on
+        region:
+          type: string
+          description: Region this Kubernetes Cluster is running in
+        status:
+          type: string
+          description: Status for VKE cluster
+        node_pools:
+          type: array
+          description: NodePools in this cluster
+          items:
+            $ref: '#/components/schemas/nodepools'
+    update_nodepool_request:
+      properties:
+        node_quantity:
+          description: Number of instances in the NodePool. Minimum of 1 is required, but at least 3 is recommended.
+          type: integer
+        tag:
+          description: Tag for your node pool
+          type: string
+        auto_scaler:
+          description: Option to use the auto scaler for your cluster. Default false.
+          type: boolean
+        min_nodes:
+          description: Auto scaler field for minimum nodes you want for your cluster. Default 1.
+          type: integer
+        max_nodes:
+          description: Auto scaler field for maximum nodes you want for your cluster. Default 1.
+          type: integer
+      type: object
+    get_kubernetes_resources_200_response_resources_block_storage_inner:
+      example:
+        date_created: date_created
+        id: id
+        label: label
+        status: status
+      properties:
+        id:
+          description: Unique identifier for the block storage volume
+          minLength: 1
+          type: string
+        label:
+          description: Label given to the block storage volume
+          minLength: 1
+          type: string
+        date_created:
+          description: Date the block storage volume was created
+          minLength: 1
+          type: string
+        status:
+          description: Status of the block storage volume
+          minLength: 1
+          type: string
+      type: object
+    create_kubernetes_cluster_201_response:
+      example:
+        vke_cluster:
+          firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+      properties:
+        vke_cluster:
+          $ref: '#/components/schemas/vke-cluster_2'
+      type: object
+    get_nodepools_200_response:
+      example:
+        node_pools:
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+      properties:
+        node_pools:
+          items:
+            $ref: '#/components/schemas/nodepools_2'
+          type: array
+      type: object
+    create_nodepools_request:
+      properties:
+        node_quantity:
+          description: Number of instances in this nodepool
+          type: integer
+        label:
+          description: Label for the nodepool. You cannot change the label after a nodepool is created. You cannot have duplicate node pool labels in the same cluster.
+          type: string
+        plan:
+          description: Plan that this nodepool will use
+          type: string
+        tag:
+          description: Tag for node pool
+          type: string
+        auto_scaler:
+          description: Option to use the auto scaler with your cluster. Default false.
+          type: boolean
+        min_nodes:
+          description: Auto scaler field for minimum nodes you want for your cluster. Default 1.
+          type: integer
+        max_nodes:
+          description: Auto scaler field for maximum nodes you want for your cluster. Default 1.
+          type: integer
+      required:
+      - label
+      - node_quantity
+      - plan
+      type: object
+    create_kubernetes_cluster_request:
+      properties:
+        label:
+          description: The label for your Kubernetes cluster.
+          type: string
+        region:
+          description: Region you want to deploy VKE in. See [Regions](#tag/region) for more information.
+          type: string
+        version:
+          description: Version of Kubernetes you want to deploy.
+          type: string
+        ha_controlplanes:
+          description: 'Whether a highly available control planes configuration should be deployed
+
+            * true
+
+            * false (default)'
+          type: boolean
+        enable_firewall:
+          description: 'Whether a [Firewall Group](#tag/firewall) should be deployed and managed by this cluster
+
+            * true
+
+            * false (default)'
+          type: boolean
+        node_pools:
+          items:
+            $ref: '#/components/schemas/create_kubernetes_cluster_request_node_pools_inner'
+          type: array
+      required:
+      - region
+      - version
+      type: object
+    get_kubernetes_resources_200_response_resources_load_balancer_inner:
+      example:
+        date_created: date_created
+        id: id
+        label: label
+        status: status
+      properties:
+        id:
+          description: Unique identifier for the load balancer
+          minLength: 1
+          type: string
+        label:
+          description: Label given to the load balancer
+          minLength: 1
+          type: string
+        date_created:
+          description: Date the load balancer was created
+          minLength: 1
+          type: string
+        status:
+          description: Status of the load balancer
+          minLength: 1
+          type: string
+      type: object
+    update_kubernetes_cluster_request:
+      properties:
+        label:
+          description: Label for the Kubernetes cluster
+          type: string
+      required:
+      - label
+      type: object
+    get_kubernetes_versions_200_response:
+      example:
+        versions:
+        - versions
+        - versions
+      properties:
+        versions:
+          items:
+            type: string
+          type: array
+      type: object
+    create_kubernetes_cluster_request_node_pools_inner:
+      properties:
+        node_quantity:
+          description: Number of instances to deploy in this nodepool. Minimum of 1 node required, but at least 3 is recommended.
+          type: integer
+        label:
+          description: Label for this nodepool. You cannot change the label after a nodepool is created. You cannot have duplicate node pool labels in the same cluster.
+          type: string
+        plan:
+          description: 'Plan you want this nodepool to use. Note: minimum plan must be $10'
+          type: string
+        tag:
+          description: Tag for node pool
+          type: string
+        auto_scaler:
+          description: Option to use the auto scaler with your cluster. Default false.
+          type: boolean
+        min_nodes:
+          description: Auto scaler field for minimum nodes you want for your cluster. Default 1.
+          type: integer
+        max_nodes:
+          description: Auto scaler field for maximum nodes you want for your cluster. Default 1.
+          type: integer
+      required:
+      - label
+      - node_quantity
+      - plan
+      type: object
+    vke-cluster_2:
+      description: VKE Cluster
+      example:
+        firewall_group_id: firewall_group_id
+        ha_controlplanes: true
+        date_created: date_created
+        ip: ip
+        label: label
+        version: version
+        endpoint: endpoint
+        cluster_subnet: cluster_subnet
+        service_subnet: service_subnet
+        node_pools:
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        id: id
+        region: region
+        status: status
+      properties:
+        id:
+          description: ID for the VKE cluster
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) linked to this cluster.
+          type: string
+        label:
+          description: Label for your cluster
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+        cluster_subnet:
+          description: IP range that your pods will run on in this cluster
+          type: string
+        service_subnet:
+          description: IP range that services will run on this cluster
+          type: string
+        ip:
+          description: IP for your Kubernetes Clusters Control Plane
+          type: string
+        endpoint:
+          description: Domain for your Kubernetes Clusters Control Plane
+          type: string
+        version:
+          description: Version of Kubernetes this cluster is running on
+          type: string
+        region:
+          description: Region this Kubernetes Cluster is running in
+          type: string
+        status:
+          description: Status for VKE cluster
+          type: string
+        ha_controlplanes:
+          description: 'Whether a highly available control planes configuration has been deployed
+
+            * true
+
+            * false (default)'
+          type: boolean
+        node_pools:
+          description: NodePools in this cluster
+          items:
+            $ref: '#/components/schemas/nodepools_2'
+          type: array
+      title: vke-cluster
+      type: object
+      x-examples:
+        example vke cluster:
+          id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+          firewall_group_id: ''
+          label: vke
+          date_created: 2021-07-07 22:57:01+00:00
+          cluster_subnet: 10.244.0.0/16
+          service_subnet: 10.96.0.0/12
+          ip: 0.0.0.0
+          endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+          version: v1.20.0+1
+          region: lax
+          status: pending
+          ha_controlplanes: false
+          node_pools:
+          - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+            date_created: 2021-07-07 22:57:01+00:00
+            label: my-label
+            tag: my-tag
+            plan: vc2-1c-2gb
+            status: pending
+            node_quantity: 2
+            nodes:
+            - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+              label: my-label-6ac60e6313dd1
+              date_created: 2021-07-07 22:57:01+00:00
+              status: pending
+            - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+              label: my-label-6ac60e6313ddc
+              date_created: 2021-07-07 22:57:01+00:00
+              status: pending
+      x-tags:
+      - kubernetes
+    start_kubernetes_cluster_upgrade_request:
+      properties:
+        upgrade_version:
+          description: The version you're upgrading to.
+          type: string
+      required:
+      - upgrade_version
+      type: object
+    get_kubernetes_resources_200_response:
+      description: ''
+      example:
+        resources:
+          load_balancer:
+          - date_created: date_created
+            id: id
+            label: label
+            status: status
+          - date_created: date_created
+            id: id
+            label: label
+            status: status
+          block_storage:
+          - date_created: date_created
+            id: id
+            label: label
+            status: status
+          - date_created: date_created
+            id: id
+            label: label
+            status: status
+      properties:
+        resources:
+          $ref: '#/components/schemas/get_kubernetes_resources_200_response_resources'
+      type: object
+      x-examples:
+        example-1:
+          resources:
+            block_storage:
+            - id: 7eb35f6c-c4fa-4835-9548-d4730912cbd4
+              label: track-again3
+              date_created: 2021-07-29 16:41:07+00:00
+              status: pending
+            - id: 6d1526c9-2d55-4f6b-a775-0024ec5048f0
+              label: tracking
+              date_created: 2021-08-04 15:34:50+00:00
+              status: pending
+            load_balancer:
+            - id: 04a27709-8d3d-42c2-ae69-c7d8ae6155d8
+              label: tracking8
+              date_created: 2021-07-29 16:46:12+00:00
+              status: active
+    nodepool-instances_2:
+      description: Instance that belongs to a nodepool
+      example:
+        date_created: date_created
+        id: id
+        label: label
+      properties:
+        id:
+          description: ID of the nodepool instance
+          type: string
+        label:
+          description: Label of the nodepool instance
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+      title: nodepool-instances
+      type: object
+      x-examples:
+        example nodepool:
+          id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+          label: my-label-48770259-6ac60e6313dd1
+          date_created: 2021-07-07 22:57:01+00:00
+          status: pending
+    get_kubernetes_clusters_config_200_response:
+      example:
+        kube_config: kube_config
+      properties:
+        kube_config:
+          description: Base64 encoded KubeConfig
+          type: string
+      type: object
+    nodepools_2:
+      description: NodePool
+      example:
+        nodes:
+        - date_created: date_created
+          id: id
+          label: label
+        - date_created: date_created
+          id: id
+          label: label
+        date_updated: date_updated
+        auto_scaler: true
+        date_created: date_created
+        node_quantity: 0
+        max_nodes: 1
+        id: id
+        label: label
+        tag: tag
+        plan: plan
+        min_nodes: 6
+        status: status
+      properties:
+        id:
+          description: The [NodePool ID](#operation/get-nodepools).
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+        label:
+          description: Label for nodepool
+          type: string
+        tag:
+          description: Tag for node pool
+          type: string
+        plan:
+          description: Plan used for nodepool
+          type: string
+        status:
+          description: Status for nodepool
+          type: string
+        node_quantity:
+          description: Number of nodes in nodepool
+          type: integer
+        nodes:
+          items:
+            $ref: '#/components/schemas/nodepool-instances_2'
+          type: array
+        date_updated:
+          description: Date the nodepool was updated.
+          type: string
+        auto_scaler:
+          description: Displays if the auto scaler is enabled or disabled for your cluster.
+          type: boolean
+        min_nodes:
+          description: Auto scaler field that displays the minimum nodes you want for your cluster.
+          type: integer
+        max_nodes:
+          description: Auto scaler field that displays the maximum nodes you want for your cluster.
+          type: integer
+      title: nodepools
+      type: object
+      x-examples:
+        example nodepool:
+          id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+          date_created: 2021-07-07 22:57:01+00:00
+          label: my-label
+          tag: my-tag
+          plan: vc2-1c-2gb
+          status: pending
+          node_quantity: 2
+          min_nodes: 2
+          max_nodes: 5
+          auto_scaler: true
+          nodes:
+          - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+            label: my-label-48770259-6ac60e6313dd1
+            date_created: 2021-07-07 22:57:01+00:00
+            status: pending
+          - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+            label: my-label-48770259-6ac60e6313ddc
+            date_created: 2021-07-07 22:57:01+00:00
+            status: pending
+      x-tags:
+      - kubernetes
+    create_nodepools_201_response:
+      example:
+        node_pool:
+          nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+      properties:
+        node_pool:
+          $ref: '#/components/schemas/nodepools_2'
+      type: object
+    get_kubernetes_available_upgrades_200_response:
+      description: ''
+      example:
+        available_upgrades:
+        - available_upgrades
+        - available_upgrades
+      properties:
+        available_upgrades:
+          description: Array of available upgrade version strings
+          items:
+            type: string
+          type: array
+      type: object
+      x-examples:
+        example-1:
+          available_upgrades:
+          - v1.22.8+3
+          - v1.21.11+3
+    list_kubernetes_clusters_200_response:
+      example:
+        vke_clusters:
+        - firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+        - firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+      properties:
+        vke_clusters:
+          items:
+            $ref: '#/components/schemas/vke-cluster_2'
+          type: array
+      type: object
+    update_nodepool_request_1:
+      properties:
+        node_quantity:
+          description: Number of instances in the nodepool. Minimum of 1 is required, but at least 3 is recommended.
+          type: integer
+      required:
+      - node_quantity
+      type: object
+    get_kubernetes_resources_200_response_resources:
+      example:
+        load_balancer:
+        - date_created: date_created
+          id: id
+          label: label
+          status: status
+        - date_created: date_created
+          id: id
+          label: label
+          status: status
+        block_storage:
+        - date_created: date_created
+          id: id
+          label: label
+          status: status
+        - date_created: date_created
+          id: id
+          label: label
+          status: status
+      properties:
+        block_storage:
+          items:
+            $ref: '#/components/schemas/get_kubernetes_resources_200_response_resources_block_storage_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+        load_balancer:
+          items:
+            $ref: '#/components/schemas/get_kubernetes_resources_200_response_resources_load_balancer_inner'
+          minItems: 1
+          type: array
+          uniqueItems: true
+      type: object
+    create_kubernetes_cluster_201_response_2:
+      example:
+        vke_cluster:
+          firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+      properties:
+        vke_cluster:
+          $ref: '#/components/schemas/vke-cluster_3'
+      type: object
+    get_nodepools_200_response_2:
+      example:
+        node_pools:
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+      properties:
+        node_pools:
+          items:
+            $ref: '#/components/schemas/nodepools_3'
+          type: array
+      type: object
+    vke-cluster_3:
+      description: VKE Cluster
+      example:
+        firewall_group_id: firewall_group_id
+        ha_controlplanes: true
+        date_created: date_created
+        ip: ip
+        label: label
+        version: version
+        endpoint: endpoint
+        cluster_subnet: cluster_subnet
+        service_subnet: service_subnet
+        node_pools:
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        - nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+        id: id
+        region: region
+        status: status
+      properties:
+        id:
+          description: ID for the VKE cluster
+          type: string
+        firewall_group_id:
+          description: The [Firewall Group id](#operation/list-firewall-groups) linked to this cluster.
+          type: string
+        label:
+          description: Label for your cluster
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+        cluster_subnet:
+          description: IP range that your pods will run on in this cluster
+          type: string
+        service_subnet:
+          description: IP range that services will run on this cluster
+          type: string
+        ip:
+          description: IP for your Kubernetes Clusters Control Plane
+          type: string
+        endpoint:
+          description: Domain for your Kubernetes Clusters Control Plane
+          type: string
+        version:
+          description: Version of Kubernetes this cluster is running on
+          type: string
+        region:
+          description: Region this Kubernetes Cluster is running in
+          type: string
+        status:
+          description: Status for VKE cluster
+          type: string
+        ha_controlplanes:
+          description: 'Whether a highly available control planes configuration has been deployed
+
+            * true
+
+            * false (default)'
+          type: boolean
+        node_pools:
+          description: NodePools in this cluster
+          items:
+            $ref: '#/components/schemas/nodepools_3'
+          type: array
+      title: vke-cluster
+      type: object
+      x-examples:
+        example vke cluster:
+          id: 455dcd32-e621-48ee-a10e-0cb5f754e13e
+          firewall_group_id: ''
+          label: vke
+          date_created: 2021-07-07 22:57:01+00:00
+          cluster_subnet: 10.244.0.0/16
+          service_subnet: 10.96.0.0/12
+          ip: 0.0.0.0
+          endpoint: 455dcd32-e621-48ee-a10e-0cb5f754e13e.vultr-k8s.com
+          version: v1.20.0+1
+          region: lax
+          status: pending
+          ha_controlplanes: false
+          node_pools:
+          - id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+            date_created: 2021-07-07 22:57:01+00:00
+            label: my-label
+            tag: my-tag
+            plan: vc2-1c-2gb
+            status: pending
+            node_quantity: 2
+            nodes:
+            - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+              label: my-label-6ac60e6313dd1
+              date_created: 2021-07-07 22:57:01+00:00
+              status: pending
+            - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+              label: my-label-6ac60e6313ddc
+              date_created: 2021-07-07 22:57:01+00:00
+              status: pending
+      x-tags:
+      - kubernetes
+    nodepool-instances_3:
+      description: Instance that belongs to a nodepool
+      example:
+        date_created: date_created
+        id: id
+        label: label
+      properties:
+        id:
+          description: ID of the nodepool instance
+          type: string
+        label:
+          description: Label of the nodepool instance
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+      title: nodepool-instances
+      type: object
+      x-examples:
+        example nodepool:
+          id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+          label: my-label-48770259-6ac60e6313dd1
+          date_created: 2021-07-07 22:57:01+00:00
+          status: pending
+    nodepools_3:
+      description: NodePool
+      example:
+        nodes:
+        - date_created: date_created
+          id: id
+          label: label
+        - date_created: date_created
+          id: id
+          label: label
+        date_updated: date_updated
+        auto_scaler: true
+        date_created: date_created
+        node_quantity: 0
+        max_nodes: 1
+        id: id
+        label: label
+        tag: tag
+        plan: plan
+        min_nodes: 6
+        status: status
+      properties:
+        id:
+          description: The [NodePool ID](#operation/get-nodepools).
+          type: string
+        date_created:
+          description: Date of creation
+          type: string
+        label:
+          description: Label for nodepool
+          type: string
+        tag:
+          description: Tag for node pool
+          type: string
+        plan:
+          description: Plan used for nodepool
+          type: string
+        status:
+          description: Status for nodepool
+          type: string
+        node_quantity:
+          description: Number of nodes in nodepool
+          type: integer
+        nodes:
+          items:
+            $ref: '#/components/schemas/nodepool-instances_3'
+          type: array
+        date_updated:
+          description: Date the nodepool was updated.
+          type: string
+        auto_scaler:
+          description: Displays if the auto scaler is enabled or disabled for your cluster.
+          type: boolean
+        min_nodes:
+          description: Auto scaler field that displays the minimum nodes you want for your cluster.
+          type: integer
+        max_nodes:
+          description: Auto scaler field that displays the maximum nodes you want for your cluster.
+          type: integer
+      title: nodepools
+      type: object
+      x-examples:
+        example nodepool:
+          id: 11e4443a-f92a-46d6-94c8-61c1a1a7514e
+          date_created: 2021-07-07 22:57:01+00:00
+          label: my-label
+          tag: my-tag
+          plan: vc2-1c-2gb
+          status: pending
+          node_quantity: 2
+          min_nodes: 2
+          max_nodes: 5
+          auto_scaler: true
+          nodes:
+          - id: 43eda5c8-67f7-4c63-88bc-2f568b48b2b0
+            label: my-label-48770259-6ac60e6313dd1
+            date_created: 2021-07-07 22:57:01+00:00
+            status: pending
+          - id: 15a7893d-d584-45d5-a74c-d9f46866aa3c
+            label: my-label-48770259-6ac60e6313ddc
+            date_created: 2021-07-07 22:57:01+00:00
+            status: pending
+      x-tags:
+      - kubernetes
+    create_nodepools_201_response_2:
+      example:
+        node_pool:
+          nodes:
+          - date_created: date_created
+            id: id
+            label: label
+          - date_created: date_created
+            id: id
+            label: label
+          date_updated: date_updated
+          auto_scaler: true
+          date_created: date_created
+          node_quantity: 0
+          max_nodes: 1
+          id: id
+          label: label
+          tag: tag
+          plan: plan
+          min_nodes: 6
+          status: status
+      properties:
+        node_pool:
+          $ref: '#/components/schemas/nodepools_3'
+      type: object
+    list_kubernetes_clusters_200_response_2:
+      example:
+        vke_clusters:
+        - firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+        - firewall_group_id: firewall_group_id
+          ha_controlplanes: true
+          date_created: date_created
+          ip: ip
+          label: label
+          version: version
+          endpoint: endpoint
+          cluster_subnet: cluster_subnet
+          service_subnet: service_subnet
+          node_pools:
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          - nodes:
+            - date_created: date_created
+              id: id
+              label: label
+            - date_created: date_created
+              id: id
+              label: label
+            date_updated: date_updated
+            auto_scaler: true
+            date_created: date_created
+            node_quantity: 0
+            max_nodes: 1
+            id: id
+            label: label
+            tag: tag
+            plan: plan
+            min_nodes: 6
+            status: status
+          id: id
+          region: region
+          status: status
+      properties:
+        vke_clusters:
+          items:
+            $ref: '#/components/schemas/vke-cluster_3'
+          type: array
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

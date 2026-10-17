@@ -1,0 +1,592 @@
+openapi: 3.2.0
+info:
+  title: Vultr Startup API
+  version: '2.0'
+  description: 'Operations tagged startup across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: startup
+  x-displayName: Startup Scripts
+  description: Vultr allows you to assign two types of scripts to a server. Boot scripts configure new deployments, and PXE scripts automatically install operating systems. Assign startup scripts to your servers through the API or on your Startup Scripts page in the customer portal.
+paths:
+  /startup-scripts/{startup-id}:
+    parameters:
+    - schema:
+        type: string
+      name: startup-id
+      in: path
+      required: true
+      description: The [Startup Script id](#operation/list-startup-scripts).
+    get:
+      summary: Get Startup Script
+      tags:
+      - startup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/startup-scripts/{startup-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  startup_script:
+                    $ref: '#/components/schemas/startup'
+              examples:
+                response:
+                  value:
+                    startup_script:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:59:20+00:00'
+                      name: Example Startup Script
+                      type: pxe
+                      script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-startup-script
+      description: Get information for a Startup Script.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Startup Script
+      tags:
+      - startup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/startup-scripts/{startup-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-startup-script
+      security:
+      - API Key: []
+      description: Delete a Startup Script.
+    patch:
+      summary: Update Startup Script
+      tags:
+      - startup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/startup-scripts/{startup-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"Example Startup Script\",\n    \"script\" : \"QmFzZTY0IEV4YW1wbGUgRGF0YQ==\"\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: update-startup-script
+      description: Update a Startup Script. The attributes `name` and `script` are optional. If not set, the attributes will retain their original values. The `script` attribute is base-64 encoded. New deployments will use the updated script, but this action does not update previously deployed instances.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the Startup Script.
+                script:
+                  type: string
+                  description: The base-64 encoded Startup Script.
+                type:
+                  type: string
+                  description: 'The Startup Script type.
+
+
+                    boot (default)
+
+                    pxe'
+            examples:
+              request:
+                value:
+                  name: Example Startup Script
+                  script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /startup-scripts:
+    parameters: []
+    get:
+      summary: List Startup Scripts
+      tags:
+      - startup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/startup-scripts\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  startup_scripts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/startup'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    startup_scripts:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:59:20+00:00'
+                      name: Example Startup Script
+                      type: pxe
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '401':
+          description: Unauthorized
+      operationId: list-startup-scripts
+      description: Get a list of all Startup Scripts.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Startup Script
+      tags:
+      - startup
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/startup-scripts\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"name\" : \"Example Startup Script\",\n    \"type\" : \"pxe\",\n    \"script\" : \"QmFzZTY0IEV4YW1wbGUgRGF0YQ==\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  startup_script:
+                    $ref: '#/components/schemas/startup'
+              examples:
+                response:
+                  value:
+                    startup_script:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      date_modified: '2020-10-10T01:56:20+00:00'
+                      name: Example Startup Script
+                      type: pxe
+                      script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-startup-script
+      description: Create a new Startup Script. The `name` and `script` attributes are required, and scripts are base-64 encoded.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the Startup Script.
+                type:
+                  type: string
+                  description: 'The Startup Script type.
+
+
+                    * boot (default)
+
+                    * pxe'
+                script:
+                  type: string
+                  description: The base-64 encoded Startup Script.
+              required:
+              - name
+              - script
+            examples:
+              request:
+                value:
+                  name: Example Startup Script
+                  type: pxe
+                  script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    startup:
+      title: startup
+      type: object
+      x-tags:
+      - startup
+      description: Startup Script information.
+      x-examples:
+        startup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          date_modified: '2020-10-10T01:59:20+00:00'
+          name: Example Startup Script
+          type: pxe
+          script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Startup Script.
+        date_created:
+          type: string
+          description: The date the Startup Script was created.
+        date_modified:
+          type: string
+          description: The date the Startup Script was last modified.
+        name:
+          type: string
+          description: The user-supplied name of the Startup Script.
+        script:
+          type: string
+          description: The base-64 encoded Startup Script.
+        type:
+          type: string
+          description: 'The Startup Script type.
+
+
+            * boot
+
+            * pxe'
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    update_startup_script_request:
+      properties:
+        name:
+          description: The name of the Startup Script.
+          type: string
+        script:
+          description: The base-64 encoded Startup Script.
+          type: string
+        type:
+          description: 'The Startup Script type.
+
+
+            boot (default)
+
+            pxe'
+          type: string
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    startup_2:
+      description: Startup Script information.
+      example:
+        date_modified: date_modified
+        date_created: date_created
+        name: name
+        id: id
+        type: type
+        script: script
+      properties:
+        id:
+          description: A unique ID for the Startup Script.
+          type: string
+        date_created:
+          description: The date the Startup Script was created.
+          type: string
+        date_modified:
+          description: The date the Startup Script was last modified.
+          type: string
+        name:
+          description: The user-supplied name of the Startup Script.
+          type: string
+        script:
+          description: The base-64 encoded Startup Script.
+          type: string
+        type:
+          description: 'The Startup Script type.
+
+
+            * boot
+
+            * pxe'
+          type: string
+      title: startup
+      type: object
+      x-tags:
+      - startup
+      x-examples:
+        startup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          date_modified: 2020-10-10 01:59:20+00:00
+          name: Example Startup Script
+          type: pxe
+          script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+    get_startup_script_200_response:
+      example:
+        startup_script:
+          date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+      properties:
+        startup_script:
+          $ref: '#/components/schemas/startup_2'
+      type: object
+    create_startup_script_request:
+      properties:
+        name:
+          description: The name of the Startup Script.
+          type: string
+        type:
+          description: 'The Startup Script type.
+
+
+            * boot (default)
+
+            * pxe'
+          type: string
+        script:
+          description: The base-64 encoded Startup Script.
+          type: string
+      required:
+      - name
+      - script
+      type: object
+    list_startup_scripts_200_response:
+      example:
+        startup_scripts:
+        - date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+        - date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        startup_scripts:
+          items:
+            $ref: '#/components/schemas/startup_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    startup_3:
+      description: Startup Script information.
+      example:
+        date_modified: date_modified
+        date_created: date_created
+        name: name
+        id: id
+        type: type
+        script: script
+      properties:
+        id:
+          description: A unique ID for the Startup Script.
+          type: string
+        date_created:
+          description: The date the Startup Script was created.
+          type: string
+        date_modified:
+          description: The date the Startup Script was last modified.
+          type: string
+        name:
+          description: The user-supplied name of the Startup Script.
+          type: string
+        script:
+          description: The base-64 encoded Startup Script.
+          type: string
+        type:
+          description: 'The Startup Script type.
+
+
+            * boot
+
+            * pxe'
+          type: string
+      title: startup
+      type: object
+      x-tags:
+      - startup
+      x-examples:
+        startup:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          date_modified: 2020-10-10 01:59:20+00:00
+          name: Example Startup Script
+          type: pxe
+          script: QmFzZTY0IEV4YW1wbGUgRGF0YQ==
+    get_startup_script_200_response_2:
+      example:
+        startup_script:
+          date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+      properties:
+        startup_script:
+          $ref: '#/components/schemas/startup_3'
+      type: object
+    list_startup_scripts_200_response_2:
+      example:
+        startup_scripts:
+        - date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+        - date_modified: date_modified
+          date_created: date_created
+          name: name
+          id: id
+          type: type
+          script: script
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        startup_scripts:
+          items:
+            $ref: '#/components/schemas/startup_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

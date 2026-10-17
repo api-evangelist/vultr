@@ -1,0 +1,203 @@
+openapi: 3.2.0
+info:
+  title: Vultr SCIM Settings API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged SCIM Settings across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: SCIM Settings
+  description: Manage SCIM enablement and tokens for organizations
+paths:
+  /v2/organizations/{id}/scim:
+    get:
+      tags:
+      - SCIM Settings
+      summary: Get SCIM Settings
+      operationId: getSCIMSettings
+      description: Retrieve SCIM settings for an organization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SCIM settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/organizations/{id}/scim/enable:
+    post:
+      tags:
+      - SCIM Settings
+      summary: Enable SCIM
+      operationId: enableSCIM
+      description: Enable SCIM for the organization and generate token
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth_method:
+                  type: string
+                  enum:
+                  - uuid
+                  - jwt
+                  default: uuid
+                  description: Authentication method for SCIM
+      responses:
+        '200':
+          description: SCIM enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/organizations/{id}/scim/disable:
+    post:
+      tags:
+      - SCIM Settings
+      summary: Disable SCIM
+      operationId: disableSCIM
+      description: Disable SCIM for the organization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SCIM disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/organizations/{id}/scim/token:
+    post:
+      tags:
+      - SCIM Settings
+      summary: Rotate SCIM Token
+      operationId: rotateSCIMToken
+      description: Generate a new SCIM authentication token
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: New token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSCIM'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  schemas:
+    OrganizationSCIM:
+      type: object
+      properties:
+        scim_enabled:
+          type: boolean
+          description: Whether SCIM is enabled
+        auth_method:
+          type: string
+          enum:
+          - uuid
+          - jwt
+          description: Authentication method for SCIM
+        scim_token:
+          type: string
+          description: SCIM authentication token (only shown when auth_method is uuid)
+        date_added:
+          type: string
+          format: date-time
+        date_updated:
+          type: string
+          format: date-time
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

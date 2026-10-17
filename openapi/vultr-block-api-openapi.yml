@@ -1,0 +1,791 @@
+openapi: 3.2.0
+info:
+  title: Vultr Block API
+  version: '2.0'
+  description: 'Operations tagged block across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Block
+  x-displayName: Block Storage
+  description: Block Storage volumes are highly-available, redundant, SSD backed, and expandable from 10 GB to 10,000 GB. Block storage volumes can be formatted with your choice of filesystems and moved between server instances as needed. See our FAQ for details.
+paths:
+  /blocks:
+    parameters: []
+    get:
+      summary: List Block storages
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blocks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/blockstorage'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                block storage list:
+                  value:
+                    blocks:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cost: 5
+                      status: pending
+                      size_gb: 50
+                      region: ewr
+                      attached_to_instance: 742c9913-d088-4d67-bc61-5a10e922fbd1
+                      label: Example Block Storage
+                      mount_id: ewr-example112233
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      operationId: list-blocks
+      description: List all Block Storage in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Block Storage
+      operationId: create-block
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  block:
+                    $ref: '#/components/schemas/blockstorage'
+              examples:
+                created block storage:
+                  value:
+                    block:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cost: 5
+                      status: active
+                      size_gb: 50
+                      region: ewr
+                      attached_to_instance: 742c9913-d088-4d67-bc61-5a10e922fbd1
+                      label: Example Block Storage
+                      mount_id: ewr-example112233
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Create new Block Storage in a `region` with a size of `size_gb`. Size may range between 10 and 10000.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                  description: The [Region id](#operation/list-regions) where the Block Storage will be created.
+                size_gb:
+                  type: integer
+                  description: Size in GB may range between 10 and 10000.
+                label:
+                  type: string
+                  description: The user-supplied label.
+              required:
+              - region
+              - size_gb
+            examples:
+              request:
+                value:
+                  region: ewr
+                  size_gb: 50
+                  label: Example Block Storage
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"size_gb\" : 50,\n    \"label\" : \"Example Block Storage\"\n  }'"
+    servers:
+    - url: https://api.vultr.com/v2
+  /blocks/{block-id}:
+    parameters:
+    - schema:
+        type: string
+      name: block-id
+      in: path
+      required: true
+      description: The [Block Storage id](#operation/list-blocks).
+    get:
+      summary: Get Block Storage
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks/{block-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  block:
+                    $ref: '#/components/schemas/blockstorage'
+              examples:
+                single block storage:
+                  value:
+                    block:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      cost: 5
+                      status: active
+                      size_gb: 50
+                      region: ewr
+                      attached_to_instance: 742c9913-d088-4d67-bc61-5a10e922fbd1
+                      label: Example Block Storage
+                      mount_id: ewr-example112233
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      operationId: get-block
+      description: Get information for Block Storage.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Block Storage
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks/{block-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-block
+      description: Delete Block Storage.
+      security:
+      - API Key: []
+    patch:
+      summary: Update Block Storage
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks/{block-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"label\" : \"Updated Block Storage Label\",\n    \"size_gb\": 50\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: update-block
+      description: Update information for Block Storage.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: The user-supplied label.
+                size_gb:
+                  type: integer
+                  description: New size of the Block Storage in GB. Size may range between 10 and 10000.
+            examples:
+              patch request:
+                value:
+                  label: Updated Block Storage Label
+                  size_gb: 50
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /blocks/{block-id}/attach:
+    parameters:
+    - schema:
+        type: string
+      name: block-id
+      in: path
+      required: true
+      description: The [Block Storage id](#operation/list-blocks).
+    post:
+      summary: Attach Block Storage
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks/{block-id}/attach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_id\" : \"a632673e-2fd5-4ff1-b251-2e28e7b65504\",\n    \"live\" : true\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: attach-block
+      description: Attach Block Storage to Instance `instance_id`.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_id:
+                  description: Attach the Block Storage to this [Instance id](#operation/list-instances).
+                  type: string
+                live:
+                  type: boolean
+                  description: 'Attach Block Storage without restarting the Instance.
+
+
+                    |   | Value | Description |
+
+                    | - | ----- | ----------- |
+
+                    |   | true | Attach live, do not restart the instance. |
+
+                    |   | false | Restart the instance and attach the Block Storage. |'
+              required:
+              - instance_id
+            examples:
+              post request:
+                value:
+                  instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  live: true
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /blocks/{block-id}/detach:
+    parameters:
+    - schema:
+        type: string
+      name: block-id
+      in: path
+      required: true
+      description: The [Block Storage id](#operation/list-blocks).
+    post:
+      summary: Detach Block Storage
+      tags:
+      - Block
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/blocks/{block-id}/detach\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"live\" : true\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: detach-block
+      security:
+      - API Key: []
+      description: Detach Block Storage.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                live:
+                  type: boolean
+                  description: 'Detach Block Storage without restarting the Instance.
+
+
+                    |   | Value | Description |
+
+                    | - | ----- | ----------- |
+
+                    |   | true | Detach live, do not restart the instance. |
+
+                    |   | false | Restart the instance and detach the Block Storage. |'
+            examples:
+              post request:
+                value:
+                  live: true
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    blockstorage:
+      title: blockstorage
+      type: object
+      x-tags:
+      - block
+      description: Block Storage information.
+      x-examples:
+        block structure:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          cost: 10
+          status: active
+          size_gb: 100
+          region: ewr
+          attached_to_instance: b92f4771-d8cd-480a-b6e6-a14ca31ea2ca
+          date_created: '2020-10-10T01:56:20+00:00'
+          label: Example Block Storage
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Block Storage.
+        cost:
+          type: integer
+          description: The monthly cost of this Block Storage.
+        status:
+          type: string
+          description: 'The current status of this Block Storage.
+
+
+            * active'
+        size_gb:
+          type: integer
+          description: Size of the Block Storage in GB.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the Block Storage is located.
+        attached_to_instance:
+          type: string
+          description: The [Instance id](#operation/list-instances) with this Block Storage attached.
+        date_created:
+          type: string
+          description: The date this Block Storage was created.
+        label:
+          type: string
+          description: The user-supplied label.
+        mount_id:
+          type: string
+          description: An ID associated with the instance, when mounted the ID can be found in /dev/disk/by-id prefixed with virtio.
+    detach_block_request:
+      properties:
+        live:
+          description: 'Detach Block Storage without restarting the Instance.
+
+
+            |   | Value | Description |
+
+            | - | ----- | ----------- |
+
+            |   | true | Detach live, do not restart the instance. |
+
+            |   | false | Restart the instance and detach the Block Storage. |'
+          type: boolean
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    attach_block_request:
+      properties:
+        instance_id:
+          description: Attach the Block Storage to this [Instance id](#operation/list-instances).
+          type: string
+        live:
+          description: 'Attach Block Storage without restarting the Instance.
+
+
+            |   | Value | Description |
+
+            | - | ----- | ----------- |
+
+            |   | true | Attach live, do not restart the instance. |
+
+            |   | false | Restart the instance and attach the Block Storage. |'
+          type: boolean
+      required:
+      - instance_id
+      type: object
+    update_block_request:
+      properties:
+        label:
+          description: The user-supplied label.
+          type: string
+        size_gb:
+          description: New size of the Block Storage in GB. Size may range between 10 and 40000 depending on the `block_type`.
+          type: integer
+      type: object
+    list_blocks_200_response:
+      example:
+        blocks:
+        - cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+        - cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        blocks:
+          items:
+            $ref: '#/components/schemas/blockstorage_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    blockstorage_2:
+      description: Block Storage information.
+      example:
+        cost: 0
+        attached_to_instance: attached_to_instance
+        date_created: date_created
+        size_gb: 6
+        id: id
+        label: label
+        region: region
+        mount_id: mount_id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Block Storage.
+          type: string
+        cost:
+          description: The monthly cost of this Block Storage.
+          type: integer
+        status:
+          description: 'The current status of this Block Storage.
+
+
+            * active'
+          type: string
+        size_gb:
+          description: Size of the Block Storage in GB.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the Block Storage is located.
+          type: string
+        attached_to_instance:
+          description: The [Instance id](#operation/list-instances) with this Block Storage attached.
+          type: string
+        date_created:
+          description: The date this Block Storage was created.
+          type: string
+        label:
+          description: The user-supplied label.
+          type: string
+        mount_id:
+          description: An ID associated with the instance, when mounted the ID can be found in /dev/disk/by-id prefixed with virtio.
+          type: string
+      title: blockstorage
+      type: object
+      x-tags:
+      - block
+      x-examples:
+        block structure:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          cost: 10
+          status: active
+          size_gb: 100
+          region: ewr
+          attached_to_instance: b92f4771-d8cd-480a-b6e6-a14ca31ea2ca
+          date_created: 2020-10-10 01:56:20+00:00
+          label: Example Block Storage
+    create_block_202_response:
+      example:
+        block:
+          cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+      properties:
+        block:
+          $ref: '#/components/schemas/blockstorage_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    create_block_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) where the Block Storage will be created.
+          type: string
+        size_gb:
+          description: Size in GB may range between 10 and 40000, depending on the `block_type`.
+          type: integer
+        label:
+          description: The user-supplied label.
+          type: string
+        block_type:
+          description: 'An optional parameter, that determines on the type of block storage volume that will be created.
+
+            Soon to become a required parameter.
+
+
+            * `high_perf` from 10GB to 10,000GB
+
+            * `storage_opt` from 40GB to 40,000GB'
+          type: string
+      required:
+      - region
+      - size_gb
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_blocks_200_response_2:
+      example:
+        blocks:
+        - cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+        - cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        blocks:
+          items:
+            $ref: '#/components/schemas/blockstorage_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    blockstorage_3:
+      description: Block Storage information.
+      example:
+        cost: 0
+        attached_to_instance: attached_to_instance
+        date_created: date_created
+        size_gb: 6
+        id: id
+        label: label
+        region: region
+        mount_id: mount_id
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Block Storage.
+          type: string
+        cost:
+          description: The monthly cost of this Block Storage.
+          type: integer
+        status:
+          description: 'The current status of this Block Storage.
+
+
+            * active'
+          type: string
+        size_gb:
+          description: Size of the Block Storage in GB.
+          type: integer
+        region:
+          description: The [Region id](#operation/list-regions) where the Block Storage is located.
+          type: string
+        attached_to_instance:
+          description: The [Instance id](#operation/list-instances) with this Block Storage attached.
+          type: string
+        date_created:
+          description: The date this Block Storage was created.
+          type: string
+        label:
+          description: The user-supplied label.
+          type: string
+        mount_id:
+          description: An ID associated with the instance, when mounted the ID can be found in /dev/disk/by-id prefixed with virtio.
+          type: string
+      title: blockstorage
+      type: object
+      x-tags:
+      - block
+      x-examples:
+        block structure:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          cost: 10
+          status: active
+          size_gb: 100
+          region: ewr
+          attached_to_instance: b92f4771-d8cd-480a-b6e6-a14ca31ea2ca
+          date_created: 2020-10-10 01:56:20+00:00
+          label: Example Block Storage
+    create_block_202_response_2:
+      example:
+        block:
+          cost: 0
+          attached_to_instance: attached_to_instance
+          date_created: date_created
+          size_gb: 6
+          id: id
+          label: label
+          region: region
+          mount_id: mount_id
+          status: status
+      properties:
+        block:
+          $ref: '#/components/schemas/blockstorage_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

@@ -1,0 +1,271 @@
+openapi: 3.2.0
+info:
+  title: Vultr Subaccount API
+  version: '2.0'
+  contact:
+    email: support@vultr.com
+    name: ''
+    url: https://www.vultr.com
+  description: 'Operations tagged subaccount across 2 of this provider''s published API definitions: vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- description: Sub-accounts are separate Vultr accounts that are directly linked to your account. These accounts function similarly to normal Vultr accounts with some additional billing and administrative features available to your account.
+  name: Sub Account
+  x-displayName: Sub-Accounts
+paths:
+  /subaccounts:
+    get:
+      description: Get information about all sub-accounts for your account.
+      operationId: list-subaccounts
+      parameters:
+      - description: Number of items requested per page. Default is 100 and Max is 500.
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    subaccounts:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      email: subaccount@vultr.com
+                      subaccount_name: Acme Widgets LLC
+                      subaccount_id: 472924
+                      activated: false
+                      balance: 0
+                      pending_charges: 0
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+              schema:
+                $ref: '#/components/schemas/list_subaccounts_200_response'
+          description: OK
+        '401':
+          description: Unauthorized
+      security:
+      - API Key: []
+      summary: List Sub-Accounts
+      tags:
+      - Sub Account
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/subaccounts\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: Create a new subaccount.
+      operationId: create-subaccount
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  email: subaccount@vultr.com
+                  subaccount_name: Acme Widgets LLC
+                  subaccount_id: 472924
+            schema:
+              $ref: '#/components/schemas/create_subaccount_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    subaccount:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      email: subaccount@vultr.com
+                      subaccount_name: Acme Widgets LLC
+                      subaccount_id: 472924
+                      activated: false
+                      balance: 0
+                      pending_charges: 0
+              schema:
+                $ref: '#/components/schemas/create_subaccount_201_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      security:
+      - API Key: []
+      summary: Create Sub-Account
+      tags:
+      - Sub Account
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/subaccounts\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"email\" : \"subaccount@vultr.com\",\n    \"subaccount_name\" : \"Acme Widgets LLC\"\n    \"subaccount_id\" : \"472924\"\n\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_subaccounts_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        subaccounts:
+        - balance: ''
+          pending_charges: ''
+          subaccount_id: subaccount_id
+          id: id
+          subaccount_name: subaccount_name
+          email: email
+          activated: true
+        - balance: ''
+          pending_charges: ''
+          subaccount_id: subaccount_id
+          id: id
+          subaccount_name: subaccount_name
+          email: email
+          activated: true
+      properties:
+        subaccounts:
+          items:
+            $ref: '#/components/schemas/subaccount'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    create_subaccount_request:
+      properties:
+        email:
+          description: Create a new sub-account with this email address.
+          type: string
+        subaccount_name:
+          description: Your name for this sub-account.
+          type: string
+        subaccount_id:
+          description: Your ID for this sub-account.
+          type: string
+      required:
+      - email
+      type: object
+    subaccount:
+      description: Sub-account information.
+      example:
+        balance: ''
+        pending_charges: ''
+        subaccount_id: subaccount_id
+        id: id
+        subaccount_name: subaccount_name
+        email: email
+        activated: true
+      properties:
+        id:
+          description: A unique ID for the sub-account.
+          type: string
+        email:
+          description: The email address of this sub-account.
+          type: string
+        subaccount_name:
+          description: Your name for this sub-account.
+          type: string
+        subaccount_id:
+          description: Your ID for this sub-account.
+          type: string
+        activated:
+          description: Has this sub-account been activated or not.
+          type: boolean
+        balance:
+          description: The current balance of the sub-account.
+          type: float
+        pending_charges:
+          description: Charges due for this sub-account at the end of the billing period.
+          type: float
+      title: subaccount
+      type: object
+      x-examples:
+        subaccount:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          email: subaccount@vultr.com
+          subaccount_name: Acme Widgets LLC
+          subaccount_id: 472924
+          activated: false
+          balance: 0
+          pending_charges: 0
+      x-tags:
+      - subaccount
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    create_subaccount_201_response:
+      example:
+        subaccount:
+          balance: ''
+          pending_charges: ''
+          subaccount_id: subaccount_id
+          id: id
+          subaccount_name: subaccount_name
+          email: email
+          activated: true
+      properties:
+        subaccount:
+          $ref: '#/components/schemas/subaccount'
+      type: object
+  securitySchemes:
+    API_Key:
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+      in: header
+      scheme: bearer
+      type: http
+x-refined-from:
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

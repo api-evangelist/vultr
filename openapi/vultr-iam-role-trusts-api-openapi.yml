@@ -1,0 +1,441 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Role Trusts API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Role Trusts across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Role Trusts
+  description: Manage trust relationships between roles
+paths:
+  /v2/role-trusts:
+    post:
+      tags:
+      - IAM Role Trusts
+      summary: Create Role Trust
+      operationId: createRoleTrust
+      description: Create a trust relationship allowing users/groups to assume a role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - role_id
+              properties:
+                role_id:
+                  type: string
+                  format: uuid
+                  description: Role that can be assumed
+                trusted_user_id:
+                  type: string
+                  format: uuid
+                  description: User ID that can assume the role (provide either this or trusted_group_id)
+                trusted_group_id:
+                  type: string
+                  format: uuid
+                  description: Group ID that can assume the role (provide either this or trusted_user_id)
+                trust_type:
+                  type: string
+                  enum:
+                  - TemporaryAssumption
+                  default: TemporaryAssumption
+                  description: Type of trust relationship
+                conditions:
+                  type: object
+                  description: Optional conditions for trust (e.g., time_of_day, ip_address)
+                  example:
+                    time_of_day:
+                      start: 10
+                      end: 17
+                    ip_address:
+                    - 10.0.0.0/8
+                    - 192.168.1.0/24
+                valid_until:
+                  type: string
+                  format: date-time
+                  description: Optional expiration date for the trust relationship
+                  example: '2025-12-31T23:59:59Z'
+      responses:
+        '201':
+          description: Trust created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleTrust'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags:
+      - IAM Role Trusts
+      summary: List Role Trusts
+      operationId: listRoleTrusts
+      description: List all role trust relationships
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of role trusts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trusts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/role-trusts/{id}:
+    get:
+      tags:
+      - IAM Role Trusts
+      summary: Get Role Trust
+      operationId: getRoleTrust
+      description: Retrieve a specific role trust relationship
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Role trust details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trust:
+                    $ref: '#/components/schemas/RoleTrust'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - IAM Role Trusts
+      summary: Update Role Trust
+      operationId: updateRoleTrust
+      description: Update a role trust relationship
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trust_type:
+                  type: string
+                  enum:
+                  - TemporaryAssumption
+                  description: Type of trust relationship
+                conditions:
+                  type: object
+                  description: Updated conditions for trust (e.g., time_of_day, ip_address)
+                  example:
+                    time_of_day:
+                      start: 9
+                      end: 17
+                    ip_address:
+                    - 10.0.0.0/8
+                    - 192.168.1.0/24
+                valid_until:
+                  type: string
+                  format: date-time
+                  description: When this trust relationship should expire
+                  example: '2025-12-31T23:59:59Z'
+      responses:
+        '200':
+          description: Trust updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleTrust'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - IAM Role Trusts
+      summary: Delete Role Trust
+      operationId: deleteRoleTrust
+      description: Remove a role trust relationship
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Trust deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/role-trusts/{id}/restore:
+    patch:
+      tags:
+      - IAM Role Trusts
+      summary: Restore Role Trust
+      operationId: restoreRoleTrust
+      description: Restore a previously deleted role trust
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Trust restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trust:
+                    $ref: '#/components/schemas/RoleTrust'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/role-trusts/by-role/{role_id}:
+    get:
+      tags:
+      - IAM Role Trusts
+      summary: List Trusts for Role
+      operationId: listTrustsForRole
+      description: List all trust relationships for a specific role
+      parameters:
+      - name: role_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: List of trusts for the role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role_trusts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/role-trusts/assumable/{user_id}:
+    get:
+      tags:
+      - IAM Role Trusts
+      summary: List Assumable Roles for User
+      operationId: listAssumableRolesForUser
+      description: List all roles that a user can assume
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of assumable roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assumable_roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoleTrust'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    RoleTrust:
+      type: object
+      required:
+      - id
+      - role_name
+      - trust_type
+      - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        role_name:
+          type: string
+          description: Name of the role that can be assumed
+        trust_type:
+          type: string
+          enum:
+          - TemporaryAssumption
+          description: Type of trust relationship
+        trusted_user_id:
+          type: string
+          format: uuid
+          description: User that can assume the role (if user trust)
+        trusted_group_id:
+          type: string
+          format: uuid
+          description: Group that can assume the role (if group trust)
+        user_display:
+          type: string
+          description: Display name of the trusted user (if user trust)
+        group_display:
+          type: string
+          description: Display name of the trusted group (if group trust)
+        conditions:
+          type: object
+          description: Conditions that must be met to assume the role
+        valid_until:
+          type: string
+          format: date-time
+          description: When this trust relationship expires
+        date_created:
+          type: string
+          format: date-time
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

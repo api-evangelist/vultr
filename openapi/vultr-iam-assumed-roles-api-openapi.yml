@@ -1,0 +1,298 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Assumed Roles API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Assumed Roles across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Assumed Roles
+  description: Manage temporary role assumptions
+paths:
+  /v2/assumed-roles/assume:
+    post:
+      tags:
+      - IAM Assumed Roles
+      summary: Assume Role
+      operationId: assumeRole
+      description: Assume a role and receive temporary credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - user_id
+              - role_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User ID that wants to assume the role
+                role_id:
+                  type: string
+                  format: uuid
+                  description: Role to assume
+                session_name:
+                  type: string
+                  description: Name for the session
+                  example: ViewAllInstances
+                duration:
+                  type: integer
+                  minimum: 900
+                  maximum: 43200
+                  default: 3600
+                  description: Session duration in seconds
+                context:
+                  type: object
+                  description: Additional context for the session
+                  properties:
+                    ip_address:
+                      type: string
+                      description: IP address for the session
+                      example: 192.168.1.1
+      responses:
+        '201':
+          description: Role assumed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_token:
+                    type: string
+                    description: Token to use for authenticated requests
+                    example: ars-8352ff31bc30e7a9fcf9492ca79974b1670b5aa686bbdec7db56b9cb09b3ee43
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: ID of the user who assumed the role
+                  role_id:
+                    type: string
+                    format: uuid
+                    description: ID of the role that was assumed
+                  session_name:
+                    type: string
+                    description: Name of the session
+                  auth_method:
+                    type: string
+                    description: Authentication method used
+                    example: api_key
+                  expires_at:
+                    type: string
+                    format: date-time
+                    description: When the session expires
+                  assumed_at:
+                    type: string
+                    format: date-time
+                    description: When the role was assumed
+                  remaining_duration:
+                    type: integer
+                    description: Remaining seconds until expiration
+                  conditions_met:
+                    type: array
+                    items:
+                      type: string
+                    description: Which conditions were met
+                  source_ip:
+                    type: string
+                    description: IP address of the request
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Access denied - cannot assume this role
+    servers:
+    - url: https://api.vultr.com
+  /v2/assumed-roles/{session_token}:
+    get:
+      tags:
+      - IAM Assumed Roles
+      summary: Get Assumed Role Session
+      operationId: getAssumedRoleSession
+      description: Get details about an assumed role session
+      parameters:
+      - name: session_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssumedRoleSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - IAM Assumed Roles
+      summary: Revoke Assumed Role Session
+      operationId: revokeAssumedRoleSession
+      description: Revoke an active assumed role session
+      parameters:
+      - name: session_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/assumed-roles/users/{user_id}/sessions:
+    get:
+      tags:
+      - IAM Assumed Roles
+      summary: List User Sessions
+      operationId: listUserSessions
+      description: List all active assumed role sessions for a user
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of active sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssumedRoleSession'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://api.vultr.com
+components:
+  schemas:
+    AssumedRoleSession:
+      type: object
+      properties:
+        session_token:
+          type: string
+          description: The session token
+          example: ars-8352ff31bc30e7a9fcf9492ca79974b1670b5aa686bbdec7db56b9cb09b3ee43
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who assumed the role
+        role_id:
+          type: string
+          format: uuid
+          description: ID of the role that was assumed
+        session_name:
+          type: string
+          description: Name of the session
+        auth_method:
+          type: string
+          description: Authentication method used
+          example: api_key
+        expires_at:
+          type: string
+          format: date-time
+          description: When the session expires
+        assumed_at:
+          type: string
+          format: date-time
+          description: When the role was assumed
+        remaining_duration:
+          type: integer
+          description: Remaining seconds until expiration
+        conditions_met:
+          type: array
+          items:
+            type: string
+          description: Which conditions were met
+        source_ip:
+          type: string
+          description: IP address of the request
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

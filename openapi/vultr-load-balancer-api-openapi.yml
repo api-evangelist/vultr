@@ -1,0 +1,2797 @@
+openapi: 3.2.0
+info:
+  title: Vultr Load Balancer API
+  version: '2.0'
+  description: 'Operations tagged load-balancer across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: load-balancer
+  x-displayName: Load Balancers
+  description: Load Balancers sit in front of your application and distribute incoming traffic across multiple Instances. When you control the load balancer via the API, you can inspect the results in the customer portal.
+paths:
+  /load-balancers:
+    parameters: []
+    get:
+      summary: List Load Balancers
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      operationId: list-load-balancers
+      description: List the Load Balancers in your account.
+      security:
+      - API Key: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  load_balancers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/loadbalancer'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    load_balancers:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      region: ewr
+                      label: Example Load Balancer
+                      status: active
+                      ipv4: 192.0.2.123
+                      ipv6: 2001:0db8:5:4973:ffff:ffff:ffff:ffff
+                      generic_info:
+                        balancing_algorithm: roundrobin
+                        ssl_redirect: false
+                        sticky_sessions:
+                          cookie_name: example-cookie
+                        proxy_protocol: false
+                        private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+                      health_check:
+                        protocol: http
+                        port: 80
+                        path: /health
+                        check_interval: 10
+                        response_timeout: 5
+                        unhealthy_threshold: 3
+                        healthy_threshold: 3
+                      has_ssl: false
+                      forwarding_rules:
+                      - id: 73d85156c2c3129d
+                        frontend_protocol: http
+                        frontend_port: 80
+                        backend_protocol: http
+                        backend_port: 80
+                      firewall_rules:
+                      - id: abcd123b93016eafb
+                        port: 80
+                        source: 198.51.100.0/24
+                        ip_type: v4
+                      instances: []
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: 'Number of items requested per page. Default is 100 and Max is 500.
+
+          '
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Load Balancer
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"balancing_algorithm\" : \"roundrobin\",\n    \"ssl_redirect\" : false,\n    \"proxy_protocol\" : false,\n    \"label\" : \"Example Load Balancer\",\n    \"health_check\" : {\n      \"protocol\" : \"http\",\n      \"port\" : 80,\n      \"path\" : \"/health\",\n      \"check_interval\" : 10,\n      \"response_timeout\" : 5,\n      \"unhealthy_threshold\" : 3,\n      \"healthy_threshold\" : 3\n    },\n    \"forwarding_rules\": [\n      {\n        \"frontend_protocol\" : \"http\",\n        \"frontend_port\" : 80,\n        \"backend_protocol\" : \"http\",\n        \"backend_port\" : 80\n      }\n    ],\n    \"firewall_rules\": [\n      {\n        \"port\" : 80,\n        \"source\" : \"0.0.0.0/0\",\n        \"ip_type\" : \"v4\",\n      }\n    ]\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  load_balancer:
+                    $ref: '#/components/schemas/loadbalancer'
+              examples:
+                response:
+                  value:
+                    load_balancer:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      region: ewr
+                      label: Example Load Balancer
+                      status: pending
+                      ipv4: ''
+                      ipv6: ''
+                      generic_info:
+                        balancing_algorithm: roundrobin
+                        ssl_redirect: false
+                        sticky_sessions:
+                          cookie_name: example-cookie
+                        proxy_protocol: false
+                        private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+                      health_check:
+                        protocol: http
+                        port: 80
+                        path: /health
+                        check_interval: 10
+                        response_timeout: 5
+                        unhealthy_threshold: 3
+                        healthy_threshold: 3
+                      has_ssl: false
+                      forwarding_rules:
+                      - id: 73d85156c2c3129d
+                        frontend_protocol: http
+                        frontend_port: 80
+                        backend_protocol: http
+                        backend_port: 80
+                      firewall_rules:
+                      - id: abcd123b93016eafb
+                        port: 80
+                        source: 24.187.16.196/16
+                        ip_type: v4
+                      instances: []
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: create-load-balancer
+      description: Create a new Load Balancer in a particular `region`.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                  description: The [Region id](#operation/list-regions) to create this Load Balancer.
+                balancing_algorithm:
+                  type: string
+                  description: 'The balancing algorithm.
+
+
+                    * roundrobin (default)
+
+                    * leastconn'
+                ssl_redirect:
+                  type: boolean
+                  description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+                    * true
+
+                    * false'
+                proxy_protocol:
+                  description: 'If `true`, you must configure backend nodes to accept Proxy protocol.
+
+
+                    * true
+
+                    * false (Default)'
+                  type: boolean
+                health_check:
+                  type: object
+                  description: The health check configuration. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+                  properties:
+                    protocol:
+                      type: string
+                      description: 'The protocol to use for health checks.
+
+
+                        * HTTPS
+
+                        * HTTP
+
+                        * TCP'
+                    port:
+                      type: integer
+                      description: The port to use for health checks.
+                    path:
+                      type: string
+                      description: HTTP Path to check. Only applies if protocol is HTTP or HTTPS.
+                    check_interval:
+                      type: integer
+                      description: Interval between health checks.
+                    response_timeout:
+                      type: integer
+                      description: Timeout before health check fails.
+                    unhealthy_threshold:
+                      type: integer
+                      description: Number times a check must fail before becoming unhealthy.
+                    healthy_threshold:
+                      type: integer
+                      description: Number of times a check must succeed before returning to healthy status.
+                forwarding_rules:
+                  type: array
+                  description: An array of forwarding rule objects.
+                  items:
+                    type: object
+                    properties:
+                      frontend_protocol:
+                        type: string
+                        description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+                          * HTTP
+
+                          * HTTPS
+
+                          * TCP'
+                      frontend_port:
+                        type: integer
+                        description: The port number on the Load Balancer to forward to the backend.
+                      backend_protocol:
+                        type: string
+                        description: 'The protocol destination on the backend server.
+
+
+                          * HTTP
+
+                          * HTTPS
+
+                          * TCP'
+                      backend_port:
+                        type: integer
+                        description: The port number destination on the backend server.
+                sticky_session:
+                  type: object
+                  description: Enables sticky sessions for your load balancer when a cookie_name is provided.
+                  properties:
+                    cookie_name:
+                      type: string
+                      description: The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+                ssl:
+                  type: object
+                  description: An SSL certificate to install on the Load Balancer.
+                  properties:
+                    private_key:
+                      type: string
+                      description: The private key.
+                    certificate:
+                      type: string
+                      description: The SSL certificate.
+                    chain:
+                      type: string
+                      description: The certificate chain.
+                label:
+                  type: string
+                  description: Label for your Load Balancer.
+                instances:
+                  type: array
+                  description: An array of instances IDs that you want attached to the load balancer.
+                  items:
+                    type: string
+                firewall_rules:
+                  type: array
+                  description: An array of firewall rule objects.
+                  items:
+                    type: object
+                    properties:
+                      port:
+                        type: integer
+                        description: Port for this rule.
+                      source:
+                        type: string
+                        description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+                          Possible values:
+
+
+                          |   | Value | Description |
+
+                          | - | ------ | ------------- |
+
+                          |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+                          |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+                      ip_type:
+                        type: string
+                        description: 'The type of IP rule.
+
+
+                          * v4
+
+                          * v6'
+                private_network:
+                  type: string
+                  description: ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+              required:
+              - region
+            examples:
+              request:
+                value:
+                  region: ewr
+                  balancing_algorithm: roundrobin
+                  ssl_redirect: false
+                  proxy_protocol: false
+                  label: Example Load Balancer
+                  health_check:
+                    protocol: http
+                    port: 80
+                    path: /health
+                    check_interval: 10
+                    response_timeout: 5
+                    unhealthy_threshold: 3
+                    healthy_threshold: 3
+                  forwarding_rules:
+                  - frontend_protocol: http
+                    frontend_port: 80
+                    backend_protocol: http
+                    backend_port: 80
+                  firewall_rules:
+                  - port: 80
+                    source: 24.187.16.196/16
+                    ip_type: v4
+                  private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{load-balancer-id}:
+    parameters:
+    - schema:
+        type: string
+      name: load-balancer-id
+      in: path
+      required: true
+      description: The [Load Balancer id](#operation/list-load-balancers).
+    get:
+      summary: Get Load Balancer
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  load_balancer:
+                    $ref: '#/components/schemas/loadbalancer'
+              examples:
+                response:
+                  value:
+                    load_balancer:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      region: ewr
+                      label: Example Load Balancer
+                      status: active
+                      ipv4: 192.0.2.123
+                      ipv6: 2001:0db8:5:4973:ffff:ffff:ffff:ffff
+                      generic_info:
+                        balancing_algorithm: roundrobin
+                        ssl_redirect: false
+                        sticky_sessions:
+                          cookie_name: example-cookie
+                        proxy_protocol: false
+                        private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+                      health_check:
+                        protocol: http
+                        port: 80
+                        path: /health
+                        check_interval: 10
+                        response_timeout: 5
+                        unhealthy_threshold: 3
+                        healthy_threshold: 3
+                      has_ssl: false
+                      forwarding_rules:
+                      - id: 73d85156c2c3129d
+                        frontend_protocol: http
+                        frontend_port: 80
+                        backend_protocol: http
+                        backend_port: 80
+                      firewall_rules:
+                      - id: abcd123b93016eafb
+                        port: 80
+                        source: 198.51.100.0/24
+                        ip_type: v4
+                      instances: []
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-load-balancer
+      description: Get information for a Load Balancer.
+      security:
+      - API Key: []
+    patch:
+      summary: Update Load Balancer
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}\" \\\n  -X PATCH \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"ssl\": {\n      \"private_key\": \"-----BEGIN RSA ... \",\n      \"certificate\": \"-----BEGIN RSA ... \",\n      \"chain\": \"-----BEGIN RSA ... \"\n    },\n    \"sticky_session\": {\n      \"cookie_name\": \"example-cookie\"\n    },\n    \"forwarding_rules\": [\n      {\n        \"frontend_protocol\": \"http\",\n        \"frontend_port\": 80,\n        \"backend_protocol\": \"http\",\n        \"backend_port\": 80\n      }\n    ],\n    \"health_check\": {\n      \"protocol\": \"http\",\n      \"port\": 80,\n      \"path\": \"/health\",\n      \"check_interval\": \"10\",\n      \"response_timeout\": \"5\",\n      \"unhealthy_threshold\": \"3\",\n      \"healthy_threshold\": \"3\"\n    },\n    \"proxy_protocol\": true,\n    \"ssl_redirect\": true,\n    \"balancing_algorithm\": \"roundrobin\",\n    \"instances\": [\n      \"73d85156c2c3129d\"\n    ]\n  }'"
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: update-load-balancer
+      security:
+      - API Key: []
+      description: Update information for a Load Balancer. All attributes are optional. If not set, the attributes will retain their original values.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ssl:
+                  type: object
+                  description: An SSL certificate to install on the Load Balancer.
+                  properties:
+                    private_key:
+                      type: string
+                      description: The private key.
+                    certificate:
+                      type: string
+                      description: The SSL certificate.
+                    chain:
+                      type: string
+                      description: The certificate chain.
+                sticky_session:
+                  type: object
+                  description: Enables sticky sessions for your load balancer when a cookie_name is provided.
+                  properties:
+                    cookie_name:
+                      type: string
+                      description: The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+                forwarding_rules:
+                  type: array
+                  description: An array of forwarding rule objects.
+                  items:
+                    type: object
+                    properties:
+                      frontend_protocol:
+                        type: string
+                        description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+                          * HTTP
+
+                          * HTTPS
+
+                          * TCP'
+                      frontend_port:
+                        type: integer
+                        description: The port number on the Load Balancer to forward to the backend.
+                      backend_protocol:
+                        type: string
+                        description: 'The protocol destination on the backend server.
+
+
+                          * HTTP
+
+                          * HTTPS
+
+                          * TCP'
+                      backend_port:
+                        type: integer
+                        description: The port number destination on the backend server.
+                health_check:
+                  type: object
+                  description: The health check configuration. [See Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+                  properties:
+                    protocol:
+                      type: string
+                      description: 'The protocol to use for health checks.
+
+
+                        * HTTPS
+
+                        * HTTP
+
+                        * TCP'
+                    port:
+                      type: integer
+                      description: The port to use for health checks.
+                    path:
+                      type: string
+                      description: HTTP Path to check. Only applies if protocol is HTTP or HTTPS.
+                    check_interval:
+                      type: string
+                      description: Interval between health checks.
+                    response_timeout:
+                      type: string
+                      description: Timeout before health check fails.
+                    unhealthy_threshold:
+                      type: string
+                      description: Number times a check must fail before becoming unhealthy.
+                    healthy_threshold:
+                      type: string
+                      description: Number of times a check must succeed before returning to healthy status.
+                proxy_protocol:
+                  type: boolean
+                  description: 'If `true`, you must configure backend nodes to accept Proxy protocol.
+
+
+                    * true
+
+                    * false (Default)'
+                ssl_redirect:
+                  type: boolean
+                  description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+                    * true
+
+                    * false'
+                balancing_algorithm:
+                  type: string
+                  description: 'The balancing algorithm.
+
+
+                    * roundrobin (default)
+
+                    * leastconn'
+                instances:
+                  type: array
+                  description: Send the complete array of Instances IDs that should be attached to this Load Balancer. Instances will be attached or detached to match your array. For example, if Instances **X**, **Y**, and **Z** are currently attached, and you send [A,B,Z], then Instance **A** and **B** will be attached,  **X** and **Y** will be detached, and **Z** will remain attached.
+                  items:
+                    type: string
+                label:
+                  type: string
+                  description: The label for your Load Balancer
+                private_network:
+                  type: string
+                  description: ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+                firewall_rules:
+                  type: array
+                  description: An array of firewall rule objects.
+                  items:
+                    type: object
+                    properties:
+                      port:
+                        type: integer
+                        description: Port for this rule.
+                      source:
+                        type: string
+                        description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+                          Possible values:
+
+
+                          |   | Value | Description |
+
+                          | - | ------ | ------------- |
+
+                          |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+                          |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+                      ip_type:
+                        type: string
+                        description: 'The type of IP rule.
+
+
+                          * v4
+
+                          * v6'
+            examples:
+              request:
+                value:
+                  ssl:
+                    private_key: '-----BEGIN RSA ... '
+                    certificate: '-----BEGIN RSA ... '
+                    chain: '-----BEGIN RSA ... '
+                  sticky_session:
+                    cookie_name: example-cookie
+                  forwarding_rules:
+                  - frontend_protocol: http
+                    frontend_port: 80
+                    backend_protocol: http
+                    backend_port: 80
+                  firewall_rules:
+                  - port: 80
+                    source: 192.168.1.1/16
+                    ip_type: v4
+                  health_check:
+                    protocol: http
+                    port: 80
+                    path: /health
+                    check_interval: '10'
+                    response_timeout: '5'
+                    unhealthy_threshold: '3'
+                    healthy_threshold: '3'
+                  proxy_protocol: true
+                  ssl_redirect: true
+                  balancing_algorithm: roundrobin
+                  instances:
+                  - cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    delete:
+      summary: Delete Load Balancer
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-load-balancer
+      description: Delete a Load Balancer.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{load-balancer-id}/forwarding-rules:
+    parameters:
+    - schema:
+        type: string
+      name: load-balancer-id
+      in: path
+      required: true
+      description: The [Load Balancer id](#operation/list-load-balancers).
+    get:
+      summary: List Forwarding Rules
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/forwarding-rules\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forwarding_rules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/forwarding-rule'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    forwarding_rules:
+                    - id: 443f2e6c0b60
+                      frontend_protocol: http
+                      frontend_port: 80
+                      backend_protocol: http
+                      backend_port: 80
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-load-balancer-forwarding-rules
+      description: List the fowarding rules for a Load Balancer.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Forwarding Rule
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/forwarding-rules\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"frontend_protocol\" : \"http\",\n    \"frontend_port\" : 8080,\n    \"backend_protocol\" : \"http\",\n    \"backend_port\" : 80\n  }'"
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: create-load-balancer-forwarding-rules
+      description: Create a new forwarding rule for a Load Balancer.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                frontend_protocol:
+                  type: string
+                  description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+                    * HTTP
+
+                    * HTTPS
+
+                    * TCP'
+                frontend_port:
+                  type: integer
+                  description: The port number on the Load Balancer to forward to the backend.
+                backend_protocol:
+                  type: string
+                  description: 'The protocol destination on the backend server.
+
+
+                    * HTTP
+
+                    * HTTPS
+
+                    * TCP'
+                backend_port:
+                  type: integer
+                  description: The port number destination on the backend server.
+              required:
+              - frontend_protocol
+              - frontend_port
+              - backend_protocol
+              - backend_port
+            examples:
+              response:
+                value:
+                  frontend_protocol: http
+                  frontend_port: 8080
+                  backend_protocol: http
+                  backend_port: 80
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{load-balancer-id}/forwarding-rules/{forwarding-rule-id}:
+    parameters:
+    - schema:
+        type: string
+      name: load-balancer-id
+      in: path
+      required: true
+      description: The [Load Balancer id](#operation/list-load-balancers).
+    - schema:
+        type: string
+      name: forwarding-rule-id
+      in: path
+      required: true
+      description: The [Forwarding Rule id](#operation/list-load-balancer-forwarding-rules).
+    get:
+      summary: Get Forwarding Rule
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/forwarding-rules/{forwarding-rule-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forwarding_rule:
+                    $ref: '#/components/schemas/forwarding-rule'
+              examples:
+                response:
+                  value:
+                    forwarding_rule:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      frontend_protocol: http
+                      frontend_port: 8080
+                      backend_protocol: http
+                      backend_port: 80
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-load-balancer-forwarding-rule
+      description: Get information for a Forwarding Rule on a Load Balancer.
+      security:
+      - API Key: []
+    delete:
+      summary: Delete Forwarding Rule
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/forwarding-rules/{forwarding-rule-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-load-balancer-forwarding-rule
+      description: Delete a Forwarding Rule on a Load Balancer.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{loadbalancer-id}/firewall-rules:
+    parameters:
+    - schema:
+        type: string
+      name: loadbalancer-id
+      in: path
+      required: true
+    get:
+      summary: List Firewall Rules
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/firewall-rules\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loadbalancer-firewall-rule'
+              examples:
+                Response:
+                  value:
+                    firewall_rules:
+                    - id: asb123f2e6c0b60
+                      port: 80
+                      source: 24.187.16.196/16
+                      ip_type: v4
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: list-loadbalancer-firewall-rules
+      description: List the firewall rules for a Load Balancer.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{loadbalancer-id}/firewall-rules/{firewall-rule-id}:
+    parameters:
+    - schema:
+        type: string
+      name: loadbalancer-id
+      in: path
+      required: true
+    - schema:
+        type: string
+      name: firewall-rule-id
+      in: path
+      required: true
+    get:
+      summary: Get Firewall Rule
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/firewall-rules/{firewall-rule-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loadbalancer-firewall-rule'
+              examples:
+                Example:
+                  value:
+                    firewall_rule:
+                      id: asb123f2e6c0b60
+                      port: 80
+                      source: 24.187.16.196/16
+                      ip_type: v4
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-loadbalancer-firewall-rule
+      description: Get a firewall rule for a Load Balancer.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /load-balancers/{load-balancer-id}/ssl:
+    delete:
+      description: Delete a Load Balancer SSL.
+      operationId: delete-load-balancer-ssl
+      parameters:
+      - description: The [Load Balancer id](#operation/delete-load-balancer-ssl).
+        explode: false
+        in: path
+        name: load-balancer-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete Load Balancer SSL
+      tags:
+      - load-balancer
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/load-balancers/{load-balancer-id}/ssl\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    loadbalancer-firewall-rule:
+      description: Load Balancer firewall rule information.
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: The unique ID for the firewall rule
+        port:
+          type: integer
+          description: 'Port for this rule.
+
+            '
+        source:
+          type: string
+          minLength: 1
+          description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+        ip_type:
+          type: string
+          minLength: 1
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6
+
+            '
+      x-examples:
+        Example:
+          id: 9fea55b93016eafb
+          port: 80
+          source: 192.168.1.1/16
+          ip_type: v4
+    forwarding-rule:
+      title: forwarding-rule
+      type: object
+      x-tags:
+      - load-balancer
+      description: Forwarding Rule information.
+      x-examples:
+        forwarding rules:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          frontend_protocol: http
+          frontend_port: 80
+          backend_protocol: http
+          backend_port: 80
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Forwarding Rule.
+        frontend_protocol:
+          type: string
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+        frontend_port:
+          type: integer
+          description: The port number on the Load Balancer to forward to the backend.
+        backend_protocol:
+          type: string
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+        backend_port:
+          type: integer
+          description: The port number destination on the backend server.
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    loadbalancer:
+      title: loadbalancer
+      type: object
+      x-tags:
+      - load-balancer
+      description: Load Balancer information.
+      x-examples:
+        load balancer:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          region: ewr
+          label: Example Load Balancer
+          status: active
+          ipv4: 192.0.2.123
+          ipv6: 2001:0db8:6374:dc29:ffff:ffff:ffff:ffff
+          generic_info:
+            balancing_algorithm: roundrobin
+            ssl_redirect: true
+            sticky_sessions:
+              cookie_name: example-cookie
+            proxy_protocol: false
+            private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+          health_check:
+            protocol: http
+            port: 80
+            path: /health
+            check_interval: 10
+            response_timeout: 5
+            unhealthy_threshold: 3
+            healthy_threshold: 3
+          has_ssl: true
+          forward_rules:
+          - id: 73d85156c2c3129d
+            frontend_protocol: http
+            frontend_port: 80
+            backend_portocol: http
+            backend_port: 80
+          firewall_rules:
+          - id: abcd123b93016eafb
+            port: 80
+            source: 198.51.100.0/24
+            ip_type: v4
+          instances:
+          - d277caaa-0fab-48cc-9c35-eab056b9b141
+      properties:
+        id:
+          description: A unique ID for the Load Balancer.
+          type: string
+        date_created:
+          type: string
+          description: Date this Load Balancer was created.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the Load Balancer is located.
+        label:
+          type: string
+          description: The user-supplied label for this load-balancer.
+        status:
+          type: string
+          description: 'The current status.
+
+
+            * active'
+        ipv4:
+          type: string
+          description: The IPv4 address of this Load Balancer.
+        ipv6:
+          type: string
+          description: The IPv6 address of this Load Balancer.
+        generic_info:
+          type: object
+          description: An object containing additional options.
+          properties:
+            balancing_algorithm:
+              type: string
+              description: 'The balancing algorithm.
+
+
+                * roundrobin (default)
+
+                * leastconn'
+            ssl_redirect:
+              type: boolean
+              description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+                * true
+
+                * false'
+            sticky_sessions:
+              type: object
+              description: Array of sticky session cookies.
+              properties:
+                cookie_name:
+                  type: string
+                  description: The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+            proxy_protocol:
+              type: boolean
+              description: '"If `true`, you must configure backend nodes to accept Proxy protocol. \n\n* true\n* false (Default)"'
+            private_network:
+              type: string
+              description: ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+        health_check:
+          type: object
+          description: The health check object configuration. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers#Load_Balancer_Configuration).
+          properties:
+            protocol:
+              type: string
+              description: 'The protocol to use for health checks.
+
+
+                * HTTPS
+
+                * HTTP
+
+                * TCP'
+            port:
+              type: integer
+              description: The port to use for health checks.
+            path:
+              type: string
+              description: HTTP Path to check. Only applies if Protocol is HTTP or HTTPS.
+            check_interval:
+              type: integer
+              description: Interval between health checks.
+            response_timeout:
+              type: integer
+              description: Timeout before health check fails.
+            unhealthy_threshold:
+              type: integer
+              description: Number times a check must fail before becoming unhealthy.
+            healthy_threshold:
+              type: integer
+              description: Number of times a check must succeed before returning to healthy status.
+        has_ssl:
+          type: boolean
+          description: Indicates if this Load Balancer has an SSL certificate installed.
+        forward_rules:
+          type: array
+          description: An array of forwarding rule objects.
+          items:
+            type: object
+            description: A forwarding rule object.
+            properties:
+              id:
+                type: string
+                description: A unique ID for the forwarding rule.
+              frontend_protocol:
+                type: string
+                description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+                  * HTTP
+
+                  * HTTPS
+
+                  * TCP'
+              frontend_port:
+                type: integer
+                description: The port number on the Load Balancer to forward to the backend.
+              backend_portocol:
+                type: string
+                description: 'The protocol destination on the backend server.
+
+
+                  * HTTP
+
+                  * HTTPS
+
+                  * TCP'
+              backend_port:
+                type: integer
+                description: 'The port number destination on the backend server. '
+        instances:
+          type: array
+          description: Array of [Instance ids](#operation/list-instances) attached to this Load Balancer.
+          items:
+            type: string
+        firewall_rules:
+          type: array
+          description: An array of firewall rule objects.
+          items:
+            type: object
+            description: ''
+            properties:
+              id:
+                type: string
+                description: A unique ID for the firewall rule.
+              port:
+                type: integer
+                description: Port for this rule.
+              source:
+                type: string
+                description: "If the source string is given a value of \"cloudflare\" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.\n\n  Possible values:\n\n  |   | Value | Description |\n  | - | ------ | ------------- |\n  |   | \"192.168.1.1/16\" | Ip address with a subnet size. |\n  |   | cloudflare | Allow all of Cloudflare's IP space through the firewall |"
+              ip_type:
+                type: string
+                description: 'The type of IP rule.
+
+
+                  * v4
+
+                  * v6
+
+                  '
+    update_load_balancer_request:
+      properties:
+        ssl:
+          $ref: '#/components/schemas/create_load_balancer_request_ssl'
+        sticky_session:
+          $ref: '#/components/schemas/create_load_balancer_request_sticky_session'
+        forwarding_rules:
+          description: An array of forwarding rule objects.
+          items:
+            $ref: '#/components/schemas/create_load_balancer_request_forwarding_rules_inner'
+          type: array
+        health_check:
+          $ref: '#/components/schemas/update_load_balancer_request_health_check'
+        proxy_protocol:
+          description: 'If `true`, you must configure backend nodes to accept Proxy protocol.
+
+
+            * true
+
+            * false (Default)'
+          type: boolean
+        ssl_redirect:
+          description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+            * true
+
+            * false'
+          type: boolean
+        http2:
+          description: 'If `true`, this will enable HTTP2 traffic. You must have an HTTPS forwarding rule combo (HTTPS -> HTTPS) to enable this option.
+
+
+            * true
+
+            * false'
+          type: boolean
+        nodes:
+          description: The number of nodes to add to the load balancer (1-99), must be an odd number. This defaults to 1.
+          type: integer
+        balancing_algorithm:
+          description: 'The balancing algorithm.
+
+
+            * roundrobin (default)
+
+            * leastconn'
+          type: string
+        instances:
+          description: Send the complete array of Instances IDs that should be attached to this Load Balancer. Instances will be attached or detached to match your array. For example, if Instances **X**, **Y**, and **Z** are currently attached, and you send [A,B,Z], then Instance **A** and **B** will be attached,  **X** and **Y** will be detached, and **Z** will remain attached.
+          items:
+            type: string
+          type: array
+        label:
+          description: The label for your Load Balancer
+          type: string
+        private_network:
+          deprecated: true
+          description: Use `vpc` instead. ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+          type: string
+        vpc:
+          description: ID of the VPC you wish to use. If a VPC ID is omitted it will default to the public network.
+          type: string
+        firewall_rules:
+          description: An array of firewall rule objects.
+          items:
+            $ref: '#/components/schemas/create_load_balancer_request_firewall_rules_inner'
+          type: array
+      type: object
+    loadbalancer_forward_rules_inner:
+      description: A forwarding rule object.
+      example:
+        backend_portocol: backend_portocol
+        frontend_protocol: frontend_protocol
+        id: id
+        frontend_port: 7
+        backend_port: 9
+      properties:
+        id:
+          description: A unique ID for the forwarding rule.
+          type: string
+        frontend_protocol:
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        frontend_port:
+          description: The port number on the Load Balancer to forward to the backend.
+          type: integer
+        backend_portocol:
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        backend_port:
+          description: 'The port number destination on the backend server. '
+          type: integer
+      type: object
+    list_load_balancer_forwarding_rules_200_response:
+      example:
+        forwarding_rules:
+        - frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+        - frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        forwarding_rules:
+          items:
+            $ref: '#/components/schemas/forwarding-rule_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    create_load_balancer_request_ssl:
+      description: An SSL certificate to install on the Load Balancer.
+      properties:
+        private_key:
+          description: The private key.
+          type: string
+        certificate:
+          description: The SSL certificate.
+          type: string
+        chain:
+          description: The certificate chain.
+          type: string
+        private_key_b64:
+          description: The private key base64 encoded. (Base64 encoded values should not be used alongside with non-Base64 encoded values)
+          type: string
+        certificate_b64:
+          description: The SSL certificate base64 encoded. (Base64 encoded values should not be used alongside with non-Base64 encoded values)
+          type: string
+        chain_b64:
+          description: The certificate chain base64 encoded. (Base64 encoded values should not be used alongside with non-Base64 encoded values)
+          type: string
+      type: object
+    forwarding-rule_2:
+      description: Forwarding Rule information.
+      example:
+        frontend_protocol: frontend_protocol
+        id: id
+        frontend_port: 0
+        backend_protocol: backend_protocol
+        backend_port: 6
+      properties:
+        id:
+          description: A unique ID for the Forwarding Rule.
+          type: string
+        frontend_protocol:
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        frontend_port:
+          description: The port number on the Load Balancer to forward to the backend.
+          type: integer
+        backend_protocol:
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        backend_port:
+          description: The port number destination on the backend server.
+          type: integer
+      title: forwarding-rule
+      type: object
+      x-tags:
+      - load-balancer
+      x-examples:
+        forwarding rules:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          frontend_protocol: http
+          frontend_port: 80
+          backend_protocol: http
+          backend_port: 80
+    loadbalancer_generic_info:
+      description: An object containing additional options.
+      example:
+        sticky_sessions:
+          cookie_name: cookie_name
+        private_network: private_network
+        ssl_redirect: true
+        proxy_protocol: true
+        vpc: vpc
+        balancing_algorithm: balancing_algorithm
+      properties:
+        balancing_algorithm:
+          description: 'The balancing algorithm.
+
+
+            * roundrobin (default)
+
+            * leastconn'
+          type: string
+        ssl_redirect:
+          description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+            * true
+
+            * false'
+          type: boolean
+        sticky_sessions:
+          $ref: '#/components/schemas/loadbalancer_generic_info_sticky_sessions'
+        proxy_protocol:
+          description: '"If `true`, you must configure backend nodes to accept Proxy protocol. \n\n* true\n* false (Default)"'
+          type: boolean
+        private_network:
+          deprecated: true
+          description: Use `vpc` instead. ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+          type: string
+        vpc:
+          description: ID of the VPC you wish to use. If a VPC ID is omitted it will default to the public network.
+          type: string
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    loadbalancer-firewall-rule_2:
+      description: Load Balancer firewall rule information.
+      example:
+        port: 0
+        id: id
+        source: source
+        ip_type: ip_type
+      properties:
+        id:
+          description: The unique ID for the firewall rule
+          minLength: 1
+          type: string
+        port:
+          description: 'Port for this rule.
+
+            '
+          type: integer
+        source:
+          description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+          minLength: 1
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6
+
+            '
+          minLength: 1
+          type: string
+      type: object
+      x-examples:
+        Example:
+          id: 9fea55b93016eafb
+          port: 80
+          source: 192.168.1.1/16
+          ip_type: v4
+    update_load_balancer_request_health_check:
+      description: The health check configuration. [See Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers/#Load_Balancer_Configuration).
+      properties:
+        protocol:
+          description: 'The protocol to use for health checks.
+
+
+            * HTTPS
+
+            * HTTP
+
+            * TCP'
+          type: string
+        port:
+          description: The port to use for health checks.
+          type: integer
+        path:
+          description: HTTP Path to check. Only applies if protocol is HTTP, or HTTPS.
+          type: string
+        check_interval:
+          description: Interval between health checks.
+          type: string
+        response_timeout:
+          description: Timeout before health check fails.
+          type: string
+        unhealthy_threshold:
+          description: Number times a check must fail before becoming unhealthy.
+          type: string
+        healthy_threshold:
+          description: Number of times a check must succeed before returning to healthy status.
+          type: string
+      type: object
+    loadbalancer_generic_info_sticky_sessions:
+      description: Array of sticky session cookies.
+      example:
+        cookie_name: cookie_name
+      properties:
+        cookie_name:
+          description: The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers/#Load_Balancer_Configuration).
+          type: string
+      type: object
+    create_load_balancer_202_response:
+      example:
+        load_balancer:
+          generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+      properties:
+        load_balancer:
+          $ref: '#/components/schemas/loadbalancer_2'
+      type: object
+    create_load_balancer_request_firewall_rules_inner:
+      properties:
+        port:
+          description: Port for this rule.
+          type: integer
+        source:
+          description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6'
+          type: string
+      type: object
+    get_load_balancer_forwarding_rule_200_response:
+      example:
+        forwarding_rule:
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+      properties:
+        forwarding_rule:
+          $ref: '#/components/schemas/forwarding-rule_2'
+      type: object
+    create_load_balancer_request:
+      properties:
+        region:
+          description: The [Region id](#operation/list-regions) to create this Load Balancer.
+          type: string
+        balancing_algorithm:
+          description: 'The balancing algorithm.
+
+
+            * roundrobin (default)
+
+            * leastconn'
+          type: string
+        ssl_redirect:
+          description: 'If `true`, this will redirect all HTTP traffic to HTTPS. You must have an HTTPS rule and SSL certificate installed on the load balancer to enable this option.
+
+
+            * true
+
+            * false'
+          type: boolean
+        http2:
+          description: 'If `true`, this will enable HTTP2 traffic. You must have an HTTPS forwarding rule combo (HTTPS -> HTTPS) to enable this option.
+
+
+            * true
+
+            * false'
+          type: boolean
+        nodes:
+          description: The number of nodes to add to the load balancer (1-99), must be an odd number. This defaults to 1.
+          type: integer
+        proxy_protocol:
+          description: 'If `true`, you must configure backend nodes to accept Proxy protocol.
+
+
+            * true
+
+            * false (Default)'
+          type: boolean
+        health_check:
+          $ref: '#/components/schemas/create_load_balancer_request_health_check'
+        forwarding_rules:
+          description: An array of forwarding rule objects.
+          items:
+            $ref: '#/components/schemas/create_load_balancer_request_forwarding_rules_inner'
+          type: array
+        sticky_session:
+          $ref: '#/components/schemas/create_load_balancer_request_sticky_session'
+        ssl:
+          $ref: '#/components/schemas/create_load_balancer_request_ssl'
+        label:
+          description: Label for your Load Balancer.
+          type: string
+        instances:
+          description: An array of instances IDs that you want attached to the load balancer.
+          items:
+            type: string
+          type: array
+        firewall_rules:
+          description: An array of firewall rule objects.
+          items:
+            $ref: '#/components/schemas/create_load_balancer_request_firewall_rules_inner'
+          type: array
+        private_network:
+          deprecated: true
+          description: Use `vpc` instead. ID of the private network you wish to use. If private_network is omitted it will default to the public network.
+          type: string
+        vpc:
+          description: ID of the VPC you wish to use. If a VPC ID is omitted it will default to the public network.
+          type: string
+      required:
+      - region
+      type: object
+    create_load_balancer_request_forwarding_rules_inner:
+      properties:
+        frontend_protocol:
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        frontend_port:
+          description: The port number on the Load Balancer to forward to the backend.
+          type: integer
+        backend_protocol:
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        backend_port:
+          description: The port number destination on the backend server.
+          type: integer
+      type: object
+    loadbalancer_2:
+      description: Load Balancer information.
+      example:
+        generic_info:
+          sticky_sessions:
+            cookie_name: cookie_name
+          private_network: private_network
+          ssl_redirect: true
+          proxy_protocol: true
+          vpc: vpc
+          balancing_algorithm: balancing_algorithm
+        instances:
+        - instances
+        - instances
+        firewall_rules:
+        - port: 3
+          id: id
+          source: source
+          ip_type: ip_type
+        - port: 3
+          id: id
+          source: source
+          ip_type: ip_type
+        date_created: date_created
+        has_ssl: true
+        label: label
+        health_check:
+          path: path
+          response_timeout: 1
+          healthy_threshold: 5
+          protocol: protocol
+          check_interval: 6
+          port: 0
+          unhealthy_threshold: 5
+        forward_rules:
+        - backend_portocol: backend_portocol
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 7
+          backend_port: 9
+        - backend_portocol: backend_portocol
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 7
+          backend_port: 9
+        nodes: 2
+        ipv4: ipv4
+        ipv6: ipv6
+        http2: true
+        id: id
+        region: region
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Load Balancer.
+          type: string
+        date_created:
+          description: Date this Load Balancer was created.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Load Balancer is located.
+          type: string
+        label:
+          description: The user-supplied label for this load-balancer.
+          type: string
+        status:
+          description: 'The current status.
+
+
+            * active'
+          type: string
+        ipv4:
+          description: The IPv4 address of this Load Balancer.
+          type: string
+        ipv6:
+          description: The IPv6 address of this Load Balancer.
+          type: string
+        generic_info:
+          $ref: '#/components/schemas/loadbalancer_generic_info'
+        health_check:
+          $ref: '#/components/schemas/loadbalancer_health_check'
+        has_ssl:
+          description: Indicates if this Load Balancer has an SSL certificate installed.
+          type: boolean
+        http2:
+          description: Indicates if this Load Balancer has HTTP2 enabled.
+          type: boolean
+        nodes:
+          description: The number of nodes to add to the load balancer (1-99), must be an odd number. This defaults to 1.
+          type: integer
+        forward_rules:
+          description: An array of forwarding rule objects.
+          items:
+            $ref: '#/components/schemas/loadbalancer_forward_rules_inner'
+          type: array
+        instances:
+          description: Array of [Instance ids](#operation/list-instances) attached to this Load Balancer.
+          items:
+            type: string
+          type: array
+        firewall_rules:
+          description: An array of firewall rule objects.
+          items:
+            $ref: '#/components/schemas/loadbalancer_firewall_rules_inner'
+          type: array
+      title: loadbalancer
+      type: object
+      x-tags:
+      - load-balancer
+      x-examples:
+        load balancer:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          label: Example Load Balancer
+          status: active
+          ipv4: 192.0.2.123
+          ipv6: 2001:0db8:6374:dc29:ffff:ffff:ffff:ffff
+          generic_info:
+            balancing_algorithm: roundrobin
+            ssl_redirect: true
+            sticky_sessions:
+              cookie_name: example-cookie
+            proxy_protocol: false
+            private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+            vpc: 9fed374c-0afc-42bf-926c-abcf840b5406
+          health_check:
+            protocol: http
+            port: 80
+            path: /health
+            check_interval: 10
+            response_timeout: 5
+            unhealthy_threshold: 3
+            healthy_threshold: 3
+          has_ssl: true
+          nodes: 1
+          forward_rules:
+          - id: 73d85156c2c3129d
+            frontend_protocol: http
+            frontend_port: 80
+            backend_portocol: http
+            backend_port: 80
+          firewall_rules:
+          - id: abcd123b93016eafb
+            port: 80
+            source: 198.51.100.0/24
+            ip_type: v4
+          instances:
+          - d277caaa-0fab-48cc-9c35-eab056b9b141
+    create_load_balancer_request_health_check:
+      description: The health check configuration. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers/#Load_Balancer_Configuration).
+      properties:
+        protocol:
+          description: 'The protocol to use for health checks.
+
+
+            * HTTPS
+
+            * HTTP
+
+            * TCP'
+          type: string
+        port:
+          description: The port to use for health checks.
+          type: integer
+        path:
+          description: HTTP Path to check. Only applies if protocol is HTTP, or HTTPS.
+          type: string
+        check_interval:
+          description: Interval between health checks.
+          type: integer
+        response_timeout:
+          description: Timeout before health check fails.
+          type: integer
+        unhealthy_threshold:
+          description: Number times a check must fail before becoming unhealthy.
+          type: integer
+        healthy_threshold:
+          description: Number of times a check must succeed before returning to healthy status.
+          type: integer
+      type: object
+    create_load_balancer_forwarding_rules_request:
+      properties:
+        frontend_protocol:
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        frontend_port:
+          description: The port number on the Load Balancer to forward to the backend.
+          type: integer
+        backend_protocol:
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        backend_port:
+          description: The port number destination on the backend server.
+          type: integer
+      required:
+      - backend_port
+      - backend_protocol
+      - frontend_port
+      - frontend_protocol
+      type: object
+    loadbalancer_firewall_rules_inner:
+      description: ''
+      example:
+        port: 3
+        id: id
+        source: source
+        ip_type: ip_type
+      properties:
+        id:
+          description: A unique ID for the firewall rule.
+          type: string
+        port:
+          description: Port for this rule.
+          type: integer
+        source:
+          description: "If the source string is given a value of \"cloudflare\" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.\n\n  Possible values:\n\n  |   | Value | Description |\n  | - | ------ | ------------- |\n  |   | \"192.168.1.1/16\" | Ip address with a subnet size. |\n  |   | cloudflare | Allow all of Cloudflare's IP space through the firewall |"
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6
+
+            '
+          type: string
+      type: object
+    list_load_balancers_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        load_balancers:
+        - generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+        - generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+      properties:
+        load_balancers:
+          items:
+            $ref: '#/components/schemas/loadbalancer_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    create_load_balancer_request_sticky_session:
+      description: Enables sticky sessions for your load balancer when a cookie_name is provided.
+      properties:
+        cookie_name:
+          description: The cookie name to make sticky. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers/#Load_Balancer_Configuration).
+          type: string
+      type: object
+    loadbalancer_health_check:
+      description: The health check object configuration. See [Load Balancer documentation](https://www.vultr.com/docs/vultr-load-balancers/#Load_Balancer_Configuration).
+      example:
+        path: path
+        response_timeout: 1
+        healthy_threshold: 5
+        protocol: protocol
+        check_interval: 6
+        port: 0
+        unhealthy_threshold: 5
+      properties:
+        protocol:
+          description: 'The protocol to use for health checks.
+
+
+            * HTTPS
+
+            * HTTP
+
+            * TCP'
+          type: string
+        port:
+          description: The port to use for health checks.
+          type: integer
+        path:
+          description: HTTP Path to check. Only applies if Protocol is HTTP or HTTPS.
+          type: string
+        check_interval:
+          description: Interval between health checks.
+          type: integer
+        response_timeout:
+          description: Timeout before health check fails.
+          type: integer
+        unhealthy_threshold:
+          description: Number times a check must fail before becoming unhealthy.
+          type: integer
+        healthy_threshold:
+          description: Number of times a check must succeed before returning to healthy status.
+          type: integer
+      type: object
+    list_load_balancer_forwarding_rules_200_response_2:
+      example:
+        forwarding_rules:
+        - frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+        - frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        forwarding_rules:
+          items:
+            $ref: '#/components/schemas/forwarding-rule_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    forwarding-rule_3:
+      description: Forwarding Rule information.
+      example:
+        frontend_protocol: frontend_protocol
+        id: id
+        frontend_port: 0
+        backend_protocol: backend_protocol
+        backend_port: 6
+      properties:
+        id:
+          description: A unique ID for the Forwarding Rule.
+          type: string
+        frontend_protocol:
+          description: 'The protocol on the Load Balancer to forward to the backend.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        frontend_port:
+          description: The port number on the Load Balancer to forward to the backend.
+          type: integer
+        backend_protocol:
+          description: 'The protocol destination on the backend server.
+
+
+            * HTTP
+
+            * HTTPS
+
+            * TCP'
+          type: string
+        backend_port:
+          description: The port number destination on the backend server.
+          type: integer
+      title: forwarding-rule
+      type: object
+      x-tags:
+      - load-balancer
+      x-examples:
+        forwarding rules:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          frontend_protocol: http
+          frontend_port: 80
+          backend_protocol: http
+          backend_port: 80
+    loadbalancer-firewall-rule_3:
+      description: Load Balancer firewall rule information.
+      example:
+        port: 0
+        id: id
+        source: source
+        ip_type: ip_type
+      properties:
+        id:
+          description: The unique ID for the firewall rule
+          minLength: 1
+          type: string
+        port:
+          description: 'Port for this rule.
+
+            '
+          type: integer
+        source:
+          description: 'If the source string is given a value of "cloudflare" then cloudflare IPs will be supplied. Otherwise enter a IP address with subnet size that you wish to permit through the firewall.
+
+
+            Possible values:
+
+
+            |   | Value | Description |
+
+            | - | ------ | ------------- |
+
+            |   | "192.168.1.1/16" | Ip address with a subnet size. |
+
+            |   | cloudflare | Allow all of Cloudflare''s IP space through the firewall |'
+          minLength: 1
+          type: string
+        ip_type:
+          description: 'The type of IP rule.
+
+
+            * v4
+
+            * v6
+
+            '
+          minLength: 1
+          type: string
+      type: object
+      x-examples:
+        Example:
+          id: 9fea55b93016eafb
+          port: 80
+          source: 192.168.1.1/16
+          ip_type: v4
+    create_load_balancer_202_response_2:
+      example:
+        load_balancer:
+          generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+      properties:
+        load_balancer:
+          $ref: '#/components/schemas/loadbalancer_3'
+      type: object
+    get_load_balancer_forwarding_rule_200_response_2:
+      example:
+        forwarding_rule:
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 0
+          backend_protocol: backend_protocol
+          backend_port: 6
+      properties:
+        forwarding_rule:
+          $ref: '#/components/schemas/forwarding-rule_3'
+      type: object
+    loadbalancer_3:
+      description: Load Balancer information.
+      example:
+        generic_info:
+          sticky_sessions:
+            cookie_name: cookie_name
+          private_network: private_network
+          ssl_redirect: true
+          proxy_protocol: true
+          vpc: vpc
+          balancing_algorithm: balancing_algorithm
+        instances:
+        - instances
+        - instances
+        firewall_rules:
+        - port: 3
+          id: id
+          source: source
+          ip_type: ip_type
+        - port: 3
+          id: id
+          source: source
+          ip_type: ip_type
+        date_created: date_created
+        has_ssl: true
+        label: label
+        health_check:
+          path: path
+          response_timeout: 1
+          healthy_threshold: 5
+          protocol: protocol
+          check_interval: 6
+          port: 0
+          unhealthy_threshold: 5
+        forward_rules:
+        - backend_portocol: backend_portocol
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 7
+          backend_port: 9
+        - backend_portocol: backend_portocol
+          frontend_protocol: frontend_protocol
+          id: id
+          frontend_port: 7
+          backend_port: 9
+        nodes: 2
+        ipv4: ipv4
+        ipv6: ipv6
+        http2: true
+        id: id
+        region: region
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Load Balancer.
+          type: string
+        date_created:
+          description: Date this Load Balancer was created.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the Load Balancer is located.
+          type: string
+        label:
+          description: The user-supplied label for this load-balancer.
+          type: string
+        status:
+          description: 'The current status.
+
+
+            * active'
+          type: string
+        ipv4:
+          description: The IPv4 address of this Load Balancer.
+          type: string
+        ipv6:
+          description: The IPv6 address of this Load Balancer.
+          type: string
+        generic_info:
+          $ref: '#/components/schemas/loadbalancer_generic_info'
+        health_check:
+          $ref: '#/components/schemas/loadbalancer_health_check'
+        has_ssl:
+          description: Indicates if this Load Balancer has an SSL certificate installed.
+          type: boolean
+        http2:
+          description: Indicates if this Load Balancer has HTTP2 enabled.
+          type: boolean
+        nodes:
+          description: The number of nodes to add to the load balancer (1-99), must be an odd number. This defaults to 1.
+          type: integer
+        forward_rules:
+          description: An array of forwarding rule objects.
+          items:
+            $ref: '#/components/schemas/loadbalancer_forward_rules_inner'
+          type: array
+        instances:
+          description: Array of [Instance ids](#operation/list-instances) attached to this Load Balancer.
+          items:
+            type: string
+          type: array
+        firewall_rules:
+          description: An array of firewall rule objects.
+          items:
+            $ref: '#/components/schemas/loadbalancer_firewall_rules_inner'
+          type: array
+      title: loadbalancer
+      type: object
+      x-tags:
+      - load-balancer
+      x-examples:
+        load balancer:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          label: Example Load Balancer
+          status: active
+          ipv4: 192.0.2.123
+          ipv6: 2001:0db8:6374:dc29:ffff:ffff:ffff:ffff
+          generic_info:
+            balancing_algorithm: roundrobin
+            ssl_redirect: true
+            sticky_sessions:
+              cookie_name: example-cookie
+            proxy_protocol: false
+            private_network: 9fed374c-0afc-42bf-926c-abcf840b5406
+            vpc: 9fed374c-0afc-42bf-926c-abcf840b5406
+          health_check:
+            protocol: http
+            port: 80
+            path: /health
+            check_interval: 10
+            response_timeout: 5
+            unhealthy_threshold: 3
+            healthy_threshold: 3
+          has_ssl: true
+          nodes: 1
+          forward_rules:
+          - id: 73d85156c2c3129d
+            frontend_protocol: http
+            frontend_port: 80
+            backend_portocol: http
+            backend_port: 80
+          firewall_rules:
+          - id: abcd123b93016eafb
+            port: 80
+            source: 198.51.100.0/24
+            ip_type: v4
+          instances:
+          - d277caaa-0fab-48cc-9c35-eab056b9b141
+    list_load_balancers_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        load_balancers:
+        - generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+        - generic_info:
+            sticky_sessions:
+              cookie_name: cookie_name
+            private_network: private_network
+            ssl_redirect: true
+            proxy_protocol: true
+            vpc: vpc
+            balancing_algorithm: balancing_algorithm
+          instances:
+          - instances
+          - instances
+          firewall_rules:
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          - port: 3
+            id: id
+            source: source
+            ip_type: ip_type
+          date_created: date_created
+          has_ssl: true
+          label: label
+          health_check:
+            path: path
+            response_timeout: 1
+            healthy_threshold: 5
+            protocol: protocol
+            check_interval: 6
+            port: 0
+            unhealthy_threshold: 5
+          forward_rules:
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          - backend_portocol: backend_portocol
+            frontend_protocol: frontend_protocol
+            id: id
+            frontend_port: 7
+            backend_port: 9
+          nodes: 2
+          ipv4: ipv4
+          ipv6: ipv6
+          http2: true
+          id: id
+          region: region
+          status: status
+      properties:
+        load_balancers:
+          items:
+            $ref: '#/components/schemas/loadbalancer_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

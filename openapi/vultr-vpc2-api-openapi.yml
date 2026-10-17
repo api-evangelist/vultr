@@ -1,0 +1,601 @@
+openapi: 3.2.0
+info:
+  title: Vultr VPC2 API
+  version: '2.0'
+  contact:
+    email: support@vultr.com
+    name: ''
+    url: https://www.vultr.com
+  description: 'Operations tagged VPC2 across 2 of this provider''s published API definitions: vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- description: VPCs are fully isolated networks accessible only by instances on your account. Each VPC is only available in one region and cannot span across regions. An instance can connect to multiple VPCs and you may have up to 5 VPCs per region.
+  name: VPC2
+  x-displayName: VPC 2.0
+paths:
+  /vpc2/{vpc-id}:
+    delete:
+      description: Delete a VPC 2.0 network.
+      operationId: delete-vpc2
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Delete a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    get:
+      description: Get information about a VPC 2.0 network.
+      operationId: get-vpc2
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    vpc:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: 2020-10-10 01:56:20+00:00
+                      region: ewr
+                      description: Example VPC Description
+                      ip_block: 10.99.0.0
+                      prefix_length: 24
+              schema:
+                $ref: '#/components/schemas/get_vpc2_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    put:
+      description: Update information for a VPC 2.0 network.
+      operationId: update-vpc2
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              request:
+                value:
+                  description: Example VPC
+            schema:
+              $ref: '#/components/schemas/update_vpc2_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Update a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"description\" : \"Example VPC\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /vpc2:
+    get:
+      description: Get a list of all VPC 2.0 networks in your account.
+      operationId: list-vpc2
+      parameters:
+      - description: Number of items requested per page. Default is 100 and Max is 500.
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    vpcs:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      date_created: 2020-10-10 01:56:20+00:00
+                      description: Example VPC Description
+                      ip_block: 10.99.0.0
+                      prefix_length: 24
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+              schema:
+                $ref: '#/components/schemas/list_vpc2_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: List VPC 2.0 networks
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    post:
+      description: 'Create a new VPC 2.0 network in a `region`. VPCs should use RFC1918 private address space:
+
+
+        10.0.0.0 - 10.255.255.255 (10/8 prefix)
+
+        172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
+
+        192.168.0.0 - 192.168.255.255 (192.168/16 prefix)'
+      operationId: create-vpc2
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  region: ewr
+                  description: Example VPC
+                  ip_block: 10.99.0.0
+                  prefix_length: 24
+            schema:
+              $ref: '#/components/schemas/create_vpc2_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    network:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: 2020-10-10 01:56:20+00:00
+                      region: ewr
+                      description: Example VPC
+                      ip_block: 10.99.0.0
+                      prefix_length: 24
+              schema:
+                $ref: '#/components/schemas/get_vpc2_200_response'
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Create a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"description\" : \"Example VPC\",\n    \"ip_block\" : \"10.99.0.0\",\n    \"prefix_length\" : 24\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /vpc2/{vpc-id}/nodes:
+    get:
+      description: Get a list of nodes attached to a VPC 2.0 network.
+      operationId: list-vpc2-nodes
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of items requested per page. Default is 100 and Max is 500.
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    nodes:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      ip_address: 10.1.96.3
+                      mac_address: '98964710968448'
+                      description: Example-Description
+                      type: vps
+                      node_status: active
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+              schema:
+                $ref: '#/components/schemas/get_vpc2_200_response'
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Get a list of nodes attached to a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}/nodes\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /vpc2/{vpc-id}/nodes/attach:
+    post:
+      description: Attach nodes to a VPC 2.0 network.
+      operationId: attach-vpc2-nodes
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  nodes:
+                  - a4021db4-c1d0-43ba-8b5c-7a4a35444167
+                  - 12a43ca5-0025-40ef-9edb-3a475809a8c0
+            schema:
+              $ref: '#/components/schemas/attach_vpc2_nodes_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          description: accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Attach nodes to a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}/nodes/attach\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+  /vpc2/{vpc-id}/nodes/detach:
+    post:
+      description: Remove nodes from a VPC 2.0 network.
+      operationId: detach-vpc2-nodes
+      parameters:
+      - description: The [VPC ID](#operation/list-vpcs).
+        explode: false
+        in: path
+        name: vpc-id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  nodes:
+                  - a4021db4-c1d0-43ba-8b5c-7a4a35444167
+                  - 12a43ca5-0025-40ef-9edb-3a475809a8c0
+            schema:
+              $ref: '#/components/schemas/detach_vpc2_nodes_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          description: accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Remove nodes from a VPC 2.0 network
+      tags:
+      - VPC2
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/vpc2/{vpc-id}/nodes/detach\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      x-content-type: application/json
+      x-accepts: application/json
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    update_vpc2_request:
+      properties:
+        description:
+          description: The VPC description. </br> Must be no longer than 255 characters and may include only letters, numbers, spaces, underscores and hyphens.
+          type: string
+      required:
+      - description
+      type: object
+    attach_vpc2_nodes_request:
+      properties:
+        nodes:
+          description: An array of ID strings for [instances](#operation/list-instances) and [Bare Metal servers](#operation/list-baremetals) to attach as nodes to the VPC 2.0 network. A limit of 1000 nodes can be processed in a request
+          type: array
+      required:
+      - nodes
+      type: object
+    create_vpc2_request:
+      properties:
+        region:
+          description: Create the VPC in this [Region id](#operation/list-regions).
+          type: string
+        description:
+          description: A description of the VPC. </br> Must be no longer than 255 characters and may include only letters, numbers, spaces, underscores and hyphens.
+          type: string
+        ip_type:
+          description: 'Accepted values:
+
+            * `v4`'
+          type: enum
+        ip_block:
+          description: 'The VPC subnet IP address. For example: 10.99.0.0<br><span style="color: red">If a prefix_length is specified then ip_block is a required field.</span>'
+          type: string
+        prefix_length:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24<br><span style="color: red">If an ip_block is specified then prefix_length is a required field.</span>'
+          type: integer
+      required:
+      - region
+      type: object
+    vpc2:
+      description: VPC 2.0 information.
+      example:
+        date_created: date_created
+        description: description
+        id: id
+        prefix_length: 0
+        region: region
+        ip_block: ip_block
+      properties:
+        id:
+          description: A unique ID for the VPC.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the VPC is located.
+          type: string
+        date_created:
+          description: Date the VPC was created.
+          type: string
+        description:
+          description: A description of the VPC.
+          type: string
+        ip_block:
+          description: 'The VPC subnet IP address. For example: 10.99.0.0'
+          type: string
+        prefix_length:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+      required:
+      - id
+      title: vpc2
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          description: Example VPC
+          ip_block: 10.99.0.0
+          prefix_length: 24
+      x-tags:
+      - VPC
+    detach_vpc2_nodes_request:
+      properties:
+        nodes:
+          description: An array of ID strings for [nodes](#operation/list-vpc2-nodes) to detach from the VPC 2.0 network. A limit of 1000 nodes can be processed in a request
+          type: array
+      required:
+      - nodes
+      type: object
+    list_vpc2_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        vpcs:
+        - date_created: date_created
+          description: description
+          id: id
+          prefix_length: 0
+          region: region
+          ip_block: ip_block
+        - date_created: date_created
+          description: description
+          id: id
+          prefix_length: 0
+          region: region
+          ip_block: ip_block
+      properties:
+        vpcs:
+          items:
+            $ref: '#/components/schemas/vpc2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta'
+      type: object
+    get_vpc2_200_response:
+      example:
+        vpc:
+          date_created: date_created
+          description: description
+          id: id
+          prefix_length: 0
+          region: region
+          ip_block: ip_block
+      properties:
+        vpc:
+          $ref: '#/components/schemas/vpc2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+  securitySchemes:
+    API_Key:
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+      in: header
+      scheme: bearer
+      type: http
+x-refined-from:
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

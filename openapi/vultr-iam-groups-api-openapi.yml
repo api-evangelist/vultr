@@ -1,0 +1,495 @@
+openapi: 3.2.0
+info:
+  title: Vultr IAM Groups API
+  version: 2.0.0
+  contact:
+    email: support@vultr.com
+    url: https://www.vultr.com
+  description: 'Operations tagged IAM Groups across 2 of this provider''s published API definitions: vultr-iam-management-api-openapi.yml, vultr-iam-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com
+tags:
+- name: IAM Groups
+  description: Non-SCIM group management endpoints
+paths:
+  /v2/groups:
+    post:
+      tags:
+      - IAM Groups
+      summary: Create Group
+      operationId: createGroup
+      description: Create a new IAM group within the organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - display_name
+              properties:
+                display_name:
+                  type: string
+                  description: Display name of the group
+                  example: DevelopersGroup
+                description:
+                  type: string
+                  description: Description of the group
+                  example: Group for all developers
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags:
+      - IAM Groups
+      summary: List Groups
+      operationId: listGroups
+      description: List all IAM groups within the organization
+      parameters:
+      - $ref: '#/components/parameters/per_page'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    servers:
+    - url: https://api.vultr.com
+  /v2/groups/{id}:
+    get:
+      tags:
+      - IAM Groups
+      summary: Get Group
+      operationId: getGroup
+      description: Retrieve a specific IAM group by ID
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  group:
+                    $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - IAM Groups
+      summary: Update Group
+      operationId: updateGroup
+      description: Update an IAM group's attributes
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  description: Display name of the group
+                description:
+                  type: string
+                  description: Description of the group
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - IAM Groups
+      summary: Delete Group
+      operationId: deleteGroup
+      description: Soft delete an IAM group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Group deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/groups/{id}/members:
+    post:
+      tags:
+      - IAM Groups
+      summary: Add Member to Group
+      operationId: addGroupMember
+      description: Add a user to a group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - user_id
+              properties:
+                user_id:
+                  type: string
+                  description: User ID to add to the group
+                display_name:
+                  type: string
+                  description: Optional display name for the group member
+      responses:
+        '200':
+          description: Member added
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/groups/{id}/members/{user_id}:
+    delete:
+      tags:
+      - IAM Groups
+      summary: Remove Member from Group
+      operationId: removeGroupMember
+      description: Remove a user from a group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Member removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/groups/{id}/policies:
+    get:
+      tags:
+      - IAM Groups
+      summary: List Policies for Group
+      operationId: listPoliciesForGroup
+      description: List all policies that are attached to this group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List Policies for Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Group:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  policies:
+                    type: object
+                    properties:
+                      direct:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GroupAttachedPolicy'
+                      from_roles:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GroupAttachedPolicy'
+                      all:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GroupAttachedPolicy'
+                  meta:
+                    $ref: '#/components/schemas/MetaWithoutPagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+  /v2/groups/{id}/roles:
+    get:
+      tags:
+      - IAM Groups
+      summary: List Roles for Group
+      operationId: listRolesForGroup
+      description: List all roles that are attached to this group
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List Roles for Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Group:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      description:
+                        type: string
+                  Roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupAttachedRole'
+                  meta:
+                    $ref: '#/components/schemas/MetaWithoutPagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    servers:
+    - url: https://api.vultr.com
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not Found
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Forbidden
+              message:
+                type: string
+                example: Not allowed to use IAM endpoints
+  schemas:
+    GroupAttachedPolicy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        policy_document:
+          type: object
+        from_role:
+          type: string
+        source:
+          type: string
+        date_assigned:
+          type: string
+          format: date-time
+    GroupAttachedRole:
+      type: object
+      required:
+      - id
+      - name
+      - role_type
+      - max_session_duration
+      - date_assigned
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        role_type:
+          type: string
+          enum:
+          - assumable
+          - assignable
+          description: Type of role
+          example: assumable
+        date_assigned:
+          type: string
+          format: date-time
+    Group:
+      type: object
+      required:
+      - id
+      - display_name
+      - date_created
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          description: Display name of the group
+        description:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        members:
+          type: array
+          items:
+            type: object
+          description: Group members (only included when not empty - typically not present in create response)
+    MetaWithoutPagination:
+      type: object
+      description: Result Count metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+    Meta:
+      type: object
+      description: Pagination metadata
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              description: Cursor for next page
+            prev:
+              type: string
+              description: Cursor for previous page
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Cursor for pagination
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: Resource UUID
+      schema:
+        type: string
+        format: uuid
+    per_page:
+      name: per_page
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+x-refined-from:
+- vultr-iam-management-api-openapi.yml
+- vultr-iam-openapi.yml

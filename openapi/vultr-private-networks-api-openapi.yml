@@ -1,0 +1,579 @@
+openapi: 3.2.0
+info:
+  title: Vultr private Networks API
+  version: '2.0'
+  description: 'Operations tagged private Networks across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: private Networks
+  x-displayName: Private Networks
+  description: Private Networks are fully isolated networks accessible only by instances on your account. Each private network is only available in one Region and cannot span across regions. An instance can connect to multiple private networks and you may have up to 5 private networks per region.
+paths:
+  /private-networks/{network-id}:
+    parameters:
+    - schema:
+        type: string
+      name: network-id
+      in: path
+      required: true
+      description: The [Network id](#operation/list-networks).
+    get:
+      summary: Get a private network
+      tags:
+      - private Networks
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/private-networks/{network-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  network:
+                    $ref: '#/components/schemas/network'
+              examples:
+                response:
+                  value:
+                    network:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      region: ewr
+                      description: Example Network Description
+                      v4_subnet: 10.99.0.0
+                      v4_subnet_mask: 24
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-network
+      security:
+      - API Key: []
+      description: Get information about a Private Network.
+    delete:
+      summary: Delete a private network
+      tags:
+      - private Networks
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/private-networks/{network-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: delete-network
+      description: Delete a Private Network.
+      security:
+      - API Key: []
+    put:
+      summary: Update a Private Network
+      operationId: update-network
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Update information for a Private Network.
+      tags:
+      - private Networks
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/private-networks/{network-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"description\" : \"Example Private Network\"\n  }'"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: The Private Network description.
+              required:
+              - description
+            examples:
+              request:
+                value:
+                  description: Example Private Network
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /private-networks:
+    get:
+      summary: List Private Networks
+      tags:
+      - private Networks
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/private-networks\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  networks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/network'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    networks:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      region: ewr
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Network Description
+                      v4_subnet: 10.99.0.0
+                      v4_subnet_mask: 24
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: list-networks
+      security:
+      - API Key: []
+      description: Get a list of all Private Networks in your account.
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create a Private Network
+      tags:
+      - private Networks
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/private-networks\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"region\" : \"ewr\",\n    \"description\" : \"Example Private Network\",\n    \"v4_subnet\" : \"10.99.0.0\",\n    \"v4_subnet_mask\" : 24\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  network:
+                    $ref: '#/components/schemas/network'
+              examples:
+                response:
+                  value:
+                    network:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      region: ewr
+                      description: Example Private Network
+                      v4_subnet: 10.99.0.0
+                      v4_subnet_mask: 24
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-network
+      security:
+      - API Key: []
+      description: 'Create a new Private Network in a `region`. Private networks should use RFC1918 private address space:
+
+
+        10.0.0.0 - 10.255.255.255 (10/8 prefix)
+
+        172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
+
+        192.168.0.0 - 192.168.255.255 (192.168/16 prefix)'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region:
+                  type: string
+                  description: Create the Private Network in this [Region id](#operation/list-regions).
+                description:
+                  type: string
+                  description: A description of the private network.
+                v4_subnet:
+                  type: string
+                  description: 'The IPv4 network address. For example: 10.99.0.0'
+                v4_subnet_mask:
+                  type: integer
+                  description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+              required:
+              - region
+            examples:
+              example:
+                value:
+                  region: ewr
+                  description: Example Private Network
+                  v4_subnet: 10.99.0.0
+                  v4_subnet_mask: 24
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    network:
+      title: network
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          region: ewr
+          description: Example Private Network
+          v4_subnet: 10.99.0.0
+          v4_subnet_mask: 24
+      description: Network information.
+      x-tags:
+      - Private Networks
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Private Network.
+        region:
+          type: string
+          description: The [Region id](#operation/list-regions) where the network is located.
+        date_created:
+          type: string
+          description: Date the network was created.
+        description:
+          type: string
+          description: A description of the private network.
+        v4_subnet:
+          type: string
+          description: 'The IPv4 network address. For example: 10.99.0.0'
+        v4_subnet_mask:
+          type: integer
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+      required:
+      - id
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_networks_200_response:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        networks:
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        networks:
+          items:
+            $ref: '#/components/schemas/network_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    update_network_request:
+      properties:
+        description:
+          description: The Private Network description.
+          type: string
+      required:
+      - description
+      type: object
+    get_network_200_response:
+      example:
+        network:
+          date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        network:
+          $ref: '#/components/schemas/network_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    network_2:
+      deprecated: true
+      description: Network information.
+      example:
+        date_created: date_created
+        v4_subnet_mask: 0
+        description: description
+        v4_subnet: v4_subnet
+        id: id
+        region: region
+      properties:
+        id:
+          description: A unique ID for the Private Network.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the network is located.
+          type: string
+        date_created:
+          description: Date the network was created.
+          type: string
+        description:
+          description: A description of the private network.
+          type: string
+        v4_subnet:
+          description: 'The IPv4 network address. For example: 10.99.0.0'
+          type: string
+        v4_subnet_mask:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+      required:
+      - id
+      title: network
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          description: Example Private Network
+          v4_subnet: 10.99.0.0
+          v4_subnet_mask: 24
+      x-tags:
+      - Private Networks
+    create_network_request:
+      properties:
+        region:
+          description: Create the Private Network in this [Region id](#operation/list-regions).
+          type: string
+        description:
+          description: A description of the private network.
+          type: string
+        v4_subnet:
+          description: 'The IPv4 network address. For example: 10.99.0.0'
+          type: string
+        v4_subnet_mask:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+      required:
+      - region
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    list_networks_200_response_2:
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        networks:
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+        - date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        networks:
+          items:
+            $ref: '#/components/schemas/network_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    get_network_200_response_2:
+      example:
+        network:
+          date_created: date_created
+          v4_subnet_mask: 0
+          description: description
+          v4_subnet: v4_subnet
+          id: id
+          region: region
+      properties:
+        network:
+          $ref: '#/components/schemas/network_3'
+      type: object
+    network_3:
+      deprecated: true
+      description: Network information.
+      example:
+        date_created: date_created
+        v4_subnet_mask: 0
+        description: description
+        v4_subnet: v4_subnet
+        id: id
+        region: region
+      properties:
+        id:
+          description: A unique ID for the Private Network.
+          type: string
+        region:
+          description: The [Region id](#operation/list-regions) where the network is located.
+          type: string
+        date_created:
+          description: Date the network was created.
+          type: string
+        description:
+          description: A description of the private network.
+          type: string
+        v4_subnet:
+          description: 'The IPv4 network address. For example: 10.99.0.0'
+          type: string
+        v4_subnet_mask:
+          description: 'The number of bits for the netmask in CIDR notation. Example: 24'
+          type: integer
+      required:
+      - id
+      title: network
+      type: object
+      x-examples:
+        example:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          region: ewr
+          description: Example Private Network
+          v4_subnet: 10.99.0.0
+          v4_subnet_mask: 24
+      x-tags:
+      - Private Networks
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

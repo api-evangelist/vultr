@@ -1,0 +1,711 @@
+openapi: 3.2.0
+info:
+  title: Vultr Snapshot API
+  version: '2.0'
+  description: 'Operations tagged snapshot across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Snapshot
+  x-displayName: Snapshots
+  description: A snapshot is a point-in-time image of an instance. We do not stop the instance when taking a snapshot. Booting from a snapshot is similar to rebooting after a non-graceful restart. Snapshots are physically the same as backups, but snapshots are manual while backups run automatically on a schedule. See our Snapshot Quickstart Guide for more information.
+paths:
+  /snapshots/{snapshot-id}:
+    parameters:
+    - schema:
+        type: string
+      name: snapshot-id
+      in: path
+      required: true
+      description: The [Snapshot id](#operation/list-snapshots).
+    delete:
+      summary: Delete Snapshot
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots/{snapshot-id}\" \\\n  -X DELETE \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: delete-snapshot
+      description: Delete a Snapshot.
+      security:
+      - API Key: []
+    get:
+      summary: Get Snapshot
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots/{snapshot-id}\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshot:
+                    $ref: '#/components/schemas/snapshot'
+              examples:
+                response:
+                  value:
+                    snapshot:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Snapshot
+                      size: 42949672960
+                      compressed_size: 949678560
+                      status: complete
+                      os_id: 215
+                      app_id: 0
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: get-snapshot
+      description: Get information about a Snapshot.
+      security:
+      - API Key: []
+    put:
+      summary: Update Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots/{snapshot-id}\" \\\n  -X PUT \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"description\": \"Example Snapshot\"\n  }'"
+      operationId: put-snapshots-snapshot-id
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Update the description for a Snapshot.
+      tags:
+      - Snapshot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: The user-supplied description for the Snapshot.
+              required:
+              - description
+            examples:
+              request:
+                value:
+                  description: Example Snapshot
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /snapshots:
+    get:
+      summary: List Snapshots
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/snapshot'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    snapshots:
+                    - id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Snapshot
+                      size: 42949672960
+                      compressed_size: 949678560
+                      status: complete
+                      os_id: 215
+                      app_id: 0
+                    meta:
+                      total: 1
+                      links:
+                        next: ''
+                        prev: ''
+        '401':
+          description: Unauthorized
+      operationId: list-snapshots
+      description: Get information about all Snapshots in your account.
+      security:
+      - API Key: []
+      parameters:
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+    post:
+      summary: Create Snapshot
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"instance_id\" : \"cb676a46-66fd-4dfb-b839-443f2e6c0b60\",\n    \"description\" : \"Example Snapshot\"\n  }'"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshot:
+                    $ref: '#/components/schemas/snapshot'
+              examples:
+                response:
+                  value:
+                    snapshot:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Snapshot
+                      size: 0
+                      compressed_size: 0
+                      status: pending
+                      os_id: 215
+                      app_id: 0
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      operationId: create-snapshot
+      description: Create a new Snapshot for `instance_id`.
+      security:
+      - API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instance_id:
+                  type: string
+                  description: Create a Snapshot for this [Instance id](#operation/list-instances).
+                description:
+                  type: string
+                  description: The user-supplied description of the Snapshot.
+              required:
+              - instance_id
+            examples:
+              request:
+                value:
+                  instance_id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                  description: Example Snapshot
+        description: Include a JSON object in the request body with a content type of **application/json**.
+    servers:
+    - url: https://api.vultr.com/v2
+  /snapshot/create-from-url:
+    post:
+      summary: Create Snapshot from URL
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots/create-from-url\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"url\" : \"https://example.com/disk_image.raw\"\n  }'"
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshot:
+                    $ref: '#/components/schemas/snapshot'
+              examples:
+                snapshot:
+                  value:
+                    snapshot:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: '2020-10-10T01:56:20+00:00'
+                      description: Example Snapshot
+                      size: 0
+                      compressed_size: 0
+                      status: pending
+                      os_id: 215
+                      app_id: 0
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: create-snapshot-create-from-url
+      description: Create a new Snapshot from a RAW image located at `url`.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: The public URL containing a RAW image.
+              required:
+              - url
+            examples:
+              example:
+                value:
+                  url: http://example.com/disk_image.raw
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      security:
+      - API Key: []
+    servers:
+    - url: https://api.vultr.com/v2
+  /snapshots/create-from-url:
+    post:
+      description: Create a new Snapshot from a RAW image located at `url`.
+      operationId: postSnapshotsCreateFromUrl
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  url: http://example.com/disk_image.raw
+                  description: Example Snapshot
+            schema:
+              $ref: '#/components/schemas/create_snapshot_create_from_url_request'
+        description: Include a JSON object in the request body with a content type of **application/json**.
+      responses:
+        '202':
+          content:
+            application/json:
+              examples:
+                snapshot:
+                  value:
+                    snapshot:
+                      id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+                      date_created: 2020-10-10 01:56:20+00:00
+                      description: Example Snapshot
+                      size: 0
+                      compressed_size: 0
+                      status: pending
+                      os_id: 215
+                      app_id: 0
+              schema:
+                $ref: '#/components/schemas/get_snapshot_200_response'
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+      - API Key: []
+      summary: Create Snapshot from URL
+      tags:
+      - Snapshot
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/snapshots/create-from-url\" \\\n  -X POST \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\n    \"url\" : \"https://example.com/disk_image.raw\",\n    \"description\" : \"Example Snapshot\",\n    \"uefi\": \"no\"\n  }'"
+      x-content-type: application/json
+      x-accepts: application/json
+      x-operation-id-source: normalized
+      x-operation-id-original: create-snapshot-create-from-url
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    snapshot:
+      title: snapshot
+      type: object
+      x-examples:
+        snapshot:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: '2020-10-10T01:56:20+00:00'
+          description: Example Snapshot
+          size: 42949672960
+          status: complete
+          os_id: 215
+          app_id: 0
+      description: Snapshot information.
+      x-tags:
+      - snapshot
+      properties:
+        id:
+          type: string
+          description: A unique ID for the Snapshot.
+        date_created:
+          type: string
+          description: The date this snapshot was created.
+        description:
+          type: string
+          description: The user-supplied description of the Snapshot.
+        size:
+          type: integer
+          description: The snapshot size in bytes.
+        status:
+          type: string
+          description: 'The Snapshot status.
+
+
+            * pending
+
+            * complete
+
+            * deleted'
+        os_id:
+          type: integer
+          description: The [Operating System id](#operation/list-os) for this Snapshot.
+        app_id:
+          type: integer
+          description: The [Application id](#operation/list-applications) for this snapshot.
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    get_snapshot_200_response:
+      example:
+        snapshot:
+          size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+      properties:
+        snapshot:
+          $ref: '#/components/schemas/snapshot_2'
+      type: object
+    create_snapshot_request:
+      properties:
+        instance_id:
+          description: Create a Snapshot for this [Instance id](#operation/list-instances).
+          type: string
+        description:
+          description: The user-supplied description of the Snapshot.
+          type: string
+      required:
+      - instance_id
+      type: object
+    snapshot_2:
+      description: Snapshot information.
+      example:
+        size: 0
+        date_created: date_created
+        os_id: 6
+        description: description
+        id: id
+        app_id: 1
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Snapshot.
+          type: string
+        date_created:
+          description: The date this snapshot was created.
+          type: string
+        description:
+          description: The user-supplied description of the Snapshot.
+          type: string
+        size:
+          description: The snapshot size in bytes.
+          type: integer
+        status:
+          description: 'The Snapshot status.
+
+
+            * pending
+
+            * complete
+
+            * deleted'
+          type: string
+        os_id:
+          description: The [Operating System id](#operation/list-os) for this Snapshot.
+          type: integer
+        app_id:
+          description: The [Application id](#operation/list-applications) for this snapshot.
+          type: integer
+      title: snapshot
+      type: object
+      x-examples:
+        snapshot:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          description: Example Snapshot
+          size: 42949672960
+          status: complete
+          os_id: 215
+          app_id: 0
+      x-tags:
+      - snapshot
+    create_snapshot_create_from_url_request:
+      properties:
+        url:
+          description: The public URL containing a RAW image.
+          type: string
+        description:
+          description: The user-supplied description of the Snapshot.
+          type: string
+        uefi:
+          description: Whether or not the snapshot uses UEFI.
+          type: string
+      required:
+      - url
+      type: object
+    put_snapshots_snapshot_id_request:
+      properties:
+        description:
+          description: The user-supplied description for the Snapshot.
+          type: string
+      required:
+      - description
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    list_snapshots_200_response:
+      example:
+        snapshots:
+        - size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+        - size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        snapshots:
+          items:
+            $ref: '#/components/schemas/snapshot_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    get_snapshot_200_response_2:
+      example:
+        snapshot:
+          size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+      properties:
+        snapshot:
+          $ref: '#/components/schemas/snapshot_3'
+      type: object
+    snapshot_3:
+      description: Snapshot information.
+      example:
+        size: 0
+        date_created: date_created
+        os_id: 6
+        description: description
+        id: id
+        app_id: 1
+        status: status
+      properties:
+        id:
+          description: A unique ID for the Snapshot.
+          type: string
+        date_created:
+          description: The date this snapshot was created.
+          type: string
+        description:
+          description: The user-supplied description of the Snapshot.
+          type: string
+        size:
+          description: The snapshot size in bytes.
+          type: integer
+        status:
+          description: 'The Snapshot status.
+
+
+            * pending
+
+            * complete
+
+            * deleted'
+          type: string
+        os_id:
+          description: The [Operating System id](#operation/list-os) for this Snapshot.
+          type: integer
+        app_id:
+          description: The [Application id](#operation/list-applications) for this snapshot.
+          type: integer
+      title: snapshot
+      type: object
+      x-examples:
+        snapshot:
+          id: cb676a46-66fd-4dfb-b839-443f2e6c0b60
+          date_created: 2020-10-10 01:56:20+00:00
+          description: Example Snapshot
+          size: 42949672960
+          status: complete
+          os_id: 215
+          app_id: 0
+      x-tags:
+      - snapshot
+    list_snapshots_200_response_2:
+      example:
+        snapshots:
+        - size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+        - size: 0
+          date_created: date_created
+          os_id: 6
+          description: description
+          id: id
+          app_id: 1
+          status: status
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+      properties:
+        snapshots:
+          items:
+            $ref: '#/components/schemas/snapshot_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml

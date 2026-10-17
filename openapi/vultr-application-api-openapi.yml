@@ -1,0 +1,417 @@
+openapi: 3.2.0
+info:
+  title: Vultr Application API
+  version: '2.0'
+  description: 'Operations tagged application across 3 of this provider''s published API definitions: vultr-schema-openapi.json, vultr-v2-openapi.yaml, vultr-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.vultr.com/v2
+security:
+- API Key: []
+tags:
+- name: Application
+  x-displayName: Applications
+  description: 'One-Click and Marketplace Applications are ready-to-run with minimal configuration. We have an extensive documentation library for our Applications.
+
+
+    There are two types of Applications: `marketplace` and `one-click`. This is denoted by the `type` field in the Application object. Applications with `type` of `marketplace` can be deployed by using the `image_id` while Applications with `type` of `one-click` should use the `id`.'
+paths:
+  /applications:
+    get:
+      summary: List Applications
+      x-codeSamples:
+      - lang: Curl
+        source: "curl \"https://api.vultr.com/v2/applications\" \\\n  -X GET \\\n  -H \"Authorization: Bearer ${VULTR_API_KEY}\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: ''
+                properties:
+                  applications:
+                    type: array
+                    description: ''
+                    items:
+                      $ref: '#/components/schemas/application'
+                  meta:
+                    $ref: '#/components/schemas/meta'
+              examples:
+                response:
+                  value:
+                    applications:
+                    - id: 1
+                      name: LEMP
+                      short_name: lemp
+                      deploy_name: LEMP on CentOS 6 x64
+                      type: one-click
+                      vendor: vultr
+                      image_id: ''
+                    - id: 1028
+                      name: OpenLiteSpeed WordPress
+                      short_name: openlitespeedwordpress
+                      deploy_name: OpenLiteSpeed WordPress on Ubuntu 20.04 x64
+                      type: marketplace
+                      vendor: LiteSpeed_Technologies
+                      image_id: openlitespeed-wordpress
+                    meta:
+                      total: 2
+                      links:
+                        next: ''
+                        prev: ''
+      operationId: list-applications
+      description: Get a list of all available Applications. This list can be filtered by `type`.
+      tags:
+      - Application
+      parameters:
+      - schema:
+          type: string
+        in: query
+        name: type
+        description: 'Filter the results by type.
+
+
+          |   | Type | Description |
+
+          | - | ------ | ------------- |
+
+          |   | all | All available application types |
+
+          |   | marketplace | Marketplace applications |
+
+          |   | one-click | Vultr One-Click applications |'
+      - schema:
+          type: integer
+        in: query
+        name: per_page
+        description: Number of items requested per page. Default is 100 and Max is 500.
+      - schema:
+          type: string
+        in: query
+        name: cursor
+        description: Cursor for paging. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination).
+      security: []
+    servers:
+    - url: https://api.vultr.com/v2
+components:
+  schemas:
+    meta:
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      properties:
+        total:
+          type: integer
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+        links:
+          type: object
+          description: Cursor values for pagination.
+          properties:
+            next:
+              type: string
+              description: Cursor value for the next page.
+            prev:
+              type: string
+              description: Cursor value for the previous page.
+    application:
+      title: application
+      type: object
+      x-examples:
+        application:
+        - id: 1
+          name: LEMP
+          short_name: lemp
+          deploy_name: LEMP on CentOS 6 x64
+          type: one-click
+          vendor: vultr
+          image_id: ''
+        - id: 10008
+          name: OpenLiteSpeed WordPress
+          short_name: ''
+          deploy_name: ''
+          type: marketplace
+          vendor: LiteSpeed_Technologies
+          image_id: openlitespeed-wordpress
+      description: Application information.
+      x-tags:
+      - application
+      properties:
+        id:
+          type: integer
+          description: A unique ID for the application.
+        name:
+          type: string
+          description: The application name.
+        short_name:
+          type: string
+          description: The short application name.
+        deploy_name:
+          type: string
+          description: A long description of the application.
+        type:
+          type: string
+          description: 'The type of application.
+
+
+            * one-click - use app_id to deploy one-click applications.
+
+            * marketplace - use image_id to deploy marketplace applications.'
+        vendor:
+          type: string
+          description: The application vendor name.
+        image_id:
+          type: string
+          description: A unique ID for marketplace applications.
+    list_applications_200_response:
+      description: ''
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        applications:
+        - vendor: vendor
+          name: name
+          deploy_name: deploy_name
+          short_name: short_name
+          id: 0
+          type: type
+          image_id: image_id
+        - vendor: vendor
+          name: name
+          deploy_name: deploy_name
+          short_name: short_name
+          id: 0
+          type: type
+          image_id: image_id
+      properties:
+        applications:
+          description: ''
+          items:
+            $ref: '#/components/schemas/application_2'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_2'
+      type: object
+    meta_links:
+      description: Cursor values for pagination.
+      example:
+        next: next
+        prev: prev
+      properties:
+        next:
+          description: Cursor value for the next page.
+          type: string
+        prev:
+          description: Cursor value for the previous page.
+          type: string
+      type: object
+    meta_2:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    application_2:
+      description: Application information.
+      example:
+        vendor: vendor
+        name: name
+        deploy_name: deploy_name
+        short_name: short_name
+        id: 0
+        type: type
+        image_id: image_id
+      properties:
+        id:
+          description: A unique ID for the application.
+          type: integer
+        name:
+          description: The application name.
+          type: string
+        short_name:
+          description: The short application name.
+          type: string
+        deploy_name:
+          description: A long description of the application.
+          type: string
+        type:
+          description: 'The type of application.
+
+
+            * one-click - use app_id to deploy one-click applications.
+
+            * marketplace - use image_id to deploy marketplace applications.'
+          type: string
+        vendor:
+          description: The application vendor name.
+          type: string
+        image_id:
+          description: A unique ID for marketplace applications.
+          type: string
+      title: application
+      type: object
+      x-examples:
+        application:
+        - id: 1
+          name: LEMP
+          short_name: lemp
+          deploy_name: LEMP on CentOS 6 x64
+          type: one-click
+          vendor: vultr
+          image_id: ''
+        - id: 10008
+          name: OpenLiteSpeed WordPress
+          short_name: ''
+          deploy_name: ''
+          type: marketplace
+          vendor: LiteSpeed_Technologies
+          image_id: openlitespeed-wordpress
+      x-tags:
+      - application
+    list_applications_200_response_2:
+      description: ''
+      example:
+        meta:
+          total: 0
+          links:
+            next: next
+            prev: prev
+        applications:
+        - vendor: vendor
+          name: name
+          deploy_name: deploy_name
+          short_name: short_name
+          id: 0
+          type: type
+          image_id: image_id
+        - vendor: vendor
+          name: name
+          deploy_name: deploy_name
+          short_name: short_name
+          id: 0
+          type: type
+          image_id: image_id
+      properties:
+        applications:
+          description: ''
+          items:
+            $ref: '#/components/schemas/application_3'
+          type: array
+        meta:
+          $ref: '#/components/schemas/meta_3'
+      type: object
+    meta_3:
+      description: The meta information object. See [Meta and Pagination](#section/Introduction/Meta-and-Pagination) for more information.
+      example:
+        total: 0
+        links:
+          next: next
+          prev: prev
+      properties:
+        total:
+          description: Total objects available in the list. This value may be greater than the number of objects returned if `per_page` is set.
+          type: integer
+        links:
+          $ref: '#/components/schemas/meta_links'
+      title: meta
+      type: object
+      x-examples:
+        meta response:
+          meta:
+            total: 31
+            links:
+              next: WxYzExampleNext
+              prev: ''
+    application_3:
+      description: Application information.
+      example:
+        vendor: vendor
+        name: name
+        deploy_name: deploy_name
+        short_name: short_name
+        id: 0
+        type: type
+        image_id: image_id
+      properties:
+        id:
+          description: A unique ID for the application.
+          type: integer
+        name:
+          description: The application name.
+          type: string
+        short_name:
+          description: The short application name.
+          type: string
+        deploy_name:
+          description: A long description of the application.
+          type: string
+        type:
+          description: 'The type of application.
+
+
+            * one-click - use app_id to deploy one-click applications.
+
+            * marketplace - use image_id to deploy marketplace applications.'
+          type: string
+        vendor:
+          description: The application vendor name.
+          type: string
+        image_id:
+          description: A unique ID for marketplace applications.
+          type: string
+      title: application
+      type: object
+      x-examples:
+        application:
+        - id: 1
+          name: LEMP
+          short_name: lemp
+          deploy_name: LEMP on CentOS 6 x64
+          type: one-click
+          vendor: vultr
+          image_id: ''
+        - id: 10008
+          name: OpenLiteSpeed WordPress
+          short_name: ''
+          deploy_name: ''
+          type: marketplace
+          vendor: LiteSpeed_Technologies
+          image_id: openlitespeed-wordpress
+      x-tags:
+      - application
+  securitySchemes:
+    API_Key:
+      type: http
+      scheme: bearer
+      in: header
+      description: "The Vultr API v2 uses API keys for authentication. You can manage your API keys in the Vultr customer portal. Please do not share API keys publicly, or embed them in client-side code. It is a good security practice to restrict their use by IP address in the [customer portal](https://my.vultr.com/settings/#settingsapi).\n\nTo authenticate a request, send your API Key as a bearer token in the request header.\n\n### Authentication Example\n\n    curl \"https://api.vultr.com/v2/account\" \\\n      -X GET \\\n      -H \"Authorization: Bearer ${VULTR_API_KEY}\"\n\nUnauthenticated API requests will fail. All requests must use HTTPS encryption for security, and calls made with HTTP will fail."
+x-refined-from:
+- vultr-schema-openapi.json
+- vultr-v2-openapi.yaml
+- vultr-openapi.yml
