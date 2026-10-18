@@ -15,6 +15,16 @@ tags:
 - Compute
 - Object Storage
 - Kubernetes
+- Database
+- GPU
+- MCP
+tags_raw:
+- Company
+- Cloud
+- Infrastructure
+- Compute
+- Object Storage
+- Kubernetes
 - Databases
 - GPU
 - MCP
@@ -81,6 +91,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Account
+  tags_raw:
   - account
   properties:
   - type: OpenAPI
@@ -122,6 +134,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Application
+  tags_raw:
   - application
   properties:
   - type: OpenAPI
@@ -161,6 +175,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Backup
+  tags_raw:
   - backup
   properties:
   - type: OpenAPI
@@ -197,6 +213,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Bare Metal
+  tags_raw:
   - baremetal
   properties:
   - type: OpenAPI
@@ -232,6 +250,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Billing
+  tags_raw:
   - billing
   properties:
   - type: OpenAPI
@@ -270,6 +290,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Block
+  tags_raw:
   - block
   properties:
   - type: OpenAPI
@@ -342,6 +364,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - DNS
+  tags_raw:
   - dns
   properties:
   - type: OpenAPI
@@ -379,6 +403,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Firewall
+  tags_raw:
   - firewall
   properties:
   - type: OpenAPI
@@ -792,6 +818,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Instances
+  tags_raw:
   - instances
   properties:
   - type: OpenAPI
@@ -828,6 +856,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - ISO
+  tags_raw:
   - iso
   properties:
   - type: OpenAPI
@@ -862,6 +892,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Kubernetes
+  tags_raw:
   - kubernetes
   properties:
   - type: OpenAPI
@@ -899,6 +931,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Load Balancer
+  tags_raw:
   - load-balancer
   properties:
   - type: OpenAPI
@@ -969,6 +1003,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Managed Database
+  tags_raw:
   - managed-databases
   properties:
   - type: OpenAPI
@@ -1071,6 +1107,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Organization
+  tags_raw:
   - Organizations
   properties:
   - type: OpenAPI
@@ -1107,6 +1145,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Os
+  tags_raw:
   - os
   properties:
   - type: OpenAPI
@@ -1144,6 +1184,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Plans
+  tags_raw:
   - plans
   properties:
   - type: OpenAPI
@@ -1182,6 +1224,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Private Networks
+  tags_raw:
   - private Networks
   properties:
   - type: OpenAPI
@@ -1219,6 +1263,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Region
+  tags_raw:
   - region
   properties:
   - type: OpenAPI
@@ -1293,6 +1339,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - S3
+  tags_raw:
   - s3
   properties:
   - type: OpenAPI
@@ -1434,6 +1482,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Snapshot
+  tags_raw:
   - snapshot
   properties:
   - type: OpenAPI
@@ -1472,6 +1522,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - SSH
+  tags_raw:
   - ssh
   properties:
   - type: OpenAPI
@@ -1510,6 +1562,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - Startups
+  tags_raw:
   - startup
   properties:
   - type: OpenAPI
@@ -1581,6 +1635,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - User
+  tags_raw:
   - users
   properties:
   - type: OpenAPI
@@ -1657,6 +1713,8 @@ apis:
   humanURL: https://docs.vultr.com
   baseURL: https://api.vultr.com/v2
   tags:
+  - VPC
+  tags_raw:
   - VPCs
   properties:
   - type: OpenAPI
