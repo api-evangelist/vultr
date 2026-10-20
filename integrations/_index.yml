@@ -96,3 +96,157 @@
     detected: '2026-10-19'
   status: not-a-workflow
   arazzo: null
+- slug: vultr-peeringdb-interconnection-register
+  label: PeeringDB (interconnection register)
+  partner_name: PeeringDB (interconnection register)
+  category: network interconnection register
+  type: register
+  channel: standard-directory
+  evidence: https://www.peeringdb.com/net/813
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: PeeringDB (peeringdb.com/api net, ix, fac, org)
+    standard: null
+    spec_file: null
+    role: peeringdb-network
+    registered_name: The Constant Company
+    register_id: https://www.peeringdb.com/net/813
+    matched_domain: vultr.com
+    matched_by: domain
+    asns:
+    - 20473
+    info_types:
+    - NSP
+    ix_presence: 65
+    exchanges_operated: []
+    facilities_operated: 0
+    signal_note: 'participation only: PeeringDB is self-registered by network operators; ASNs, IX presence and facility
+      counts are context, never counted'
+    detected_by: sweep-network-edge.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
+- slug: vultr-manrs-mutually-agreed-norms-for-routing-security
+  label: MANRS (Mutually Agreed Norms for Routing Security)
+  partner_name: MANRS (Mutually Agreed Norms for Routing Security)
+  category: routing-security programme
+  type: register
+  channel: standard-directory
+  evidence: https://manrs.org/participant/019eccd4-bc10-706b-a373-2e395a2fd04b
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: MANRS participants (manrs.org netops / cdn-cloud-providers / ixps / equipment-vendors)
+    standard: MANRS
+    spec_file: null
+    role: manrs-participant
+    registered_name: Vultr
+    register_id: https://manrs.org/participant/019eccd4-bc10-706b-a373-2e395a2fd04b
+    matched_domain: vultr.com
+    matched_by: domain
+    domain_source: peeringdb net website for AS20473
+    certified_products:
+    - product: MANRS CDN and Cloud Providers
+      program: cdn-cloud-providers
+      lapsed: false
+      approved: '2020-06-12'
+    signal_note: certified_products = one entry per MANRS programme admitted to (reviewed against the programme's
+      actions), never per ASN; ASNs are context. The tables list current participants only, so lapsed is always
+      false
+    detected_by: sweep-network-edge.py
+    detected: '2026-10-20'
+    identity_source: peeringdb net website by the participant's ASN (labelled provenance step)
+  status: not-a-workflow
+  arazzo: null
+- slug: vultr-homebrew
+  label: Homebrew
+  partner: homebrew
+  partner_name: Homebrew
+  category: official CLI (Homebrew)
+  type: register
+  channel: package-registry
+  evidence: https://formulae.brew.sh/formula/vultr-cli
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: Homebrew (public package index)
+    spec_file: null
+    packages:
+    - name: vultr-cli
+      kind: formula
+      version: 3.11.0
+      released: null
+      lapsed: false
+      page: https://formulae.brew.sh/formula/vultr-cli
+      cli: 'formula desc: Command-line tool for Vultr services'
+      repo_leg: github-org:vultr
+      publisher_leg: artifact-github-org:vultr
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
+- slug: vultr-scoop
+  label: Scoop
+  partner_name: Scoop
+  category: official CLI (Scoop)
+  type: register
+  channel: package-registry
+  evidence: https://github.com/ScoopInstaller/Main/blob/master/bucket/vultr.json
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: Scoop (public package index)
+    spec_file: null
+    packages:
+    - name: vultr
+      kind: main
+      version: 3.11.0
+      released: null
+      lapsed: false
+      page: https://github.com/ScoopInstaller/Main/blob/master/bucket/vultr.json
+      cli: 'scoop description: The official Vultr CLI tool.'
+      repo_leg: github-org:vultr
+      publisher_leg: artifact-github-org:vultr
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
+- slug: vultr-winget-windows-package-manager
+  label: winget (Windows Package Manager)
+  partner_name: winget (Windows Package Manager)
+  category: official CLI (winget (Windows Package Manager))
+  type: register
+  channel: package-registry
+  evidence: https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/Vultr/CLI
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: winget (Windows Package Manager) (public package index)
+    spec_file: null
+    packages:
+    - name: Vultr.CLI
+      kind: manifest
+      version: 3.4.0
+      released: '2024-10-31'
+      lapsed: false
+      page: https://github.com/microsoft/winget-pkgs/tree/master/manifests/v/Vultr/CLI
+      cli: 'winget: Official command line tool for Vultr services'
+      repo_leg: github-org:vultr
+      publisher_leg: artifact-github-org:vultr
+      matched_by: github-org
+    current: true
+    signal_note: 'the provider''s own command-line tool on a package manager: distribution, not an integration;
+      lapsed = no release in 24 months or deprecated / disabled by the manager'
+    detected_by: sweep-official-clis.py
+    detected: '2026-10-20'
+  status: not-a-workflow
+  arazzo: null
