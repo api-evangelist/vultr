@@ -33,6 +33,7 @@ checked:
 - https://www.raycast.com/api/v1/store_listings
 - artifact-hub/integrations/artifact-hub-integration-edges.yml
 - ansible/integrations/ansible-integration-edges.yml
+- hugging-face/integrations/hugging-face-integration-edges.yml
 summary: null
 marketplace_apps: []
 edges:
@@ -474,4 +475,31 @@ edges:
   category: configuration-management content listing (Ansible collection)
   badges:
   - Verified publisher (GitHub domain-verified organization)
+- partner_name: Hugging Face (hugging-face-hub)
+  partner: hugging-face
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: hugging-face-hub
+  evidence: https://huggingface.co/vultr
+  mirror_of: hugging-face/integrations/hugging-face-integration-edges.yml
+  apps:
+  - vultr/VultronRetrieverPrime-Qwen3.5-8B
+  - vultr/VultronRetrieverFlash-Qwen3.5-0.8B
+  - vultr/Qwen3.6-35B-A3B-GGUF
+  - vultr/Qwen3.6-27B-GGUF
+  - vultr/VultronRetrieverCore-Qwen3.5-4.5B
+  - vultr/Qwen3.8-27B-GGUF
+  - vultr/GLM-5.3-Flash-GGUF
+  - vultr/Step-3.7-Flash-GGUF
+  - vultr
+  listing_count: 2
+  detected: '2026-10-23'
+  detected_by: mirror-platform-listings.py
+  category: Hugging Face Hub models
+  badges:
+  - Verified publisher (Hugging Face verified organisation)
 templates: []
